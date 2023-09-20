@@ -6,4 +6,6 @@ data class Profile(
     val nickname: String = "",
     val email: String = "",
     val profileImageUrl: String = "",
+    val tripHistory: List<TripHistory> = emptyList(),
+    val favorites: List<Trip> = emptyList()
 )
