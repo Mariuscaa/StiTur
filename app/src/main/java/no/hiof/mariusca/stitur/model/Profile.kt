@@ -6,6 +6,13 @@ data class Profile(
     val nickname: String = "",
     val email: String = "",
     val profileImageUrl: String = "",
+
+    // Connected properties
+    val personalRanking: PersonalRanking,
+    val friends: List<String> = emptyList(),
+    val sentInvites: List<Friendship> = emptyList(),
+    val receivedInvites: List<Friendship> = emptyList(),
     val tripHistory: List<TripHistory> = emptyList(),
-    val favorites: List<Trip> = emptyList()
+    val favorites: List<Trip> = emptyList(),
+    val geoTreasures: List<GeoTreasure> = emptyList()
 )
