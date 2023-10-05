@@ -22,12 +22,16 @@ android {
     }
 
     buildTypes {
+        debug {
+            resValue("string", "google_maps_api_key", System.getenv("MAPS_API_KEY"))
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            resValue("string", "google_maps_api_key", System.getenv("MAPS_API_KEY"))
         }
     }
     compileOptions {
