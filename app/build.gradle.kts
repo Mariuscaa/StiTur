@@ -51,8 +51,16 @@ android {
     }
 }
 
+
+
+
 dependencies {
 
+    implementation("com.google.dagger:hilt-android:2.47")
+    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
+    implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("androidx.navigation:navigation-compose:2.7.2")
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
@@ -66,6 +74,7 @@ dependencies {
     implementation("com.google.maps.android:maps-compose:2.14.1")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("com.google.firebase:firebase-firestore-ktx:24.8.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
