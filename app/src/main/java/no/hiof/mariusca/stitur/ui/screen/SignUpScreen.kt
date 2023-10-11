@@ -1,4 +1,4 @@
-package no.hiof.mariusca.stitur.signup
+package no.hiof.mariusca.stitur.ui.screen
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import no.hiof.mariusca.stitur.R
+import no.hiof.mariusca.stitur.signup.SignUpViewModel
 
 @Composable
 fun SignUpScreen(loggedIn: () -> Unit,

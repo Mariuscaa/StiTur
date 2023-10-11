@@ -25,6 +25,7 @@ import androidx.navigation.compose.rememberNavController
 import no.hiof.mariusca.stitur.ui.screen.SettingsScreen
 import no.hiof.mariusca.stitur.ui.screen.TempStartPage
 import no.hiof.mariusca.stitur.ui.screen.map.StiturMapScreen
+import no.hiof.mariusca.stitur.ui.screen.SignUpScreen
 
 @Composable
 fun HomeScreen() {
@@ -56,6 +57,14 @@ fun NavigationApp() {
                         contentDescription = "Home button"
                     )
                 }
+                //Signuo
+                IconButton(onClick = { navController.navigate(Screen.TempStartPage.name) }) {
+                    Icon(
+                        imageVector = Icons.Filled.Home,
+                        contentDescription = "Home button"
+                    )
+                }
+                //Signuo
                 IconButton(onClick = { navController.navigate(Screen.StiturMap.name) }) {
                     Icon(
                         imageVector = Icons.Filled.AccountBox,
@@ -87,6 +96,10 @@ fun NavigationApp() {
             composable(Screen.Settings.name) {
                 SettingsScreen()
             }
+            //composable(Screen.) {
+            //    SignUpScreen(navController)
+            //}
+            // Jeg holder på å legge til Signup i menyen.
         }
     }
 }
