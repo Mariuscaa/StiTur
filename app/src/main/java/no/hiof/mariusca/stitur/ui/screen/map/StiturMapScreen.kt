@@ -111,3 +111,5 @@ fun StiturMap() {
         Marker(MarkerState(position = halden), title = "Halden", snippet = "Marker in Halden.")
     }
 }
+
+
