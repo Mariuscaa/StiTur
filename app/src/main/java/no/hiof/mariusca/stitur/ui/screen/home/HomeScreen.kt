@@ -1,37 +1,25 @@
 package no.hiof.mariusca.stitur.ui.screen.home
 
-import android.util.Log
-import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -40,7 +28,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import no.hiof.mariusca.stitur.R
 import no.hiof.mariusca.stitur.ui.screen.LeaderboardScreen
-import no.hiof.mariusca.stitur.ui.screen.SettingsScreen
+import no.hiof.mariusca.stitur.ui.screen.SignUpScreen
 import no.hiof.mariusca.stitur.ui.screen.TempStartPage
 import no.hiof.mariusca.stitur.ui.screen.map.StiturMapScreen
 
@@ -57,6 +45,8 @@ sealed class Screen(val route: String, @StringRes val title: Int, val icon: Imag
     object Leaderboard : Screen("leaderboard", R.string.leaderboard, Icons.Default.Star)
     object StiturMap : Screen("maps", R.string.stiturMap, Icons.Default.LocationOn)
     object Profile : Screen("profile", R.string.profile, Icons.Default.AccountCircle)
+
+    object SignUp : Screen("SignUp", R.string.SignUp, Icons.Default.AccountCircle)
 }
 
 
@@ -64,7 +54,7 @@ sealed class Screen(val route: String, @StringRes val title: Int, val icon: Imag
 @Composable
 fun NavigationApp() {
     val navController = rememberNavController()
-
+    //val signUpViewModel: SignUpViewModel = hiltViewModel()
     val bottomNavigationScreen = listOf(
         Screen.Leaderboard,
         Screen.StiturMap,
@@ -104,7 +94,9 @@ fun NavigationApp() {
 
                 }
 
-
+                composable(Screen.SignUp.route) {
+                    SignUpScreen()
+                }
 
 
             }
