@@ -38,17 +38,19 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import no.hiof.mariusca.stitur.R
 import no.hiof.mariusca.stitur.signup.SignUpViewModel
 
+
 @Composable
-fun SignUpScreen(loggedIn: () -> Unit,
+fun SignUpScreen(
     modifier: Modifier = Modifier,
     viewModel: SignUpViewModel = hiltViewModel()
+
 ) {
     val uiState by viewModel.uiState
     val isAnonymous by viewModel.isAnonymous.collectAsState(initial = true)
-
     val fieldModifier = Modifier
         .fillMaxWidth()
         .padding(16.dp, 4.dp)
+
 
     if (isAnonymous) {
         Column(
@@ -70,14 +72,14 @@ fun SignUpScreen(loggedIn: () -> Unit,
 
             Row {
                 Button(
-                    onClick = { viewModel.onLoginClick(loggedIn) },
+                    onClick = { viewModel.onLoginClick() },
                     modifier = Modifier
                         .padding(16.dp, 8.dp),
                 ) {
                     Text(text = stringResource(R.string.login), fontSize = 16.sp)
                 }
                 Button(
-                    onClick = { viewModel.onSignUpClick(loggedIn) },
+                    onClick = { viewModel.onSignUpClick() },
                     modifier = Modifier
                         .padding(16.dp, 8.dp),
                 ) {

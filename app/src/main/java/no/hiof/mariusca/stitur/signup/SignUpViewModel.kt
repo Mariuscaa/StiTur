@@ -7,13 +7,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import no.hiof.mariusca.stitur.R
-import no.hiof.mariusca.stitur.service.module.AccountService
 import no.hiof.mariusca.stitur.common.ext.isValidEmail
 import no.hiof.mariusca.stitur.common.ext.isValidPassword
+import no.hiof.mariusca.stitur.service.module.AccountService
 import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(private val accountService: AccountService, ) : ViewModel() {
+
     var uiState = mutableStateOf(SignUpUiState())
         private set
 
@@ -36,7 +37,7 @@ class SignUpViewModel @Inject constructor(private val accountService: AccountSer
         uiState.value = uiState.value.copy(repeatPassword = newValue)
     }
 
-    fun onLoginClick(loggedIn: () -> Unit) {
+    fun onLoginClick() {
         if (!email.isValidEmail()) {
             uiState.value = uiState.value.copy(errorMessage = R.string.email_error)
             return
@@ -46,21 +47,22 @@ class SignUpViewModel @Inject constructor(private val accountService: AccountSer
             uiState.value = uiState.value.copy(errorMessage = R.string.password_error)
             return
         }
-
-        viewModelScope.launch {
-            try {
-                accountService.authenticate(email, password) { error ->
-                    if (error == null)
-                        loggedIn()
+        /*
+                viewModelScope.launch {
+                    try {
+                        accountService.authenticate(email, password) { error ->
+                            if (error == null)
+                            return@authenticate
+                        }
+                    }
+                    catch(e: Exception) {
+                        uiState.value = uiState.value.copy(errorMessage = R.string.could_not_log_in)
+                    }
                 }
-            }
-            catch(e: Exception) {
-                uiState.value = uiState.value.copy(errorMessage = R.string.could_not_log_in)
-            }
-        }
+                */
     }
 
-    fun onSignUpClick(loggedIn: () -> Unit) {
+    fun onSignUpClick() {
         if (!email.isValidEmail()) {
             uiState.value = uiState.value.copy(errorMessage = R.string.email_error)
             return
@@ -75,18 +77,19 @@ class SignUpViewModel @Inject constructor(private val accountService: AccountSer
             uiState.value = uiState.value.copy(errorMessage = R.string.password_match_error)
             return
         }
-
-        viewModelScope.launch {
-            try {
-                accountService.linkAccount(email, password) { error ->
-                    if (error == null)
-                        loggedIn()
+        /*
+                viewModelScope.launch {
+                    try {
+                        accountService.linkAccount(email, password) { error ->
+                            if (error == null)
+                                return@linkAccount
+                        }
+                    }
+                    catch(e: Exception) {
+                        uiState.value = uiState.value.copy(errorMessage = R.string.could_not_create_account)
+                    }
                 }
-            }
-            catch(e: Exception) {
-                uiState.value = uiState.value.copy(errorMessage = R.string.could_not_create_account)
-            }
-        }
+                */
     }
 
     fun onSignOutClick() {
