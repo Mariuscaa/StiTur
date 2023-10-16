@@ -10,8 +10,10 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -20,7 +22,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -33,6 +37,9 @@ import no.hiof.mariusca.stitur.ui.screen.LeaderboardScreen
 import no.hiof.mariusca.stitur.ui.screen.ProfileScreen
 import no.hiof.mariusca.stitur.ui.screen.SignUpScreen
 import no.hiof.mariusca.stitur.ui.screen.map.StiturMapScreen
+import no.hiof.mariusca.stitur.ui.screen.WeatherScreen
+
+
 
 @Composable
 fun HomeScreen() {
@@ -47,6 +54,7 @@ sealed class Screen(val route: String, @StringRes val title: Int, val icon: Imag
     object Leaderboard : Screen("leaderboard", R.string.leaderboard, Icons.Default.Star)
     object StiturMap : Screen("maps", R.string.stiturMap, Icons.Default.LocationOn)
     object Profile : Screen("profile", R.string.profile, Icons.Default.AccountCircle)
+    object Weather : Screen("weather", R.string.profile, Icons.Default.AccountCircle)
 
     object SignUp : Screen("SignUp", R.string.SignUp, Icons.Default.AccountCircle)
     object GeoTreasure : Screen("GeoTreasure", R.string.SignUp, Icons.Default.Favorite)
@@ -75,13 +83,21 @@ fun NavigationApp() {
         ) {
             NavHost(
                 navController = navController,
-                startDestination = Screen.Profile.route
+                startDestination = Screen.Profile.route /*, modifier = Modifier.padding(innerPadding)*/
+
+
             ) {
                 composable(Screen.Leaderboard.route) {
                     LeaderboardScreen()
                 }
                 composable(Screen.StiturMap.route) {
-                    StiturMapScreen()
+
+                    //Text("Profile", modifier = Modifier.padding(innerPadding))
+                    StiturMapScreen(weatherIconClicked = {
+                        navController.navigate(Screen.Weather.route)
+                    })
+
+
                 }
                 composable(Screen.Profile.route) {
                     ProfileScreen()
@@ -90,9 +106,16 @@ fun NavigationApp() {
                     SignUpScreen()
                 }
 
+
+                composable(Screen.Weather.route) {
+                    WeatherScreen()
+                }
+
+
                 composable(Screen.GeoTreasure.route) {
                     GeoTreasureScreen()
                 }
+
 
             }
         }
@@ -114,7 +137,12 @@ fun BottomNavBar(navController: NavController, bottomNavigationScreen: List<Scre
                             saveState = true
                         }
                         launchSingleTop = true
-                        restoreState = true
+
+
+                        //restoreState = true
+
+
+
                     }
                 },
                 icon = { Icon(imageVector = screen.icon, contentDescription = "Icon") },

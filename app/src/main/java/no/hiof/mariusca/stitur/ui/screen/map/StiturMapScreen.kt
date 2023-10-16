@@ -2,10 +2,16 @@ package no.hiof.mariusca.stitur.ui.screen.map
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,22 +35,30 @@ import com.google.maps.android.data.geojson.GeoJsonLayer
 import com.google.maps.android.data.geojson.GeoJsonLineStringStyle
 import no.hiof.mariusca.stitur.R
 
+
+
 @Composable
-fun StiturMapScreen() {
+fun StiturMapScreen(weatherIconClicked: () -> Unit) {
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
         StiturMap()
 
-        Image(
-            painter = painterResource(id = R.drawable.ic_weathericon),
-            contentDescription = "Weather icon",
-            modifier = Modifier
-                .size(48.dp)
-                .align(Alignment.TopStart)
-                .padding(10.dp,10.dp,0.dp)
 
-        )
+        IconButton(onClick = weatherIconClicked) {
+
+                Image(
+                    painter = painterResource(id = R.drawable.ic_weathericon),
+                    contentDescription = "Weather icon",
+                    modifier = Modifier
+                        .size(48.dp)
+                        .align(Alignment.TopStart)
+                        .padding(10.dp, 10.dp, 0.dp)
+
+                )
+
+        }
     }
 }
 
