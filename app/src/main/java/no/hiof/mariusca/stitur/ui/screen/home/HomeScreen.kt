@@ -30,12 +30,13 @@ import androidx.navigation.compose.rememberNavController
 import no.hiof.mariusca.stitur.R
 import no.hiof.mariusca.stitur.ui.screen.GeoTreasureScreen
 import no.hiof.mariusca.stitur.ui.screen.LeaderboardScreen
+import no.hiof.mariusca.stitur.ui.screen.ProfileScreen
 import no.hiof.mariusca.stitur.ui.screen.SignUpScreen
-import no.hiof.mariusca.stitur.ui.screen.TempStartPage
 import no.hiof.mariusca.stitur.ui.screen.map.StiturMapScreen
 
 @Composable
 fun HomeScreen() {
+
     Column (horizontalAlignment = Alignment.CenterHorizontally) {
         NavigationApp()
     }
@@ -62,39 +63,29 @@ fun NavigationApp() {
         Screen.StiturMap,
         Screen.Profile,
         Screen.GeoTreasure
+
     )
 
     Scaffold(bottomBar = { BottomNavBar(navController, bottomNavigationScreen) }) { innerPadding ->
-
-
         Box(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize(),
             contentAlignment = Alignment.BottomCenter
         ) {
-
-
             NavHost(
                 navController = navController,
                 startDestination = Screen.Profile.route
             ) {
                 composable(Screen.Leaderboard.route) {
                     LeaderboardScreen()
-
                 }
-
                 composable(Screen.StiturMap.route) {
                     StiturMapScreen()
-
-
                 }
-
                 composable(Screen.Profile.route) {
-                    TempStartPage()
-
+                    ProfileScreen()
                 }
-
                 composable(Screen.SignUp.route) {
                     SignUpScreen()
                 }
@@ -119,22 +110,16 @@ fun BottomNavBar(navController: NavController, bottomNavigationScreen: List<Scre
             NavigationBarItem(selected = currentDeestination == screen.route,
                 onClick = {
                     navController.navigate(screen.route) {
-
                         popUpTo(navController.graph.findStartDestination().id) {
-                        saveState = true
+                            saveState = true
                         }
                         launchSingleTop = true
-
                         restoreState = true
-
-
                     }
-
                 },
                 icon = { Icon(imageVector = screen.icon, contentDescription = "Icon") },
                 label = {
                     Text(title)
-
                 }
             )
         }

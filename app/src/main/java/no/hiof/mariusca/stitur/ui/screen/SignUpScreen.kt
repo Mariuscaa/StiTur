@@ -43,14 +43,12 @@ import no.hiof.mariusca.stitur.signup.SignUpViewModel
 fun SignUpScreen(
     modifier: Modifier = Modifier,
     viewModel: SignUpViewModel = hiltViewModel()
-
 ) {
     val uiState by viewModel.uiState
     val isAnonymous by viewModel.isAnonymous.collectAsState(initial = true)
     val fieldModifier = Modifier
         .fillMaxWidth()
         .padding(16.dp, 4.dp)
-
 
     if (isAnonymous) {
         Column(
