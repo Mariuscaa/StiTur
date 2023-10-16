@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,6 +28,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import no.hiof.mariusca.stitur.R
+import no.hiof.mariusca.stitur.ui.screen.GeoTreasureScreen
 import no.hiof.mariusca.stitur.ui.screen.LeaderboardScreen
 import no.hiof.mariusca.stitur.ui.screen.ProfileScreen
 import no.hiof.mariusca.stitur.ui.screen.SignUpScreen
@@ -34,8 +36,8 @@ import no.hiof.mariusca.stitur.ui.screen.map.StiturMapScreen
 
 @Composable
 fun HomeScreen() {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        //Text(text = "Navigation page")
+
+    Column (horizontalAlignment = Alignment.CenterHorizontally) {
         NavigationApp()
     }
 }
@@ -47,6 +49,7 @@ sealed class Screen(val route: String, @StringRes val title: Int, val icon: Imag
     object Profile : Screen("profile", R.string.profile, Icons.Default.AccountCircle)
 
     object SignUp : Screen("SignUp", R.string.SignUp, Icons.Default.AccountCircle)
+    object GeoTreasure : Screen("GeoTreasure", R.string.SignUp, Icons.Default.Favorite)
 }
 
 
@@ -56,7 +59,11 @@ fun NavigationApp() {
     val navController = rememberNavController()
     //val signUpViewModel: SignUpViewModel = hiltViewModel()
     val bottomNavigationScreen = listOf(
-        Screen.Leaderboard, Screen.StiturMap, Screen.Profile
+        Screen.Leaderboard,
+        Screen.StiturMap,
+        Screen.Profile,
+        Screen.GeoTreasure
+
     )
 
     Scaffold(bottomBar = { BottomNavBar(navController, bottomNavigationScreen) }) { innerPadding ->
@@ -68,7 +75,7 @@ fun NavigationApp() {
         ) {
             NavHost(
                 navController = navController,
-                startDestination = Screen.Leaderboard.route /*, modifier = Modifier.padding(innerPadding)*/
+                startDestination = Screen.Profile.route
             ) {
                 composable(Screen.Leaderboard.route) {
                     LeaderboardScreen()
@@ -82,6 +89,11 @@ fun NavigationApp() {
                 composable(Screen.SignUp.route) {
                     SignUpScreen()
                 }
+
+                composable(Screen.GeoTreasure.route) {
+                    GeoTreasureScreen()
+                }
+
             }
         }
     }

@@ -84,6 +84,13 @@ fun SignUpScreen(
                     Text(text = stringResource(R.string.create_account), fontSize = 16.sp)
                 }
             }
+            Button(
+                onClick = {viewModel.createAnonymousAccount()},
+                modifier = Modifier
+                    .padding(16.dp, 8.dp),)
+            {
+                Text(text = ("Continue as Anonymous"), fontSize = 16.sp)
+            }
         }
     }
     else {
