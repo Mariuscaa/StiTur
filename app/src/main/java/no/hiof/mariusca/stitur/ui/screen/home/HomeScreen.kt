@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
@@ -31,9 +32,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import no.hiof.mariusca.stitur.R
+import no.hiof.mariusca.stitur.ui.screen.GeoTreasureScreen
 import no.hiof.mariusca.stitur.ui.screen.LeaderboardScreen
+import no.hiof.mariusca.stitur.ui.screen.ProfileScreen
 import no.hiof.mariusca.stitur.ui.screen.SignUpScreen
-import no.hiof.mariusca.stitur.ui.screen.TempStartPage
 import no.hiof.mariusca.stitur.ui.screen.map.StiturMapScreen
 import no.hiof.mariusca.stitur.ui.screen.WeatherScreen
 
@@ -41,8 +43,8 @@ import no.hiof.mariusca.stitur.ui.screen.WeatherScreen
 
 @Composable
 fun HomeScreen() {
+
     Column (horizontalAlignment = Alignment.CenterHorizontally) {
-        //Text(text = "Navigation page")
         NavigationApp()
     }
 }
@@ -55,6 +57,7 @@ sealed class Screen(val route: String, @StringRes val title: Int, val icon: Imag
     object Weather : Screen("weather", R.string.profile, Icons.Default.AccountCircle)
 
     object SignUp : Screen("SignUp", R.string.SignUp, Icons.Default.AccountCircle)
+    object GeoTreasure : Screen("GeoTreasure", R.string.SignUp, Icons.Default.Favorite)
 }
 
 
@@ -66,52 +69,52 @@ fun NavigationApp() {
     val bottomNavigationScreen = listOf(
         Screen.Leaderboard,
         Screen.StiturMap,
-        Screen.Profile
+        Screen.Profile,
+        Screen.GeoTreasure
+
     )
 
     Scaffold(bottomBar = { BottomNavBar(navController, bottomNavigationScreen) }) { innerPadding ->
-
-
         Box(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize(),
             contentAlignment = Alignment.BottomCenter
         ) {
-
-
             NavHost(
                 navController = navController,
                 startDestination = Screen.Profile.route /*, modifier = Modifier.padding(innerPadding)*/
+
+
             ) {
                 composable(Screen.Leaderboard.route) {
                     LeaderboardScreen()
-
                 }
-
                 composable(Screen.StiturMap.route) {
+
                     //Text("Profile", modifier = Modifier.padding(innerPadding))
                     StiturMapScreen(weatherIconClicked = {
                         navController.navigate(Screen.Weather.route)
                     })
 
-                }
 
+                }
                 composable(Screen.Profile.route) {
-                    //Text("Favourites", modifier = Modifier.padding(innerPadding))
-                    TempStartPage()
-
+                    ProfileScreen()
                 }
-
                 composable(Screen.SignUp.route) {
                     SignUpScreen()
                 }
+
 
                 composable(Screen.Weather.route) {
                     WeatherScreen()
                 }
 
 
+                composable(Screen.GeoTreasure.route) {
+                    GeoTreasureScreen()
+                }
 
 
             }
@@ -130,99 +133,23 @@ fun BottomNavBar(navController: NavController, bottomNavigationScreen: List<Scre
             NavigationBarItem(selected = currentDeestination == screen.route,
                 onClick = {
                     navController.navigate(screen.route) {
-
                         popUpTo(navController.graph.findStartDestination().id) {
-                        saveState = true
+                            saveState = true
                         }
                         launchSingleTop = true
+
 
                         //restoreState = true
 
 
-                    }
 
+                    }
                 },
                 icon = { Icon(imageVector = screen.icon, contentDescription = "Icon") },
                 label = {
                     Text(title)
-
                 }
             )
         }
     }
 }
-
-//Gammel kode under.
-
-/*enum class Screen {
- StiturMap, Leaderboard, TempStartPage
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun NavigationApp() {
-    val navController = rememberNavController()
-    Scaffold(topBar = {
-        TopAppBar(
-            colors = TopAppBarDefaults.mediumTopAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                titleContentColor = MaterialTheme.colorScheme.primary,
-            ),
-            title = { Text(text = "StiTur") },
-            actions = {
-                /*IconButton(onClick = { navController.navigate(Screen.TempStartPage.name) }) {
-                    Icon(
-                        imageVector = Icons.Filled.Home,
-                        contentDescription = "Home button"
-                    )
-                }*/
-
-                //Signuo
-                IconButton(onClick = { navController.navigate(Screen.Leaderboard.name) }) {
-                    Icon(
-                        imageVector = Icons.Filled.Star,
-                        contentDescription = "Leaderboard button"
-                    )
-                }
-
-                //Signuo
-                IconButton(onClick = { navController.navigate(Screen.StiturMap.name) }) {
-                    Icon(
-                        imageVector = Icons.Filled.LocationOn,
-                        contentDescription = "Location button"
-                    )
-                }
-                IconButton(onClick = { navController.navigate(Screen.TempStartPage.name) }) {
-                    Icon(
-                        imageVector = Icons.Filled.AccountCircle,
-                        contentDescription = "Profile button"
-                    )
-                }
-
-            })
-    }) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = Screen.TempStartPage.name,
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxWidth()
-                .padding(top = 5.dp)
-        ) {
-            composable(Screen.TempStartPage.name) {
-                TempStartPage()
-            }
-            composable(Screen.StiturMap.name) {
-                StiturMapScreen()
-            }
-            composable(Screen.Leaderboard.name) {
-                SettingsScreen()
-            }
-            //composable(Screen.) {
-            //    SignUpScreen(navController)
-            //}
-            // Jeg holder på å legge til Signup i menyen.
-        }
-    }
-}
- */

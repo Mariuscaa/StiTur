@@ -72,7 +72,6 @@ fun StiturMap() {
     }
     var geoJsonLayer by remember { mutableStateOf<GeoJsonLayer?>(null) }
     val context = LocalContext.current
-    // val scope = rememberCoroutineScope()
 
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
@@ -115,6 +114,7 @@ fun StiturMap() {
                             }
                         }
                     }
+
                     setOnFeatureClickListener {
                         Toast.makeText(
                             context,
