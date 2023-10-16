@@ -13,7 +13,7 @@ import no.hiof.mariusca.stitur.service.module.AccountService
 import javax.inject.Inject
 
 @HiltViewModel
-class SignUpViewModel @Inject constructor(private val accountService: AccountService, ) : ViewModel() {
+class SignUpViewModel @Inject constructor(private val accountService: AccountService) : ViewModel() {
 
     var uiState = mutableStateOf(SignUpUiState())
         private set
@@ -25,9 +25,19 @@ class SignUpViewModel @Inject constructor(private val accountService: AccountSer
 
     val isAnonymous = accountService.currentUser.map { it.isAnonymous }
 
+
+    fun createAnonymousAccount() {
+        viewModelScope.launch {
+            if (!accountService.hasUser)
+                accountService.createAnonymousAccount()
+        }
+    }
+
     fun onEmailChange(newValue: String) {
         uiState.value = uiState.value.copy(email = newValue)
     }
+
+
 
     fun onPasswordChange(newValue: String) {
         uiState.value = uiState.value.copy(password = newValue)
