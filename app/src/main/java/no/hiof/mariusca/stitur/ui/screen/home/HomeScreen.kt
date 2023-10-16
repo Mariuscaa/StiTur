@@ -28,13 +28,13 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import no.hiof.mariusca.stitur.R
 import no.hiof.mariusca.stitur.ui.screen.LeaderboardScreen
+import no.hiof.mariusca.stitur.ui.screen.ProfileScreen
 import no.hiof.mariusca.stitur.ui.screen.SignUpScreen
-import no.hiof.mariusca.stitur.ui.screen.TempStartPage
 import no.hiof.mariusca.stitur.ui.screen.map.StiturMapScreen
 
 @Composable
 fun HomeScreen() {
-    Column (horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         //Text(text = "Navigation page")
         NavigationApp()
     }
@@ -56,49 +56,32 @@ fun NavigationApp() {
     val navController = rememberNavController()
     //val signUpViewModel: SignUpViewModel = hiltViewModel()
     val bottomNavigationScreen = listOf(
-        Screen.Leaderboard,
-        Screen.StiturMap,
-        Screen.Profile
+        Screen.Leaderboard, Screen.StiturMap, Screen.Profile
     )
 
     Scaffold(bottomBar = { BottomNavBar(navController, bottomNavigationScreen) }) { innerPadding ->
-
-
         Box(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize(),
             contentAlignment = Alignment.BottomCenter
         ) {
-
-
             NavHost(
                 navController = navController,
                 startDestination = Screen.Leaderboard.route /*, modifier = Modifier.padding(innerPadding)*/
             ) {
                 composable(Screen.Leaderboard.route) {
                     LeaderboardScreen()
-
                 }
-
                 composable(Screen.StiturMap.route) {
-                    //Text("Profile", modifier = Modifier.padding(innerPadding))
                     StiturMapScreen()
-
-
                 }
-
                 composable(Screen.Profile.route) {
-                    //Text("Favourites", modifier = Modifier.padding(innerPadding))
-                    TempStartPage()
-
+                    ProfileScreen()
                 }
-
                 composable(Screen.SignUp.route) {
                     SignUpScreen()
                 }
-
-
             }
         }
     }
@@ -115,99 +98,18 @@ fun BottomNavBar(navController: NavController, bottomNavigationScreen: List<Scre
             NavigationBarItem(selected = currentDeestination == screen.route,
                 onClick = {
                     navController.navigate(screen.route) {
-
                         popUpTo(navController.graph.findStartDestination().id) {
-                        saveState = true
+                            saveState = true
                         }
                         launchSingleTop = true
-
                         restoreState = true
-
-
                     }
-
                 },
                 icon = { Icon(imageVector = screen.icon, contentDescription = "Icon") },
                 label = {
                     Text(title)
-
                 }
             )
         }
     }
 }
-
-//Gammel kode under.
-
-/*enum class Screen {
- StiturMap, Leaderboard, TempStartPage
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun NavigationApp() {
-    val navController = rememberNavController()
-    Scaffold(topBar = {
-        TopAppBar(
-            colors = TopAppBarDefaults.mediumTopAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                titleContentColor = MaterialTheme.colorScheme.primary,
-            ),
-            title = { Text(text = "StiTur") },
-            actions = {
-                /*IconButton(onClick = { navController.navigate(Screen.TempStartPage.name) }) {
-                    Icon(
-                        imageVector = Icons.Filled.Home,
-                        contentDescription = "Home button"
-                    )
-                }*/
-
-                //Signuo
-                IconButton(onClick = { navController.navigate(Screen.Leaderboard.name) }) {
-                    Icon(
-                        imageVector = Icons.Filled.Star,
-                        contentDescription = "Leaderboard button"
-                    )
-                }
-
-                //Signuo
-                IconButton(onClick = { navController.navigate(Screen.StiturMap.name) }) {
-                    Icon(
-                        imageVector = Icons.Filled.LocationOn,
-                        contentDescription = "Location button"
-                    )
-                }
-                IconButton(onClick = { navController.navigate(Screen.TempStartPage.name) }) {
-                    Icon(
-                        imageVector = Icons.Filled.AccountCircle,
-                        contentDescription = "Profile button"
-                    )
-                }
-
-            })
-    }) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = Screen.TempStartPage.name,
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxWidth()
-                .padding(top = 5.dp)
-        ) {
-            composable(Screen.TempStartPage.name) {
-                TempStartPage()
-            }
-            composable(Screen.StiturMap.name) {
-                StiturMapScreen()
-            }
-            composable(Screen.Leaderboard.name) {
-                SettingsScreen()
-            }
-            //composable(Screen.) {
-            //    SignUpScreen(navController)
-            //}
-            // Jeg holder på å legge til Signup i menyen.
-        }
-    }
-}
- */
