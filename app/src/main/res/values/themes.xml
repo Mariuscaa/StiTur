@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.StiTur" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.StiTur" parent="Theme.AppCompat.Light.DarkActionBar">
+
+    </style>
+
+
+    <style name="Theme.StiTur.BackgroundImageStyle">
+        <item name="android:windowBackground">@drawable/background_pages</item>
+
+
+    </style>
+
+
+
+
 </resources>

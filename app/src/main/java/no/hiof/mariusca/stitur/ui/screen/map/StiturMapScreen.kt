@@ -2,16 +2,19 @@ package no.hiof.mariusca.stitur.ui.screen.map
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material3.Button
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,7 +38,22 @@ import com.google.maps.android.data.geojson.GeoJsonLayer
 import com.google.maps.android.data.geojson.GeoJsonLineStringStyle
 import no.hiof.mariusca.stitur.R
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SearchBar(){
+    var text by remember { mutableStateOf("")}
 
+    TextField(
+        value = text,
+        onValueChange = {text = it},
+        label = {Text("Search for trailwalks!")},
+        leadingIcon = {Icon(Icons.Filled.Search, contentDescription = null)},
+        modifier = Modifier
+            .width(250.dp)
+            .height(50.dp)
+
+    )
+}
 
 @Composable
 fun StiturMapScreen(weatherIconClicked: () -> Unit) {
@@ -54,12 +72,22 @@ fun StiturMapScreen(weatherIconClicked: () -> Unit) {
                     modifier = Modifier
                         .size(48.dp)
                         .align(Alignment.TopStart)
-                        .padding(10.dp, 10.dp, 0.dp)
-
+                        .padding(10.dp, 0.dp, 0.dp)
                 )
-
         }
     }
+
+
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .padding(0.dp,50.dp,0.dp),
+        contentAlignment = Alignment.TopCenter
+
+    ){
+
+        SearchBar()
+        }
+
 }
 
 
