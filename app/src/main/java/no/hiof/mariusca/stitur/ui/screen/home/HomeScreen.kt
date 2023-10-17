@@ -45,7 +45,7 @@ fun HomeScreen() {
     }
 }
 
-
+//Alle sidene i prosjektet
 sealed class Screen(val route: String, @StringRes val title: Int, val icon: ImageVector) {
     object Leaderboard : Screen("leaderboard", R.string.leaderboard, Icons.Default.Star)
     object StiturMap : Screen("maps", R.string.stiturMap, Icons.Default.LocationOn)
