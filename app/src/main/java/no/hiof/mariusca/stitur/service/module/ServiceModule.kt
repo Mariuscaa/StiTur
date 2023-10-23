@@ -6,13 +6,15 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import no.hiof.mariusca.stitur.service.impl.AccountServiceImpl
 import no.hiof.mariusca.stitur.service.impl.TripStorageServiceImpl
+import no.hiof.mariusca.stitur.service.storage.TripStorageService
 
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class ServiceModule {
     @Binds
     abstract fun provideAccountService(impl: AccountServiceImpl): AccountService
+
     @Binds
-    abstract fun provideStorageService(impl: TripStorageServiceImpl): TripStorageServiceImpl
+    abstract fun provideTripStorageService(impl: TripStorageServiceImpl): TripStorageService
 
 }

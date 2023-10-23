@@ -3,11 +3,15 @@ package no.hiof.mariusca.stitur.ui.screen.map
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,6 +30,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -58,7 +64,7 @@ fun SearchBar(){
 @Composable
 fun StiturMapScreen(weatherIconClicked: () -> Unit) {
 
-    Box(
+    /*Box(
         modifier = Modifier.fillMaxSize()
     ) {
         StiturMap()
@@ -86,10 +92,30 @@ fun StiturMapScreen(weatherIconClicked: () -> Unit) {
     ){
 
         SearchBar()
-        }
+        }*/
+
+    TripList()
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TripList(
+    modifier: Modifier = Modifier,
+    viewModel: StiturMapViewModel = hiltViewModel(),
+) {
+    val trips = viewModel.trips.collectAsStateWithLifecycle(emptyList())
+
+    Column {
+        //TextField(value = movieTitle.value, onValueChange = { movieTitle.value = it })
+
+        LazyVerticalGrid(columns = GridCells.FixedSize(180.dp), content = {
+            items(trips.value) { trip ->
+                Text(text = trip.routeName)
+            }
+        }, modifier = modifier.padding(16.dp))
+    }
+}
 
 @OptIn(MapsComposeExperimentalApi::class)
 @Composable

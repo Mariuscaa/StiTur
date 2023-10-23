@@ -76,6 +76,8 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("com.google.android.gms:play-services-maps:18.1.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
+
 
     //Google Maps
     implementation("com.google.maps.android:maps-compose:2.14.1")
