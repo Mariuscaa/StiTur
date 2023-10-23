@@ -1,5 +1,6 @@
 package no.hiof.mariusca.stitur.ui.screen.map
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -28,12 +30,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.gson.Gson
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapEffect
 import com.google.maps.android.compose.MapsComposeExperimentalApi
@@ -43,17 +47,20 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.data.geojson.GeoJsonLayer
 import com.google.maps.android.data.geojson.GeoJsonLineStringStyle
 import no.hiof.mariusca.stitur.R
+import no.hiof.mariusca.stitur.model.tripsToGeoJSONFeatureCollection
+import org.json.JSONObject
+import java.io.ByteArrayInputStream
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBar(){
-    var text by remember { mutableStateOf("")}
+fun SearchBar() {
+    var text by remember { mutableStateOf("") }
 
     TextField(
         value = text,
-        onValueChange = {text = it},
-        label = {Text("Search for trailwalks!")},
-        leadingIcon = {Icon(Icons.Filled.Search, contentDescription = null)},
+        onValueChange = { text = it },
+        label = { Text("Search for trailwalks!") },
+        leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
         modifier = Modifier
             .width(250.dp)
             .height(50.dp)
@@ -63,14 +70,15 @@ fun SearchBar(){
 
 @Composable
 fun StiturMapScreen(weatherIconClicked: () -> Unit) {
+    var showLoading by remember { mutableStateOf(true) }
 
-    /*Box(
+    Box(
         modifier = Modifier.fillMaxSize()
     ) {
         StiturMap()
 
 
-        IconButton(onClick = weatherIconClicked) {
+        /*IconButton(onClick = weatherIconClicked) {
 
                 Image(
                     painter = painterResource(id = R.drawable.ic_weathericon),
@@ -80,25 +88,25 @@ fun StiturMapScreen(weatherIconClicked: () -> Unit) {
                         .align(Alignment.TopStart)
                         .padding(10.dp, 0.dp, 0.dp)
                 )
-        }
+        }*/
     }
 
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .padding(0.dp,50.dp,0.dp),
-        contentAlignment = Alignment.TopCenter
+    /* Box(modifier = Modifier
+         .fillMaxSize()
+         .padding(0.dp, 50.dp, 0.dp),
+         contentAlignment = Alignment.TopCenter
 
-    ){
+     ){
 
-        SearchBar()
-        }*/
+         SearchBar()
+         }*/
 
-    TripList()
+    //TripList()
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+/*@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TripList(
     modifier: Modifier = Modifier,
@@ -115,73 +123,97 @@ fun TripList(
             }
         }, modifier = modifier.padding(16.dp))
     }
-}
+}*/
 
 @OptIn(MapsComposeExperimentalApi::class)
 @Composable
-fun StiturMap() {
+fun StiturMap(
+    viewModel: StiturMapViewModel = hiltViewModel(),
+) {
+    val geoJsonData = remember { mutableStateOf<String?>(null) }
+    val trips by viewModel.trips.collectAsStateWithLifecycle(emptyList())
+
     val halden = LatLng(59.1330, 11.3875)
     val cameraPosition = rememberCameraPositionState() {
         position = CameraPosition.fromLatLngZoom(halden, 10f)
     }
-    var geoJsonLayer by remember { mutableStateOf<GeoJsonLayer?>(null) }
     val context = LocalContext.current
+    val gson = Gson()
 
-    GoogleMap(
-        modifier = Modifier.fillMaxSize(),
-        cameraPositionState = cameraPosition
-    ) {
-        MapEffect(Unit) { map ->
-            if (geoJsonLayer == null) {
-                kotlin.runCatching {
-                    geoJsonLayer = GeoJsonLayer(map, R.raw.geo_json_sample, context)
-                }
-                geoJsonLayer?.apply {
-                    addLayerToMap()
-                    for (feature in features) {
-                        when (feature.geometry.geometryType) {
-                            /*
-                            "Point" -> {
-                                val pointStyle = GeoJsonPointStyle()
-                                pointStyle.title = feature.getProperty("title")
-                                feature.pointStyle = pointStyle
-                            }
+    // Mutable state variable to store the geoJsonObject
+    val geoJsonObjectState = remember { mutableStateOf<JSONObject?>(null) }
 
-                            "Polygon" -> {
-                                val polygonStyle = GeoJsonPolygonStyle()
-                                polygonStyle.strokeColor =
-                                    feature.getProperty("stroke").toColorInt()
-                                polygonStyle.strokeWidth =
-                                    feature.getProperty("stroke-width").toFloat()
-                                polygonStyle.fillColor =
-                                    feature.getProperty("fill").toColorInt()
-                                feature.polygonStyle = polygonStyle
-                            }*/
+    Column {
+        Text(text = geoJsonData.value ?: "Loading...")
 
-                            "LineString" -> {
-                                val lineStringStyle = GeoJsonLineStringStyle()
-                                lineStringStyle.color =
-                                    "#ff0000".toColorInt()
-                                lineStringStyle.width =
-                                    20f
-                                feature.lineStringStyle = lineStringStyle
-                            }
-                        }
+        GoogleMap(
+            modifier = Modifier.fillMaxSize(),
+            cameraPositionState = cameraPosition,
+        ) {
+            trips.forEach { trip ->
+                if (trip.coordinates.isNotEmpty()) {
+                    trip.coordinates.forEach { coordinate ->
+                        val specimenPosition =
+                            LatLng(coordinate.lat.toDouble(), coordinate.long.toDouble())
+                        Marker(
+                            MarkerState(position = specimenPosition),
+                            title = trip.routeName,
+                            snippet = trip.routeDescription
+                        )
                     }
 
-                    setOnFeatureClickListener {
-                        Toast.makeText(
-                            context,
-                            "Feature Click ${it.geometry.geometryType}",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
                 }
             }
 
 
+            MapEffect(Unit) { map ->
+                if (geoJsonData.value != null) {
+                    // Create the geoJsonObject
+                    val geoJsonObject = JSONObject(geoJsonData.value!!)
+                    geoJsonObjectState.value = geoJsonObject
+
+                    // Check if geoJsonObjectState has a value
+                    val geoJsonObjectValue = geoJsonObjectState.value
+
+                    if (geoJsonObjectValue != null) {
+                        // Create the GeoJsonLayer
+                        val geoJsonLayer = GeoJsonLayer(map, geoJsonObjectValue)
+
+                        geoJsonLayer.apply {
+                            addLayerToMap()
+                            for (feature in features) {
+                                when (feature.geometry.geometryType) {
+                                    "LineString" -> {
+                                        val lineStringStyle = GeoJsonLineStringStyle()
+                                        lineStringStyle.color = "#ff0000".toColorInt()
+                                        lineStringStyle.width = 20f
+                                        feature.lineStringStyle = lineStringStyle
+                                    }
+                                }
+                            }
+                        }
+
+                        // Set an on-feature click listener
+                        geoJsonLayer.setOnFeatureClickListener {
+                            Toast.makeText(
+                                context,
+                                "Feature Click ${it.geometry.geometryType}",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+                }
+            }
+
+            // Trigger loading of the GeoJSON data
+            geoJsonData.value = gson.toJson(tripsToGeoJSONFeatureCollection(trips))
+
+            Marker(
+                MarkerState(position = halden),
+                title = "Halden",
+                snippet = "Marker in Halden."
+            )
         }
-        Marker(MarkerState(position = halden), title = "Halden", snippet = "Marker in Halden.")
     }
 }
 

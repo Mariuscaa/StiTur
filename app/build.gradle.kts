@@ -77,6 +77,10 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("com.google.android.gms:play-services-maps:18.1.0")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
+    implementation("androidx.compose.runtime:runtime-livedata:1.5.4")
+
+    // Gson / JSON
+    implementation("com.google.code.gson:gson:2.9.0")
 
 
     //Google Maps
