@@ -8,7 +8,7 @@ import no.hiof.mariusca.stitur.service.module.AccountService
 import javax.inject.Inject
 
 @HiltViewModel
-class ViewModel @Inject constructor(private val accountService: AccountService)
+class AViewModel @Inject constructor(private val accountService: AccountService)
     : ViewModel() {
 
     init {

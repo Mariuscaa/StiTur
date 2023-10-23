@@ -6,8 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.style.TextAlign
 
 @Composable
-fun TempStartPage() {
-    Text(text = "Home page",
+fun ProfileScreen() {
+    Text(text = "Profile",
         style = MaterialTheme.typography.headlineLarge,
         textAlign = TextAlign.Center)
 }
