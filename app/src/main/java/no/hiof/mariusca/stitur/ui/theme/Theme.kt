@@ -66,5 +66,6 @@ fun StiTurTheme(
         colorScheme = colorScheme,
         typography = Typography,
         content = content
+
     )
 }
