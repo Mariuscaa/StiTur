@@ -46,7 +46,7 @@ fun HomeScreen() {
     }
 }
 
-//Alle sidene i prosjektet
+//Alle sidene i prosjektet og riktige ikoner
 sealed class Screen(val route: String, @StringRes val title: Int, val icon: Int) {
     object Leaderboard : Screen("leaderboard", R.string.leaderboard, R.drawable.vector)
     object StiturMap : Screen("maps", R.string.stiturMap, R.drawable.maps)

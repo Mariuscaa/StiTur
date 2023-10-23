@@ -57,7 +57,6 @@ fun SearchBar(){
         modifier = Modifier
             .width(250.dp)
             .height(50.dp)
-
     )
 
 
