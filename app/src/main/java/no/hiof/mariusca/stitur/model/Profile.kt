@@ -9,7 +9,7 @@ data class Profile(
     val profileImageUrl: String = "",
 
     // Connected properties
-    val personalRanking: PersonalRanking,
+    val personalRanking: PersonalRanking = PersonalRanking(Tiers.SILVER, 0, 0, 0),
     val friends: List<String> = emptyList(),
     val sentInvites: List<Friendship> = emptyList(),
     val receivedInvites: List<Friendship> = emptyList(),

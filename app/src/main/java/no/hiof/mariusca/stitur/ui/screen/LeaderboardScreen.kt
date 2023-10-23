@@ -36,6 +36,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import no.hiof.mariusca.stitur.R
+import no.hiof.mariusca.stitur.leaderboards.LeaderboardsDummyData
+import no.hiof.mariusca.stitur.model.Profile
 
 @Composable
 fun LeaderboardScreen() {
@@ -43,7 +45,8 @@ fun LeaderboardScreen() {
     val customBackgroundColor = Color(0xFF133c07)
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .background(customBackgroundColor),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -52,17 +55,27 @@ fun LeaderboardScreen() {
         Spacer(modifier = Modifier.height(40.dp))
         SearchBar()
         Spacer(modifier = Modifier.height(40.dp))
-        DummyDataList()
+        //DummyDataList()
+
+        val leaderboardsDummyData = LeaderboardsDummyData()
+        val profiles = leaderboardsDummyData.createDummyProfiles()
+        DummyDataList(profiles = profiles)
     }
 }
 
 @Composable
-fun DummyDataList(){
-    val users = listOf("Sindre", "Shvan", "Jon", "Marius")
+fun DummyDataList(profiles: List<Profile>){
+
+    //val users = listOf("Sindre", "Shvan", "Jon", "Marius")
 
     LazyColumn{
-        items(users){user ->
-            LeaderboardUserCard(userName = user)
+        items(profiles){profile ->
+            LeaderboardUserCard(
+                userName = profile.username,
+                userTotalPoints = profile.personalRanking.totalPoints
+
+
+            )
         }
     }
 }
@@ -107,7 +120,7 @@ fun SearchBar(){
 }
 
 @Composable
-fun LeaderboardUserCard(userName: String){
+fun LeaderboardUserCard(userName: String, userTotalPoints: Int){
     Row(verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .padding(all = 6.dp)
@@ -141,7 +154,7 @@ fun LeaderboardUserCard(userName: String){
                 style = MaterialTheme.typography.bodySmall.copy(fontSize = 7.sp)
             )
 
-            Text(text = ">9000",
+            Text(text = "$userTotalPoints",
                 style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold)
             )
         }

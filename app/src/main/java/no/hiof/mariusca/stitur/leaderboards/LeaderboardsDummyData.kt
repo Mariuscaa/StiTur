@@ -22,7 +22,7 @@ class LeaderboardsDummyData {
 
         val profile2 = Profile("2a3b4c",
             false,
-            "JsonStatham",
+            "Jason",
             "Json boy",
             "json@hiof.no",
             "",
@@ -100,6 +100,4 @@ class LeaderboardsDummyData {
             diamondProfiles = highScoreDiamondTierProfiles
         )
     }
-
-
 }
