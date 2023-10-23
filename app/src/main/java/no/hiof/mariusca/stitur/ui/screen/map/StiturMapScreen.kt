@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,22 +39,30 @@ import com.google.maps.android.data.geojson.GeoJsonLayer
 import com.google.maps.android.data.geojson.GeoJsonLineStringStyle
 import no.hiof.mariusca.stitur.R
 
+
+
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(){
+
     var text by remember { mutableStateOf("")}
 
     TextField(
         value = text,
         onValueChange = {text = it},
         label = {Text("Search for trailwalks!")},
-        leadingIcon = {Icon(Icons.Filled.Search, contentDescription = null)},
+        leadingIcon = {Icon(Icons.Filled.Search, contentDescription = "Liste med turer")},
         modifier = Modifier
             .width(250.dp)
             .height(50.dp)
 
     )
+
+
 }
+
 
 @Composable
 fun StiturMapScreen(weatherIconClicked: () -> Unit) {
@@ -80,7 +89,7 @@ fun StiturMapScreen(weatherIconClicked: () -> Unit) {
 
     Box(modifier = Modifier
         .fillMaxSize()
-        .padding(0.dp,50.dp,0.dp),
+        .padding(0.dp, 50.dp, 0.dp),
         contentAlignment = Alignment.TopCenter
 
     ){

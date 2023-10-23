@@ -5,11 +5,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -20,7 +20,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -46,14 +47,14 @@ fun HomeScreen() {
 }
 
 //Alle sidene i prosjektet
-sealed class Screen(val route: String, @StringRes val title: Int, val icon: ImageVector) {
-    object Leaderboard : Screen("leaderboard", R.string.leaderboard, Icons.Default.Star)
-    object StiturMap : Screen("maps", R.string.stiturMap, Icons.Default.LocationOn)
-    object Profile : Screen("profile", R.string.profile, Icons.Default.AccountCircle)
-    object Weather : Screen("weather", R.string.profile, Icons.Default.AccountCircle)
+sealed class Screen(val route: String, @StringRes val title: Int, val icon: Int) {
+    object Leaderboard : Screen("leaderboard", R.string.leaderboard, R.drawable.vector)
+    object StiturMap : Screen("maps", R.string.stiturMap, R.drawable.maps)
+    object Profile : Screen("profile", R.string.profile, R.drawable.profile)
+    object Weather : Screen("weather", R.string.profile, R.drawable.ic_weathericon)
 
-    object SignUp : Screen("SignUp", R.string.SignUp, Icons.Default.AccountCircle)
-    object GeoTreasure : Screen("GeoTreasure", R.string.SignUp, Icons.Default.Favorite)
+    object SignUp : Screen("SignUp", R.string.SignUp, R.drawable.profile)
+    object GeoTreasure : Screen("GeoTreasure", R.string.SignUp,R.drawable.maps)
 }
 
 
@@ -145,7 +146,11 @@ fun BottomNavBar(navController: NavController, bottomNavigationScreen: List<Scre
 
                     }
                 },
-                icon = { Icon(imageVector = screen.icon, contentDescription = "Icon") },
+                icon = { Icon(painterResource(id = screen.icon), contentDescription = "Icon",
+                    modifier = Modifier
+                        .size(20.dp),
+                    ) },
+
                 label = {
                     Text(title)
                 }
