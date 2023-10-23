@@ -1,7 +1,5 @@
 package no.hiof.mariusca.stitur.ui.screen.map
 
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,46 +8,41 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.toColorInt
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.gson.Gson
 import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapEffect
 import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.data.geojson.GeoJsonLayer
-import com.google.maps.android.data.geojson.GeoJsonLineStringStyle
+import kotlinx.coroutines.launch
 import no.hiof.mariusca.stitur.R
-import no.hiof.mariusca.stitur.model.tripsToGeoJSONFeatureCollection
-import org.json.JSONObject
-import java.io.ByteArrayInputStream
+import no.hiof.mariusca.stitur.model.Trip
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,6 +63,7 @@ fun SearchBar() {
 
 @Composable
 fun StiturMapScreen(weatherIconClicked: () -> Unit) {
+    // TODO: Make loading gif / skeleton
     var showLoading by remember { mutableStateOf(true) }
 
     Box(
@@ -78,95 +72,95 @@ fun StiturMapScreen(weatherIconClicked: () -> Unit) {
         StiturMap()
 
 
-        /*IconButton(onClick = weatherIconClicked) {
+        IconButton(onClick = weatherIconClicked) {
 
-                Image(
-                    painter = painterResource(id = R.drawable.ic_weathericon),
-                    contentDescription = "Weather icon",
-                    modifier = Modifier
-                        .size(48.dp)
-                        .align(Alignment.TopStart)
-                        .padding(10.dp, 0.dp, 0.dp)
-                )
-        }*/
+            Image(
+                painter = painterResource(id = R.drawable.ic_weathericon),
+                contentDescription = "Weather icon",
+                modifier = Modifier
+                    .size(48.dp)
+                    .align(Alignment.TopStart)
+                    .padding(10.dp, 0.dp, 0.dp)
+            )
+        }
     }
 
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(0.dp, 50.dp, 0.dp),
+        contentAlignment = Alignment.TopCenter
 
-    /* Box(modifier = Modifier
-         .fillMaxSize()
-         .padding(0.dp, 50.dp, 0.dp),
-         contentAlignment = Alignment.TopCenter
+    ) {
 
-     ){
-
-         SearchBar()
-         }*/
-
-    //TripList()
+        SearchBar()
+    }
 
 }
 
-/*@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TripList(
-    modifier: Modifier = Modifier,
-    viewModel: StiturMapViewModel = hiltViewModel(),
-) {
-    val trips = viewModel.trips.collectAsStateWithLifecycle(emptyList())
-
-    Column {
-        //TextField(value = movieTitle.value, onValueChange = { movieTitle.value = it })
-
-        LazyVerticalGrid(columns = GridCells.FixedSize(180.dp), content = {
-            items(trips.value) { trip ->
-                Text(text = trip.routeName)
-            }
-        }, modifier = modifier.padding(16.dp))
-    }
-}*/
-
-@OptIn(MapsComposeExperimentalApi::class)
+@OptIn(MapsComposeExperimentalApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun StiturMap(
     viewModel: StiturMapViewModel = hiltViewModel(),
 ) {
-    val geoJsonData = remember { mutableStateOf<String?>(null) }
+    val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
+    var showBottomSheet by remember { mutableStateOf(false) }
     val trips by viewModel.trips.collectAsStateWithLifecycle(emptyList())
+    val selectedTripState = remember { mutableStateOf<Trip?>(null) }
 
     val halden = LatLng(59.1330, 11.3875)
     val cameraPosition = rememberCameraPositionState() {
-        position = CameraPosition.fromLatLngZoom(halden, 10f)
+        position = CameraPosition.fromLatLngZoom(halden, 12f)
     }
-    val context = LocalContext.current
-    val gson = Gson()
 
-    // Mutable state variable to store the geoJsonObject
-    val geoJsonObjectState = remember { mutableStateOf<JSONObject?>(null) }
+    LaunchedEffect(selectedTripState.value) {
+        if (selectedTripState.value != null) {
+            sheetState.show()
+            showBottomSheet = true
+        }
+    }
+
+    /*  GeoJson attempt
+        val context = LocalContext.current
+        val gson = Gson()
+
+        val geoJsonObjectState = remember { mutableStateOf<JSONObject?>(null) }*/
 
     Column {
-        Text(text = geoJsonData.value ?: "Loading...")
-
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPosition,
         ) {
+            val polylinePoints = mutableListOf<LatLng>()
+
             trips.forEach { trip ->
                 if (trip.coordinates.isNotEmpty()) {
                     trip.coordinates.forEach { coordinate ->
-                        val specimenPosition =
+                        val markerPosition =
                             LatLng(coordinate.lat.toDouble(), coordinate.long.toDouble())
-                        Marker(
-                            MarkerState(position = specimenPosition),
-                            title = trip.routeName,
-                            snippet = trip.routeDescription
-                        )
+                        polylinePoints.add(markerPosition)
                     }
-
+                    Polyline(
+                        points = polylinePoints,
+                        clickable = true,
+                        color = Color.Blue,
+                        width = 20.0f,
+                        onClick = {
+                            selectedTripState.value = trip
+                        }
+                    )
                 }
             }
 
+            Marker(
+                MarkerState(position = halden),
+                title = "Halden",
+                snippet = "Marker in Halden."
+            )
 
-            MapEffect(Unit) { map ->
+
+            /*MapEffect(Unit) { map ->
                 if (geoJsonData.value != null) {
                     // Create the geoJsonObject
                     val geoJsonObject = JSONObject(geoJsonData.value!!)
@@ -206,15 +200,42 @@ fun StiturMap(
             }
 
             // Trigger loading of the GeoJSON data
-            geoJsonData.value = gson.toJson(tripsToGeoJSONFeatureCollection(trips))
-
-            Marker(
-                MarkerState(position = halden),
-                title = "Halden",
-                snippet = "Marker in Halden."
-            )
+            geoJsonData.value = gson.toJson(tripsToGeoJSONFeatureCollection(trips))*/
         }
+
+        if (showBottomSheet) {
+            ModalBottomSheet(
+                onDismissRequest = {
+                    showBottomSheet = false
+                    selectedTripState.value = null
+                },
+                sheetState = sheetState
+            ) {
+                // Sheet content
+                Button(onClick = {
+                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            showBottomSheet = false
+                            selectedTripState.value = null
+                        }
+                    }
+                }) {
+                    Text("Hide bottom sheet")
+                }
+
+                selectedTripState.value?.let { selectedTrip ->
+                    Text("Selected Trip: ${selectedTrip.routeName}")
+                    Text("Description: ${selectedTrip.routeDescription}")
+                    Text("Difficulty: ${selectedTrip.difficulty}")
+
+                }
+
+            }
+        }
+
+
     }
 }
+
 
 
