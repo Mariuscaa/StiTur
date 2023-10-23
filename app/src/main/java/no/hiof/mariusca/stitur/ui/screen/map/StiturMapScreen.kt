@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
@@ -44,22 +45,29 @@ import kotlinx.coroutines.launch
 import no.hiof.mariusca.stitur.R
 import no.hiof.mariusca.stitur.model.Trip
 
+
+
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBar() {
-    var text by remember { mutableStateOf("") }
+fun SearchBar(){
+
+    var text by remember { mutableStateOf("")}
 
     TextField(
         value = text,
-        onValueChange = { text = it },
-        label = { Text("Search for trailwalks!") },
-        leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
+        onValueChange = {text = it},
+        label = {Text("Search for trailwalks!")},
+        leadingIcon = {Icon(Icons.Filled.Search, contentDescription = "Liste med turer")},
         modifier = Modifier
             .width(250.dp)
             .height(50.dp)
-
     )
+
+
 }
+
 
 @Composable
 fun StiturMapScreen(weatherIconClicked: () -> Unit) {
@@ -84,11 +92,9 @@ fun StiturMapScreen(weatherIconClicked: () -> Unit) {
             )
         }
     }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(0.dp, 50.dp, 0.dp),
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .padding(0.dp, 50.dp, 0.dp),
         contentAlignment = Alignment.TopCenter
 
     ) {
