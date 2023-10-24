@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Favorite
@@ -23,6 +24,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -47,21 +50,25 @@ fun HomeScreen(viewModel: SignUpViewModel = hiltViewModel()) {
     }
 }
 
+//Alle sidene i prosjektet og riktige ikoner
+//...
+sealed class Screen(val route: String, @StringRes val title: Int, val icon: Int) {
+    object Leaderboard : Screen("leaderboard", R.string.leaderboard, R.drawable.vector)
+    object StiturMap : Screen("maps", R.string.stiturMap, R.drawable.maps)
+    object Profile : Screen("profile", R.string.profile, R.drawable.profile)
+    object Weather : Screen("weather", R.string.profile, R.drawable.ic_weathericon)
 
-sealed class Screen(val route: String, @StringRes val title: Int, val icon: ImageVector) {
-    object Leaderboard : Screen("leaderboard", R.string.leaderboard, Icons.Default.Star)
-    object StiturMap : Screen("maps", R.string.stiturMap, Icons.Default.LocationOn)
-    object Profile : Screen("profile", R.string.profile, Icons.Default.AccountCircle)
-    object Weather : Screen("weather", R.string.profile, Icons.Default.AccountCircle)
-
-    object SignUp : Screen("SignUp", R.string.SignUp, Icons.Default.AccountCircle)
-    object GeoTreasure : Screen("GeoTreasure", R.string.SignUp, Icons.Default.Favorite)
+    object SignUp : Screen("SignUp", R.string.SignUp, R.drawable.profile)
+    object GeoTreasure : Screen("GeoTreasure", R.string.SignUp,R.drawable.maps)
 }
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NavigationApp() {
+    //val customBackgroundColor = Color(0xFF133c07)
+
+
     val navController = rememberNavController()
 
 
@@ -77,6 +84,8 @@ fun NavigationApp() {
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize(),
+
+                //.background(customBackgroundColor),
             contentAlignment = Alignment.BottomCenter
         ) {
             NavHost(
@@ -142,7 +151,11 @@ fun BottomNavBar(navController: NavController, bottomNavigationScreen: List<Scre
 
                     }
                 },
-                icon = { Icon(imageVector = screen.icon, contentDescription = "Icon") },
+                icon = { Icon(painterResource(id = screen.icon), contentDescription = "Icon",
+                    modifier = Modifier
+                        .size(20.dp),
+                    ) },
+
                 label = {
                     Text(title)
                 }

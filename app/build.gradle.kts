@@ -58,19 +58,8 @@ android {
 
 
 dependencies {
-
-    // Preferences DataStore (SharedPreferences like APIs)
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
-    // optional - RxJava2 support
-    //implementation("androidx.datastore:datastore-preferences-rxjava2:1.0.0")
-    // optional - RxJava3 support
-    //implementation("androidx.datastore:datastore-preferences-rxjava3:1.0.0")
-
-
     implementation("com.google.dagger:hilt-android:2.47")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
-    //implementation("androidx.datastore:datastore-core:1.0.0")
-    //implementation("androidx.datastore:datastore-core-android:1.1.0-alpha05")
     ksp("com.google.dagger:hilt-compiler:2.47")
 
     implementation("com.google.firebase:firebase-auth-ktx")
@@ -84,8 +73,14 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material3:material3:1.1.2")
     implementation("com.google.android.gms:play-services-maps:18.1.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
+    implementation("androidx.compose.runtime:runtime-livedata:1.5.4")
+
+    // Gson / JSON
+    implementation("com.google.code.gson:gson:2.9.0")
+
 
     //Google Maps
     implementation("com.google.maps.android:maps-compose:2.14.1")
