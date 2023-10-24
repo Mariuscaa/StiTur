@@ -38,7 +38,6 @@ class SignUpViewModel @Inject constructor(private val accountService: AccountSer
     }
 
 
-
     fun onPasswordChange(newValue: String) {
         uiState.value = uiState.value.copy(password = newValue)
     }
@@ -57,6 +56,7 @@ class SignUpViewModel @Inject constructor(private val accountService: AccountSer
             uiState.value = uiState.value.copy(errorMessage = R.string.password_error)
             return
         }
+
 
                 viewModelScope.launch {
                     try {

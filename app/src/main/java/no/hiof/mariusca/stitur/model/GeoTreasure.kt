@@ -7,3 +7,6 @@ data class GeoTreasure (
     val pictureUrl: String = "",
     val geoLocation: GeoLocation = GeoLocation()
 )
+
+
+

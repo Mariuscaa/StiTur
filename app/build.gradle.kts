@@ -59,8 +59,18 @@ android {
 
 dependencies {
 
+    // Preferences DataStore (SharedPreferences like APIs)
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    // optional - RxJava2 support
+    //implementation("androidx.datastore:datastore-preferences-rxjava2:1.0.0")
+    // optional - RxJava3 support
+    //implementation("androidx.datastore:datastore-preferences-rxjava3:1.0.0")
+
+
     implementation("com.google.dagger:hilt-android:2.47")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+    //implementation("androidx.datastore:datastore-core:1.0.0")
+    //implementation("androidx.datastore:datastore-core-android:1.1.0-alpha05")
     ksp("com.google.dagger:hilt-compiler:2.47")
 
     implementation("com.google.firebase:firebase-auth-ktx")

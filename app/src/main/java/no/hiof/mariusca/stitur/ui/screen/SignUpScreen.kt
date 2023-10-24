@@ -35,14 +35,18 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import no.hiof.mariusca.stitur.R
 import no.hiof.mariusca.stitur.signup.SignUpViewModel
+import no.hiof.mariusca.stitur.ui.screen.home.Screen
 
 
 @Composable
 fun SignUpScreen(
     modifier: Modifier = Modifier,
-    viewModel: SignUpViewModel = hiltViewModel()
+    viewModel: SignUpViewModel = hiltViewModel(),
+    navController: NavController
+
 ) {
     val uiState by viewModel.uiState
     val isAnonymous by viewModel.isAnonymous.collectAsState(initial = true)
@@ -94,13 +98,9 @@ fun SignUpScreen(
         }
     }
     else {
-        Button(
-            onClick = { viewModel.onSignOutClick() },
-            modifier = Modifier
-                .padding(16.dp, 8.dp),
-        ) {
-            Text(text = stringResource(R.string.sign_out), fontSize = 16.sp)
-        }
+
+        navController.navigate(route = Screen.StiturMap.route)
+
     }
 }
 
