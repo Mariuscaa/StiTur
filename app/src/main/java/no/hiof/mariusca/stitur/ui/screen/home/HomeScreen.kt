@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -17,9 +18,12 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -29,6 +33,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import no.hiof.mariusca.stitur.R
+import no.hiof.mariusca.stitur.signup.SignUpViewModel
 import no.hiof.mariusca.stitur.ui.screen.GeoTreasureScreen
 import no.hiof.mariusca.stitur.ui.screen.LeaderboardScreen
 import no.hiof.mariusca.stitur.ui.screen.ProfileScreen
@@ -38,10 +43,9 @@ import no.hiof.mariusca.stitur.ui.screen.map.StiturMapScreen
 
 
 @Composable
-fun HomeScreen() {
-
-    Column (
-        horizontalAlignment = Alignment.CenterHorizontally) {
+fun HomeScreen(viewModel: SignUpViewModel = hiltViewModel()) {
+    val isAnonymous by viewModel.isAnonymous.collectAsState(initial = true)
+    Column (horizontalAlignment = Alignment.CenterHorizontally) {
         NavigationApp()
     }
 }
@@ -66,7 +70,8 @@ fun NavigationApp() {
 
 
     val navController = rememberNavController()
-    //val signUpViewModel: SignUpViewModel = hiltViewModel()
+
+
     val bottomNavigationScreen = listOf(
         Screen.Leaderboard,
         Screen.StiturMap,
@@ -85,7 +90,7 @@ fun NavigationApp() {
         ) {
             NavHost(
                 navController = navController,
-                startDestination = Screen.Profile.route /*, modifier = Modifier.padding(innerPadding)*/
+                startDestination = Screen.SignUp.route
 
 
             ) {
@@ -105,7 +110,7 @@ fun NavigationApp() {
                     ProfileScreen()
                 }
                 composable(Screen.SignUp.route) {
-                    SignUpScreen()
+                    SignUpScreen(navController = navController)
                 }
 
 
@@ -117,7 +122,6 @@ fun NavigationApp() {
                 composable(Screen.GeoTreasure.route) {
                     GeoTreasureScreen()
                 }
-
 
             }
         }

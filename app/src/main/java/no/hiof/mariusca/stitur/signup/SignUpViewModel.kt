@@ -38,7 +38,6 @@ class SignUpViewModel @Inject constructor(private val accountService: AccountSer
     }
 
 
-
     fun onPasswordChange(newValue: String) {
         uiState.value = uiState.value.copy(password = newValue)
     }
@@ -57,19 +56,20 @@ class SignUpViewModel @Inject constructor(private val accountService: AccountSer
             uiState.value = uiState.value.copy(errorMessage = R.string.password_error)
             return
         }
-        /*
+
+
                 viewModelScope.launch {
                     try {
                         accountService.authenticate(email, password) { error ->
                             if (error == null)
-                            return@authenticate
+                                return@authenticate
                         }
                     }
                     catch(e: Exception) {
                         uiState.value = uiState.value.copy(errorMessage = R.string.could_not_log_in)
                     }
                 }
-                */
+
     }
 
     fun onSignUpClick() {
@@ -83,11 +83,10 @@ class SignUpViewModel @Inject constructor(private val accountService: AccountSer
             return
         }
 
-        else if (!(password == uiState.value.repeatPassword)) {
+        else if ((password != uiState.value.repeatPassword)) {
             uiState.value = uiState.value.copy(errorMessage = R.string.password_match_error)
             return
         }
-        /*
                 viewModelScope.launch {
                     try {
                         accountService.linkAccount(email, password) { error ->
@@ -99,7 +98,6 @@ class SignUpViewModel @Inject constructor(private val accountService: AccountSer
                         uiState.value = uiState.value.copy(errorMessage = R.string.could_not_create_account)
                     }
                 }
-                */
     }
 
     fun onSignOutClick() {

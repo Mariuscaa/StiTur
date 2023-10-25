@@ -37,7 +37,8 @@ class AccountServiceImpl @Inject constructor(private val auth: FirebaseAuth) : A
     override suspend fun linkAccount(email: String, password: String, onResult: (Throwable?) -> Unit) {
          //Av en eller annen grunn har fungerer ikke linkingen av kontoer nå?
         val credential = EmailAuthProvider.getCredential(email, password)
-        auth.currentUser!!.linkWithCredential(credential).addOnCompleteListener { onResult(it.exception) }.await()
+        //auth.currentUser!!.linkWithCredential(credential).addOnCompleteListener { onResult(it.exception) }.await()
+        //auth.currentUser?.linkWithCredential(credential)?.addOnCompleteListener { onResult(it.exception)}?.await()
         auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { onResult(it.exception) }.await()
     }
 
