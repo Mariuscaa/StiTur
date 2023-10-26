@@ -1,5 +1,6 @@
 package no.hiof.mariusca.stitur.ui.screen.map
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +23,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -29,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -120,6 +123,10 @@ fun StiturMap(
         position = CameraPosition.fromLatLngZoom(halden, 12f)
     }
 
+    val markerStateList =
+        remember { mutableStateListOf(MarkerState(halden)) }
+    val context = LocalContext.current
+
     LaunchedEffect(selectedTripState.value) {
         if (selectedTripState.value != null) {
             sheetState.show()
@@ -137,6 +144,10 @@ fun StiturMap(
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPosition,
+            onMapClick = {val isPositionExist = markerStateList.any { state -> state.position == it }
+                if (!isPositionExist) {
+                    markerStateList.add(MarkerState(it))
+                }}
         ) {
             val polylinePoints = mutableListOf<LatLng>()
 
@@ -164,6 +175,16 @@ fun StiturMap(
                 title = "Halden",
                 snippet = "Marker in Halden."
             )
+
+            Polyline(
+                points = markerStateList.map { it.position },
+                clickable = true,
+                color = Color.Red,
+                visible = true,
+                width = 20.0f,
+                onClick = {
+                    Toast.makeText(context, "Clicked polyline", Toast.LENGTH_LONG).show()
+                })
 
 
             /*MapEffect(Unit) { map ->
