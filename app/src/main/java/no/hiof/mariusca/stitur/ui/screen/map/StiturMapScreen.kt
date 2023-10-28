@@ -1,26 +1,32 @@
 package no.hiof.mariusca.stitur.ui.screen.map
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,9 +34,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.maps.model.CameraPosition
@@ -46,9 +55,7 @@ import no.hiof.mariusca.stitur.R
 import no.hiof.mariusca.stitur.model.Trip
 
 
-
-
-
+/*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(){
@@ -68,11 +75,65 @@ fun SearchBar(){
 
 }
 
+ */
 
 @Composable
-fun StiturMapScreen(weatherIconClicked: () -> Unit) {
+fun ColumnItem(item: String) {
+    Column(modifier = Modifier.padding(10.dp)) {
+        Text(text = item, modifier = Modifier.padding(vertical = 10.dp), fontSize = 22.sp)
+        Divider()
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SearchView(
+    state: MutableState<TextFieldValue>,
+    placeHolder: String,
+    modifier: Modifier
+) {
+    TextField(
+        value = state.value,
+        onValueChange = {value->
+            state.value = value
+        },
+
+        modifier
+            .fillMaxWidth()
+            .padding(80.dp, 50.dp, 80.dp, 0.dp)
+            .clip(RoundedCornerShape(30.dp))
+            .border(2.dp, Color.DarkGray, RoundedCornerShape(30.dp))
+            .height(50.dp),
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = "Search Icon"
+            )
+        },
+        placeholder = {
+            Text(text = placeHolder)
+        },
+        colors = TextFieldDefaults.textFieldColors(
+            containerColor = Color.White
+
+        ),
+        maxLines = 1,
+        singleLine = true
+    )
+
+}
+
+
+@Composable
+fun StiturMapScreen(
+    weatherIconClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+    list: List<String> ) {
+
     // TODO: Make loading gif / skeleton
     var showLoading by remember { mutableStateOf(true) }
+
+
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -86,23 +147,38 @@ fun StiturMapScreen(weatherIconClicked: () -> Unit) {
                 painter = painterResource(id = R.drawable.ic_weathericon),
                 contentDescription = "Weather icon",
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(100.dp)
                     .align(Alignment.TopStart)
-                    .padding(10.dp, 0.dp, 0.dp)
             )
         }
     }
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .padding(0.dp, 50.dp, 0.dp),
-        contentAlignment = Alignment.TopCenter
 
-    ) {
 
-        SearchBar()
+        Column(modifier.fillMaxSize()) {
+
+            val textState = remember {
+                mutableStateOf(TextFieldValue(""))
+            }
+            SearchView(state = textState, placeHolder = "Search for trailwalks!", modifier = modifier)
+
+            val searchedText = textState.value.text
+
+            if(searchedText.isNotBlank()) {
+
+                LazyColumn(modifier = Modifier.padding(10.dp)) {
+                    items(items = list.filter {
+                        it.contains(searchedText, ignoreCase = true)
+                    }, key = { it }) { item ->
+                        ColumnItem(item = item)
+
+
+                    }
+                }
+            }
+        }
     }
 
-}
+
 
 @OptIn(MapsComposeExperimentalApi::class, ExperimentalMaterial3Api::class)
 @Composable
