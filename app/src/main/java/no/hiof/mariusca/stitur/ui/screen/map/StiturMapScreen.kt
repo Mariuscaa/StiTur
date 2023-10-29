@@ -1,14 +1,19 @@
 package no.hiof.mariusca.stitur.ui.screen.map
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,14 +33,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -52,21 +60,22 @@ import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.launch
 import no.hiof.mariusca.stitur.R
+import no.hiof.mariusca.stitur.model.Coordinate
 import no.hiof.mariusca.stitur.model.Trip
 
 
 /*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBar(){
+fun SearchBar() {
 
-    var text by remember { mutableStateOf("")}
+    var text by remember { mutableStateOf("") }
 
     TextField(
         value = text,
-        onValueChange = {text = it},
-        label = {Text("Search for trailwalks!")},
-        leadingIcon = {Icon(Icons.Filled.Search, contentDescription = "Liste med turer")},
+        onValueChange = { text = it },
+        label = { Text("Search for trailwalks!") },
+        leadingIcon = { Icon(Icons.Filled.Search, contentDescription = "Liste med turer") },
         modifier = Modifier
             .width(250.dp)
             .height(50.dp)
@@ -152,8 +161,6 @@ fun StiturMapScreen(
             )
         }
     }
-
-
         Column(modifier.fillMaxSize()) {
 
             val textState = remember {
@@ -188,6 +195,7 @@ fun StiturMap(
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
+
     val trips by viewModel.trips.collectAsStateWithLifecycle(emptyList())
     val selectedTripState = remember { mutableStateOf<Trip?>(null) }
 
@@ -195,6 +203,14 @@ fun StiturMap(
     val cameraPosition = rememberCameraPositionState() {
         position = CameraPosition.fromLatLngZoom(halden, 12f)
     }
+
+
+    val context = LocalContext.current
+    val isCreateTripMode = remember { mutableStateOf(false) }
+    val newTripPoints = remember {
+        mutableStateListOf<LatLng>()
+    }
+
 
     LaunchedEffect(selectedTripState.value) {
         if (selectedTripState.value != null) {
@@ -210,37 +226,84 @@ fun StiturMap(
         val geoJsonObjectState = remember { mutableStateOf<JSONObject?>(null) }*/
 
     Column {
-        GoogleMap(
-            modifier = Modifier.fillMaxSize(),
-            cameraPositionState = cameraPosition,
+        Row(
+            horizontalArrangement = Arrangement.End,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            val polylinePoints = mutableListOf<LatLng>()
+            Button(
+                modifier = Modifier.alpha(if (isCreateTripMode.value) 1f else 0f),
+                onClick = {
+                    isCreateTripMode.value = !isCreateTripMode.value
+                    if (!isCreateTripMode.value) {
+                        newTripPoints.clear()
+                    }
+                }) {
+                Text(if (isCreateTripMode.value) "Cancel" else "")
+            }
+
+            Button(onClick = {
+                isCreateTripMode.value = !isCreateTripMode.value
+                if (!isCreateTripMode.value) {
+                    // Save the drawing as a trip when exiting drawing mode
+                    val newTrip = Trip(routeName = "New Trip",
+                        routeDescription = "Description of the new trip",
+                        difficulty = "Medium",
+                        coordinates = newTripPoints.map {
+                            Coordinate(
+                                it.latitude.toString(), it.longitude.toString()
+                            )
+                        })
+                    viewModel.createTrip(newTrip)
+                    newTripPoints.clear()
+                }
+            }) {
+                Text(if (isCreateTripMode.value) "Save trip" else "Create a new trip")
+            }
+        }
+
+        GoogleMap(modifier = Modifier.fillMaxSize(),
+            cameraPositionState = cameraPosition,
+            onMapClick = { point ->
+                if (isCreateTripMode.value) {
+                    newTripPoints.add(point)
+                }
+                Log.v("EH", newTripPoints.toString())
+            }) {
+
 
             trips.forEach { trip ->
+                val polylinePoints = mutableListOf<LatLng>()
                 if (trip.coordinates.isNotEmpty()) {
                     trip.coordinates.forEach { coordinate ->
                         val markerPosition =
                             LatLng(coordinate.lat.toDouble(), coordinate.long.toDouble())
                         polylinePoints.add(markerPosition)
                     }
-                    Polyline(
-                        points = polylinePoints,
+                    Polyline(points = polylinePoints.toList(),
                         clickable = true,
                         color = Color.Blue,
                         width = 20.0f,
                         onClick = {
                             selectedTripState.value = trip
-                        }
-                    )
+                        })
                 }
             }
 
             Marker(
-                MarkerState(position = halden),
-                title = "Halden",
-                snippet = "Marker in Halden."
+                MarkerState(position = halden), title = "Halden", snippet = "Marker in Halden."
             )
 
+            if (newTripPoints.isNotEmpty()) {
+                Polyline(
+                    points = newTripPoints.toList(),
+                    clickable = true,
+                    color = Color.Red,
+                    visible = true,
+                    width = 20.0f,
+                    onClick = {
+                        Toast.makeText(context, "Clicked polyline", Toast.LENGTH_LONG).show()
+                    })
+            }
 
             /*MapEffect(Unit) { map ->
                 if (geoJsonData.value != null) {
@@ -290,8 +353,7 @@ fun StiturMap(
                 onDismissRequest = {
                     showBottomSheet = false
                     selectedTripState.value = null
-                },
-                sheetState = sheetState
+                }, sheetState = sheetState
             ) {
                 // Sheet content
                 Button(onClick = {
@@ -309,15 +371,8 @@ fun StiturMap(
                     Text("Selected Trip: ${selectedTrip.routeName}")
                     Text("Description: ${selectedTrip.routeDescription}")
                     Text("Difficulty: ${selectedTrip.difficulty}")
-
                 }
-
             }
         }
-
-
     }
 }
-
-
-
