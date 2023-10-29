@@ -11,9 +11,9 @@ import javax.inject.Inject
 @HiltViewModel
 class StiturMapViewModel @Inject constructor(private val tripStorageService: TripStorageService) :
     ViewModel() {
-    fun createTrip(routeName: String) {
+    fun createTrip(trip: Trip) {
         viewModelScope.launch {
-            tripStorageService.save(Trip(routeName = routeName))
+            tripStorageService.save(trip)
         }
     }
 
