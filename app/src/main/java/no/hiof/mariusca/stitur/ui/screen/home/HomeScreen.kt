@@ -6,11 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -22,10 +17,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -50,8 +44,7 @@ fun HomeScreen(viewModel: SignUpViewModel = hiltViewModel()) {
     }
 }
 
-//Alle sidene i prosjektet og riktige ikoner
-//...
+//Alle sidene i prosjektet
 sealed class Screen(val route: String, @StringRes val title: Int, val icon: Int) {
     object Leaderboard : Screen("leaderboard", R.string.leaderboard, R.drawable.vector)
     object StiturMap : Screen("maps", R.string.stiturMap, R.drawable.maps)
@@ -66,8 +59,6 @@ sealed class Screen(val route: String, @StringRes val title: Int, val icon: Int)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NavigationApp() {
-    //val customBackgroundColor = Color(0xFF133c07)
-
 
     val navController = rememberNavController()
 
@@ -98,11 +89,21 @@ fun NavigationApp() {
                     LeaderboardScreen()
                 }
                 composable(Screen.StiturMap.route) {
+                    val list = listOf(
+                        "Tur1",
+                        "Tur2",
+                        "Tur3",
+                        "Tur4",
+                        "Tur5",
+                        "Tur6"
+                    )
+
+
 
                     //Text("Profile", modifier = Modifier.padding(innerPadding))
                     StiturMapScreen(weatherIconClicked = {
                         navController.navigate(Screen.Weather.route)
-                    })
+                    },list = list)
 
 
                 }
