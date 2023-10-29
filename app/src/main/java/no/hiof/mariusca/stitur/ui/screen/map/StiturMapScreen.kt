@@ -101,7 +101,6 @@ fun StiturMapScreen(weatherIconClicked: () -> Unit) {
         contentAlignment = Alignment.TopCenter
 
     ) {
-
         SearchBar()
     }
 
@@ -115,6 +114,7 @@ fun StiturMap(
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
+
     val trips by viewModel.trips.collectAsStateWithLifecycle(emptyList())
     val selectedTripState = remember { mutableStateOf<Trip?>(null) }
 
@@ -126,6 +126,9 @@ fun StiturMap(
     val markerStateList =
         remember { mutableStateListOf(MarkerState(halden)) }
     val context = LocalContext.current
+    val isCreateTripMode = remember { mutableStateOf(false)}
+    val newTripPoints = remember { mutableStateOf(false)}
+
 
     LaunchedEffect(selectedTripState.value) {
         if (selectedTripState.value != null) {
