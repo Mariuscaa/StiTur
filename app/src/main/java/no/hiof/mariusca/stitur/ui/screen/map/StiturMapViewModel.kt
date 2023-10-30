@@ -17,6 +17,12 @@ class StiturMapViewModel @Inject constructor(private val tripStorageService: Tri
         }
     }
 
+    fun deleteTrip(trip: Trip) {
+        viewModelScope.launch {
+            tripStorageService.delete(trip.uid)
+        }
+    }
+
     val trips = tripStorageService.trips
 }
 
