@@ -3,8 +3,8 @@ package no.hiof.mariusca.stitur.ui.screen.map
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,13 +13,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -103,7 +103,7 @@ fun SearchView(
 ) {
     TextField(
         value = state.value,
-        onValueChange = {value->
+        onValueChange = { value ->
             state.value = value
         },
 
@@ -137,7 +137,8 @@ fun SearchView(
 fun StiturMapScreen(
     weatherIconClicked: () -> Unit,
     modifier: Modifier = Modifier,
-    list: List<String> ) {
+    list: List<String>
+) {
 
     // TODO: Make loading gif / skeleton
     var showLoading by remember { mutableStateOf(true) }
@@ -161,30 +162,29 @@ fun StiturMapScreen(
             )
         }
     }
-        Column(modifier.fillMaxSize()) {
+    Column(modifier.fillMaxSize()) {
 
-            val textState = remember {
-                mutableStateOf(TextFieldValue(""))
-            }
-            SearchView(state = textState, placeHolder = "Search for trailwalks!", modifier = modifier)
+        val textState = remember {
+            mutableStateOf(TextFieldValue(""))
+        }
+        SearchView(state = textState, placeHolder = "Search for trailwalks!", modifier = modifier)
 
-            val searchedText = textState.value.text
+        val searchedText = textState.value.text
 
-            if(searchedText.isNotBlank()) {
+        if (searchedText.isNotBlank()) {
 
-                LazyColumn(modifier = Modifier.padding(10.dp)) {
-                    items(items = list.filter {
-                        it.contains(searchedText, ignoreCase = true)
-                    }, key = { it }) { item ->
-                        ColumnItem(item = item)
+            LazyColumn(modifier = Modifier.padding(10.dp)) {
+                items(items = list.filter {
+                    it.contains(searchedText, ignoreCase = true)
+                }, key = { it }) { item ->
+                    ColumnItem(item = item)
 
 
-                    }
                 }
             }
         }
     }
-
+}
 
 
 @OptIn(MapsComposeExperimentalApi::class, ExperimentalMaterial3Api::class)
@@ -355,23 +355,47 @@ fun StiturMap(
                     selectedTripState.value = null
                 }, sheetState = sheetState
             ) {
-                // Sheet content
-                Button(onClick = {
-                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                        if (!sheetState.isVisible) {
-                            showBottomSheet = false
-                            selectedTripState.value = null
+                Column(modifier = Modifier.padding(10.dp, top = 0.dp, bottom = 16.dp)) {
+                    Row(
+                        horizontalArrangement = Arrangement.End,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Button(
+                            modifier = Modifier.padding(end = 10.dp) ,
+                            onClick = {
+                            scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                if (!sheetState.isVisible) {
+                                    showBottomSheet = false
+                                    selectedTripState.value = null
+                                }
+                            }
+                        }) {
+                            Text("Close (X)")
                         }
                     }
-                }) {
-                    Text("Hide bottom sheet")
+
+
+                    selectedTripState.value?.let { selectedTrip ->
+                        Text("Selected Trip: ${selectedTrip.routeName}")
+                        Text("Description: ${selectedTrip.routeDescription}")
+                        Text("Difficulty: ${selectedTrip.difficulty}")
+                    }
+                    Button(
+                        modifier = Modifier.padding(top = 10.dp) ,
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                        onClick = {
+                            selectedTripState.value?.let { viewModel.deleteTrip(it) }
+                            scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                if (!sheetState.isVisible) {
+                                    showBottomSheet = false
+                                    selectedTripState.value = null
+                                }
+                            }
+                        }) {
+                        Text("Delete trip")
+                    }
                 }
 
-                selectedTripState.value?.let { selectedTrip ->
-                    Text("Selected Trip: ${selectedTrip.routeName}")
-                    Text("Description: ${selectedTrip.routeDescription}")
-                    Text("Difficulty: ${selectedTrip.difficulty}")
-                }
             }
         }
     }
