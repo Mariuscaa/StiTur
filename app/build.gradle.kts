@@ -89,6 +89,9 @@ dependencies {
     implementation("com.google.maps.android:maps-ktx:3.4.0")
     implementation("com.google.maps.android:maps-utils-ktx:3.4.0")
 
+    implementation("com.google.accompanist:accompanist-permissions:0.28.0")
+
+
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.google.firebase:firebase-firestore-ktx:24.8.1")

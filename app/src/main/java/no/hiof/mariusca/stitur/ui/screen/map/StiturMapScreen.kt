@@ -1,6 +1,6 @@
 package no.hiof.mariusca.stitur.ui.screen.map
 
-import android.util.Log
+import android.Manifest
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -53,6 +53,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
@@ -139,51 +140,62 @@ fun StiturMapScreen(
     modifier: Modifier = Modifier,
     list: List<String>
 ) {
+    // Inspired by https://github.com/android/platform-samples/blob/main/samples/base/src/main/java/com/example/platform/base/PermissionBox.kt
+    val permissions = listOf(
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.ACCESS_FINE_LOCATION,
+    )
+    PermissionBox(
+        permissions = permissions,
+        requiredPermissions = listOf(permissions.first()),
+        onGranted = {
+            // TODO: Make loading gif / skeleton
+            var showLoading by remember { mutableStateOf(true) }
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                StiturMap()
 
-    // TODO: Make loading gif / skeleton
-    var showLoading by remember { mutableStateOf(true) }
+                IconButton(onClick = weatherIconClicked) {
 
-
-
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        StiturMap()
-
-
-        IconButton(onClick = weatherIconClicked) {
-
-            Image(
-                painter = painterResource(id = R.drawable.ic_weathericon),
-                contentDescription = "Weather icon",
-                modifier = Modifier
-                    .size(100.dp)
-                    .align(Alignment.TopStart)
-            )
-        }
-    }
-    Column(modifier.fillMaxSize()) {
-
-        val textState = remember {
-            mutableStateOf(TextFieldValue(""))
-        }
-        SearchView(state = textState, placeHolder = "Search for trailwalks!", modifier = modifier)
-
-        val searchedText = textState.value.text
-
-        if (searchedText.isNotBlank()) {
-
-            LazyColumn(modifier = Modifier.padding(10.dp)) {
-                items(items = list.filter {
-                    it.contains(searchedText, ignoreCase = true)
-                }, key = { it }) { item ->
-                    ColumnItem(item = item)
-
-
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_weathericon),
+                        contentDescription = "Weather icon",
+                        modifier = Modifier
+                            .size(100.dp)
+                            .align(Alignment.TopStart)
+                    )
                 }
             }
-        }
-    }
+            Column(modifier.fillMaxSize()) {
+
+                val textState = remember {
+                    mutableStateOf(TextFieldValue(""))
+                }
+                SearchView(
+                    state = textState,
+                    placeHolder = "Search for trailwalks!",
+                    modifier = modifier
+                )
+
+                val searchedText = textState.value.text
+
+                if (searchedText.isNotBlank()) {
+
+                    LazyColumn(modifier = Modifier.padding(10.dp)) {
+                        items(items = list.filter {
+                            it.contains(searchedText, ignoreCase = true)
+                        }, key = { it }) { item ->
+                            ColumnItem(item = item)
+
+
+                        }
+                    }
+                }
+            }
+        },
+    )
+
 }
 
 
@@ -204,13 +216,11 @@ fun StiturMap(
         position = CameraPosition.fromLatLngZoom(halden, 12f)
     }
 
-
     val context = LocalContext.current
     val isCreateTripMode = remember { mutableStateOf(false) }
     val newTripPoints = remember {
         mutableStateListOf<LatLng>()
     }
-
 
     LaunchedEffect(selectedTripState.value) {
         if (selectedTripState.value != null) {
@@ -218,12 +228,6 @@ fun StiturMap(
             showBottomSheet = true
         }
     }
-
-    /*  GeoJson attempt
-        val context = LocalContext.current
-        val gson = Gson()
-
-        val geoJsonObjectState = remember { mutableStateOf<JSONObject?>(null) }*/
 
     Column {
         Row(
@@ -244,7 +248,6 @@ fun StiturMap(
             Button(onClick = {
                 isCreateTripMode.value = !isCreateTripMode.value
                 if (!isCreateTripMode.value) {
-                    // Save the drawing as a trip when exiting drawing mode
                     val newTrip = Trip(routeName = "New Trip",
                         routeDescription = "Description of the new trip",
                         difficulty = "Medium",
@@ -261,15 +264,15 @@ fun StiturMap(
             }
         }
 
-        GoogleMap(modifier = Modifier.fillMaxSize(),
+        GoogleMap(
+            modifier = Modifier.fillMaxSize(),
+            properties = MapProperties(isMyLocationEnabled = true),
             cameraPositionState = cameraPosition,
             onMapClick = { point ->
                 if (isCreateTripMode.value) {
                     newTripPoints.add(point)
                 }
-                Log.v("EH", newTripPoints.toString())
             }) {
-
 
             trips.forEach { trip ->
                 val polylinePoints = mutableListOf<LatLng>()
@@ -304,48 +307,6 @@ fun StiturMap(
                         Toast.makeText(context, "Clicked polyline", Toast.LENGTH_LONG).show()
                     })
             }
-
-            /*MapEffect(Unit) { map ->
-                if (geoJsonData.value != null) {
-                    // Create the geoJsonObject
-                    val geoJsonObject = JSONObject(geoJsonData.value!!)
-                    geoJsonObjectState.value = geoJsonObject
-
-                    // Check if geoJsonObjectState has a value
-                    val geoJsonObjectValue = geoJsonObjectState.value
-
-                    if (geoJsonObjectValue != null) {
-                        // Create the GeoJsonLayer
-                        val geoJsonLayer = GeoJsonLayer(map, geoJsonObjectValue)
-
-                        geoJsonLayer.apply {
-                            addLayerToMap()
-                            for (feature in features) {
-                                when (feature.geometry.geometryType) {
-                                    "LineString" -> {
-                                        val lineStringStyle = GeoJsonLineStringStyle()
-                                        lineStringStyle.color = "#ff0000".toColorInt()
-                                        lineStringStyle.width = 20f
-                                        feature.lineStringStyle = lineStringStyle
-                                    }
-                                }
-                            }
-                        }
-
-                        // Set an on-feature click listener
-                        geoJsonLayer.setOnFeatureClickListener {
-                            Toast.makeText(
-                                context,
-                                "Feature Click ${it.geometry.geometryType}",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                    }
-                }
-            }
-
-            // Trigger loading of the GeoJSON data
-            geoJsonData.value = gson.toJson(tripsToGeoJSONFeatureCollection(trips))*/
         }
 
         if (showBottomSheet) {
@@ -361,19 +322,18 @@ fun StiturMap(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Button(
-                            modifier = Modifier.padding(end = 10.dp) ,
+                            modifier = Modifier.padding(end = 10.dp),
                             onClick = {
-                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                if (!sheetState.isVisible) {
-                                    showBottomSheet = false
-                                    selectedTripState.value = null
+                                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                    if (!sheetState.isVisible) {
+                                        showBottomSheet = false
+                                        selectedTripState.value = null
+                                    }
                                 }
-                            }
-                        }) {
+                            }) {
                             Text("Close (X)")
                         }
                     }
-
 
                     selectedTripState.value?.let { selectedTrip ->
                         Text("Selected Trip: ${selectedTrip.routeName}")
@@ -381,7 +341,7 @@ fun StiturMap(
                         Text("Difficulty: ${selectedTrip.difficulty}")
                     }
                     Button(
-                        modifier = Modifier.padding(top = 10.dp) ,
+                        modifier = Modifier.padding(top = 10.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                         onClick = {
                             selectedTripState.value?.let { viewModel.deleteTrip(it) }
