@@ -1,11 +1,11 @@
 package no.hiof.mariusca.stitur.model
 
-data class GeoTreasure (
+data class GeoTreasure(
     val geoTreasureID: String = "",
     val title: String = "",
     val textContent: String = "",
     val pictureUrl: String = "",
-    val geoLocation: GeoLocation = GeoLocation()
+    val geoLocation: Any = GeoLocation()
 )
 
 

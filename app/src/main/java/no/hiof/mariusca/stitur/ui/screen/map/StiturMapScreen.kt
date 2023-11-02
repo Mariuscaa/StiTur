@@ -3,8 +3,8 @@ package no.hiof.mariusca.stitur.ui.screen.map
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -184,9 +183,25 @@ fun StiturMapScreen(
             }
         }
     }
-
-
-
+/*
+@Composable
+fun creatingGeoTreasure(pos){
+val customMarkerImage = painterResource(id = R.drawable.your_custom_image) // Replace with your image resource ID
+Marker(
+MarkerState(position),
+title = "Halden",
+snippet = "Marker in Halden.",
+icon = customMarkerImage, // Set the custom image here
+onClick = {
+    // Handle the click event for the marker
+    Toast.makeText(context, "Custom marker clicked!", Toast.LENGTH_LONG).show()
+}
+)
+}
+Marker(
+MarkerState(position = halden), title = "Halden", snippet = "Marker in Halden."
+)
+*/
 @OptIn(MapsComposeExperimentalApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun StiturMap(
@@ -230,6 +245,13 @@ fun StiturMap(
             horizontalArrangement = Arrangement.End,
             modifier = Modifier.fillMaxWidth()
         ) {
+            Button(onClick = {
+                //creatingGeoTreasure(halden)
+
+            }) {
+                Text("New GeoTreasure")
+            }
+
             Button(
                 modifier = Modifier.alpha(if (isCreateTripMode.value) 1f else 0f),
                 onClick = {
@@ -293,6 +315,7 @@ fun StiturMap(
                 MarkerState(position = halden), title = "Halden", snippet = "Marker in Halden."
             )
 
+
             if (newTripPoints.isNotEmpty()) {
                 Polyline(
                     points = newTripPoints.toList(),
@@ -302,7 +325,8 @@ fun StiturMap(
                     width = 20.0f,
                     onClick = {
                         Toast.makeText(context, "Clicked polyline", Toast.LENGTH_LONG).show()
-                    })
+                    }
+                )
             }
 
             /*MapEffect(Unit) { map ->
