@@ -1,7 +1,6 @@
 package no.hiof.mariusca.stitur.ui.screen.map
 
 import android.Manifest
-import android.graphics.Color.rgb
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -51,9 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.android.gms.maps.model.ButtCap
 import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.Cap
 import com.google.android.gms.maps.model.JointType
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.RoundCap
@@ -176,12 +173,15 @@ fun StiturMapScreen(
                     mutableStateOf(TextFieldValue(""))
                 }
                 SearchView(
-                    state = textState, placeHolder = "Search for trailwalks!", modifier = modifier
+                    state = textState,
+                    placeHolder = "Search for trailwalks!",
+                    modifier = modifier
                 )
 
-                val searchedText = textState.value.text
+                val searchedText = textState.value.text.lowercase()
 
                 if (searchedText.isNotBlank()) {
+
                     viewModel.getCreatedTrip(searchedText)
                     LazyColumn(modifier = Modifier.padding(10.dp)) {
                         items(items = filteredTrips, key = { it.uid }) { item ->

@@ -3,8 +3,6 @@ package no.hiof.mariusca.stitur.ui.screen.map
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import no.hiof.mariusca.stitur.model.Trip
 import no.hiof.mariusca.stitur.service.storage.TripStorageService
@@ -38,7 +36,7 @@ class StiturMapViewModel @Inject constructor(private val tripStorageService: Tri
             filteredTrips.clear()
 
             allTrips.forEach { trip ->
-                if (trip.routeName.contains(tripName))
+                if (trip.routeName.lowercase().contains(tripName))
                     filteredTrips.add(trip)
             }
 
