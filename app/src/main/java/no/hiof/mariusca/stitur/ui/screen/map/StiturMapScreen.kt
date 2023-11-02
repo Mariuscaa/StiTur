@@ -138,7 +138,7 @@ fun SearchView(
 fun StiturMapScreen(
     weatherIconClicked: () -> Unit,
     modifier: Modifier = Modifier,
-    list: List<String>,
+    //list: List<String>,
     viewModel: StiturMapViewModel = hiltViewModel()
 ) {
     val filteredTrips = viewModel.filteredTrips
