@@ -140,6 +140,13 @@ fun StiturMapScreen(
     modifier: Modifier = Modifier,
     list: List<String>
 ) {
+
+    //viewModel: StiturMapViewModel = hiltViewModel()
+
+    //val activeTrips by viewModel.trips.collectAsStateWithLifecycle(emptyList())
+    //val selectedTripState = remember { mutableStateOf<Trip?>(null) }
+
+
     // Inspired by https://github.com/android/platform-samples/blob/main/samples/base/src/main/java/com/example/platform/base/PermissionBox.kt
     val permissions = listOf(
         Manifest.permission.ACCESS_COARSE_LOCATION,

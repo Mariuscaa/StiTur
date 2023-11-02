@@ -17,6 +17,16 @@ class StiturMapViewModel @Inject constructor(private val tripStorageService: Tri
         }
     }
 
+    // henter ut absolutt alle trips, fiks så den henter kun den søkt på turen.
+    // annen måte slik at du kun henter ut den du ønsker.
+    fun getCreatedTrip(tripName: String){
+        viewModelScope.launch {
+            //ChatGbt eksempel under.
+            val trips = tripStorageService.getName(tripName)
+
+            //tripStorageService.getName(tripName)
+        }
+
     fun deleteTrip(trip: Trip) {
         viewModelScope.launch {
             tripStorageService.delete(trip.uid)

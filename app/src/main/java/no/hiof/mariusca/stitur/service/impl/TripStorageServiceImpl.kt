@@ -19,6 +19,12 @@ constructor(private val firestore: FirebaseFirestore) : TripStorageService {
     override suspend fun get(tripId: String): Trip? =
         firestore.collection(TRIPS_COLLECTION).document(tripId).get().await().toObject()
 
+    override suspend fun getName(routeName: String): List<Trip> =
+        firestore.collection(TRIPS_COLLECTION).whereArrayContains("routeName", routeName ).get().await().toObjects()
+    //document(routeName.toString()).get().await().toObject()
+    // ekstra get som kan søke på navn -X
+    // for å få det til så du lage dette i denne klassen: Her ligger implementasjoner
+
 
     override suspend fun save(trip: Trip): String =
         firestore.collection(TRIPS_COLLECTION).add(trip).await().id
