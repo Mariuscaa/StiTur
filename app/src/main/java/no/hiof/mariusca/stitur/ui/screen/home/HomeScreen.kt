@@ -89,6 +89,8 @@ fun NavigationApp() {
                     LeaderboardScreen()
                 }
                 composable(Screen.StiturMap.route) {
+
+                    //val list = viewModel.trips.collectAsStateWithLifecycle(emptyList())
                     val list = listOf(
                         "Tur1",
                         "Tur2",

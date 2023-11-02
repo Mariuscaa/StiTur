@@ -11,6 +11,7 @@ interface TripStorageService {
     //må legge til en ny get for å kun hente ut navn (ikke noe trip id).
     suspend fun getName(routeName: String): List<Trip>
 
+
     suspend fun save(trip: Trip): String
     suspend fun update(trip: Trip)
     suspend fun delete(tripId: String)
