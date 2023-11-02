@@ -1,6 +1,7 @@
 package no.hiof.mariusca.stitur.ui.screen.map
 
 import android.Manifest
+import android.graphics.Color.rgb
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -50,8 +51,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.gms.maps.model.ButtCap
 import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.Cap
+import com.google.android.gms.maps.model.JointType
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.RoundCap
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapsComposeExperimentalApi
@@ -215,6 +220,7 @@ fun StiturMap(
 
     val trips by viewModel.trips.collectAsStateWithLifecycle(emptyList())
     val selectedTripState = remember { mutableStateOf<Trip?>(null) }
+    val ongoingTripState = remember { mutableStateOf<Trip?>(null) }
 
     val halden = LatLng(59.1330, 11.3875)
     val cameraPosition = rememberCameraPositionState() {
@@ -288,9 +294,16 @@ fun StiturMap(
                         polylinePoints.add(markerPosition)
                     }
                     Polyline(points = polylinePoints.toList(),
+                        startCap = RoundCap(),
+                        endCap = RoundCap(),
+                        jointType = JointType.ROUND,
                         clickable = true,
-                        color = Color.Blue,
-                        width = 20.0f,
+                        color = if (trip == ongoingTripState.value) {
+                            Color(0xFF006600)
+                        } else {
+                            Color(0xFF000099)
+                        },
+                        width = 200.0f / cameraPosition.position.zoom,
                         onClick = {
                             selectedTripState.value = trip
                         })
@@ -309,7 +322,8 @@ fun StiturMap(
                     visible = true,
                     width = 20.0f,
                     onClick = {
-                        Toast.makeText(context, "Clicked polyline", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, "This trip is not saved yet.", Toast.LENGTH_LONG)
+                            .show()
                     })
             }
         }
@@ -340,13 +354,46 @@ fun StiturMap(
                         }
                     }
 
+                    if (selectedTripState.value == ongoingTripState.value) {
+                        Button(
+                            modifier = Modifier.padding(bottom = 10.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF006600)),
+                            onClick = {
+                                ongoingTripState.value = null
+                                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                    if (!sheetState.isVisible) {
+                                        showBottomSheet = false
+                                        selectedTripState.value = null
+                                    }
+                                }
+                            }) {
+                            Text("End trip")
+                        }
+                    } else {
+                        Button(
+                            modifier = Modifier.padding(bottom = 10.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF006600)),
+                            onClick = {
+                                ongoingTripState.value = selectedTripState.value
+                                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                    if (!sheetState.isVisible) {
+                                        showBottomSheet = false
+                                        selectedTripState.value = null
+                                    }
+                                }
+                            }) {
+                            Text("Start trip")
+                        }
+                    }
+
                     selectedTripState.value?.let { selectedTrip ->
                         Text("Selected Trip: ${selectedTrip.routeName}")
                         Text("Description: ${selectedTrip.routeDescription}")
                         Text("Difficulty: ${selectedTrip.difficulty}")
                     }
+
                     Button(
-                        modifier = Modifier.padding(top = 10.dp),
+                        modifier = Modifier.padding(top = 14.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                         onClick = {
                             selectedTripState.value?.let { viewModel.deleteTrip(it) }
