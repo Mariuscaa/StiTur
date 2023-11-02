@@ -99,6 +99,10 @@ fun NavigationApp() {
                     LeaderboardScreen()
                 }
                 composable(Screen.StiturMap.route) {
+
+                   /*
+
+                    //val list = viewModel.trips.collectAsStateWithLifecycle(emptyList())
                     val list = listOf(
                         "Tur1",
                         "Tur2",
@@ -108,12 +112,15 @@ fun NavigationApp() {
                         "Tur6"
                     )
 
+                    */
+
 
 
                     //Text("Profile", modifier = Modifier.padding(innerPadding))
                     StiturMapScreen(weatherIconClicked = {
                         navController.navigate(Screen.Weather.route)
-                    },list = list)
+                    })
+                        //,list = list)
 
 
                 }

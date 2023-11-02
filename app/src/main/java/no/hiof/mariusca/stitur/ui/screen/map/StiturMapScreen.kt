@@ -1,6 +1,7 @@
 package no.hiof.mariusca.stitur.ui.screen.map
 
-import android.util.Log
+import android.Manifest
+import android.graphics.Color.rgb
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -19,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -49,9 +51,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.gms.maps.model.ButtCap
 import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.Cap
+import com.google.android.gms.maps.model.JointType
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.RoundCap
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
@@ -102,7 +109,7 @@ fun SearchView(
 ) {
     TextField(
         value = state.value,
-        onValueChange = {value->
+        onValueChange = { value ->
             state.value = value
         },
 
@@ -136,51 +143,67 @@ fun SearchView(
 fun StiturMapScreen(
     weatherIconClicked: () -> Unit,
     modifier: Modifier = Modifier,
-    list: List<String> ) {
+    //list: List<String>,
+    viewModel: StiturMapViewModel = hiltViewModel()
+) {
+    val filteredTrips = viewModel.filteredTrips
 
-    // TODO: Make loading gif / skeleton
-    var showLoading by remember { mutableStateOf(true) }
+    //viewModel: StiturMapViewModel = hiltViewModel()
 
-
-
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        StiturMap()
+    //val activeTrips by viewModel.trips.collectAsStateWithLifecycle(emptyList())
+    //val selectedTripState = remember { mutableStateOf<Trip?>(null) }
 
 
-        IconButton(onClick = weatherIconClicked) {
+    // Inspired by https://github.com/android/platform-samples/blob/main/samples/base/src/main/java/com/example/platform/base/PermissionBox.kt
+    val permissions = listOf(
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.ACCESS_FINE_LOCATION,
+    )
+    PermissionBox(
+        permissions = permissions,
+        requiredPermissions = listOf(permissions.first()),
+        onGranted = {
+            // TODO: Make loading gif / skeleton
+            var showLoading by remember { mutableStateOf(true) }
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                StiturMap()
 
-            Image(
-                painter = painterResource(id = R.drawable.ic_weathericon),
-                contentDescription = "Weather icon",
-                modifier = Modifier
-                    .size(100.dp)
-                    .align(Alignment.TopStart)
-            )
-        }
-    }
-        Column(modifier.fillMaxSize()) {
+                IconButton(onClick = weatherIconClicked) {
 
-            val textState = remember {
-                mutableStateOf(TextFieldValue(""))
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_weathericon),
+                        contentDescription = "Weather icon",
+                        modifier = Modifier
+                            .size(100.dp)
+                            .align(Alignment.TopStart)
+                    )
+                }
             }
-            SearchView(state = textState, placeHolder = "Search for trailwalks!", modifier = modifier)
+            Column(modifier.fillMaxSize()) {
 
-            val searchedText = textState.value.text
+                val textState = remember {
+                    mutableStateOf(TextFieldValue(""))
+                }
+                SearchView(
+                    state = textState,
+                    placeHolder = "Search for trailwalks!",
+                    modifier = modifier
+                )
 
-            if(searchedText.isNotBlank()) {
+                val searchedText = textState.value.text
 
-                LazyColumn(modifier = Modifier.padding(10.dp)) {
-                    items(items = list.filter {
-                        it.contains(searchedText, ignoreCase = true)
-                    }, key = { it }) { item ->
-                        ColumnItem(item = item)
-
-
+                if (searchedText.isNotBlank()) {
+                    viewModel.getCreatedTrip(searchedText)
+                    LazyColumn(modifier = Modifier.padding(10.dp)) {
+                        items(items = filteredTrips, key = { it.uid }) { item ->
+                            ColumnItem(item = item.routeName)
+                        }
                     }
                 }
             }
+
         }
     }
 /*
@@ -202,6 +225,8 @@ Marker(
 MarkerState(position = halden), title = "Halden", snippet = "Marker in Halden."
 )
 */
+
+
 @OptIn(MapsComposeExperimentalApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun StiturMap(
@@ -213,12 +238,12 @@ fun StiturMap(
 
     val trips by viewModel.trips.collectAsStateWithLifecycle(emptyList())
     val selectedTripState = remember { mutableStateOf<Trip?>(null) }
+    val ongoingTripState = remember { mutableStateOf<Trip?>(null) }
 
     val halden = LatLng(59.1330, 11.3875)
     val cameraPosition = rememberCameraPositionState() {
         position = CameraPosition.fromLatLngZoom(halden, 12f)
     }
-
 
     val context = LocalContext.current
     val isCreateTripMode = remember { mutableStateOf(false) }
@@ -226,19 +251,12 @@ fun StiturMap(
         mutableStateListOf<LatLng>()
     }
 
-
     LaunchedEffect(selectedTripState.value) {
         if (selectedTripState.value != null) {
             sheetState.show()
             showBottomSheet = true
         }
     }
-
-    /*  GeoJson attempt
-        val context = LocalContext.current
-        val gson = Gson()
-
-        val geoJsonObjectState = remember { mutableStateOf<JSONObject?>(null) }*/
 
     Column {
         Row(
@@ -266,7 +284,6 @@ fun StiturMap(
             Button(onClick = {
                 isCreateTripMode.value = !isCreateTripMode.value
                 if (!isCreateTripMode.value) {
-                    // Save the drawing as a trip when exiting drawing mode
                     val newTrip = Trip(routeName = "New Trip",
                         routeDescription = "Description of the new trip",
                         difficulty = "Medium",
@@ -283,15 +300,15 @@ fun StiturMap(
             }
         }
 
-        GoogleMap(modifier = Modifier.fillMaxSize(),
+        GoogleMap(
+            modifier = Modifier.fillMaxSize(),
+            properties = MapProperties(isMyLocationEnabled = true),
             cameraPositionState = cameraPosition,
             onMapClick = { point ->
                 if (isCreateTripMode.value) {
                     newTripPoints.add(point)
                 }
-                Log.v("EH", newTripPoints.toString())
             }) {
-
 
             trips.forEach { trip ->
                 val polylinePoints = mutableListOf<LatLng>()
@@ -302,9 +319,16 @@ fun StiturMap(
                         polylinePoints.add(markerPosition)
                     }
                     Polyline(points = polylinePoints.toList(),
+                        startCap = RoundCap(),
+                        endCap = RoundCap(),
+                        jointType = JointType.ROUND,
                         clickable = true,
-                        color = Color.Blue,
-                        width = 20.0f,
+                        color = if (trip == ongoingTripState.value) {
+                            Color(0xFF006600)
+                        } else {
+                            Color(0xFF000099)
+                        },
+                        width = 200.0f / cameraPosition.position.zoom,
                         onClick = {
                             selectedTripState.value = trip
                         })
@@ -324,52 +348,11 @@ fun StiturMap(
                     visible = true,
                     width = 20.0f,
                     onClick = {
-                        Toast.makeText(context, "Clicked polyline", Toast.LENGTH_LONG).show()
-                    }
-                )
+
+                        Toast.makeText(context, "This trip is not saved yet.", Toast.LENGTH_LONG)
+                            .show()
+                    })
             }
-
-            /*MapEffect(Unit) { map ->
-                if (geoJsonData.value != null) {
-                    // Create the geoJsonObject
-                    val geoJsonObject = JSONObject(geoJsonData.value!!)
-                    geoJsonObjectState.value = geoJsonObject
-
-                    // Check if geoJsonObjectState has a value
-                    val geoJsonObjectValue = geoJsonObjectState.value
-
-                    if (geoJsonObjectValue != null) {
-                        // Create the GeoJsonLayer
-                        val geoJsonLayer = GeoJsonLayer(map, geoJsonObjectValue)
-
-                        geoJsonLayer.apply {
-                            addLayerToMap()
-                            for (feature in features) {
-                                when (feature.geometry.geometryType) {
-                                    "LineString" -> {
-                                        val lineStringStyle = GeoJsonLineStringStyle()
-                                        lineStringStyle.color = "#ff0000".toColorInt()
-                                        lineStringStyle.width = 20f
-                                        feature.lineStringStyle = lineStringStyle
-                                    }
-                                }
-                            }
-                        }
-
-                        // Set an on-feature click listener
-                        geoJsonLayer.setOnFeatureClickListener {
-                            Toast.makeText(
-                                context,
-                                "Feature Click ${it.geometry.geometryType}",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                    }
-                }
-            }
-
-            // Trigger loading of the GeoJSON data
-            geoJsonData.value = gson.toJson(tripsToGeoJSONFeatureCollection(trips))*/
         }
 
         if (showBottomSheet) {
@@ -379,23 +362,79 @@ fun StiturMap(
                     selectedTripState.value = null
                 }, sheetState = sheetState
             ) {
-                // Sheet content
-                Button(onClick = {
-                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                        if (!sheetState.isVisible) {
-                            showBottomSheet = false
-                            selectedTripState.value = null
+                Column(modifier = Modifier.padding(10.dp, top = 0.dp, bottom = 16.dp)) {
+                    Row(
+                        horizontalArrangement = Arrangement.End,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Button(
+                            modifier = Modifier.padding(end = 10.dp),
+                            onClick = {
+                                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                    if (!sheetState.isVisible) {
+                                        showBottomSheet = false
+                                        selectedTripState.value = null
+                                    }
+                                }
+                            }) {
+                            Text("Close (X)")
                         }
                     }
-                }) {
-                    Text("Hide bottom sheet")
+
+                    if (selectedTripState.value == ongoingTripState.value) {
+                        Button(
+                            modifier = Modifier.padding(bottom = 10.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF006600)),
+                            onClick = {
+                                ongoingTripState.value = null
+                                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                    if (!sheetState.isVisible) {
+                                        showBottomSheet = false
+                                        selectedTripState.value = null
+                                    }
+                                }
+                            }) {
+                            Text("End trip")
+                        }
+                    } else {
+                        Button(
+                            modifier = Modifier.padding(bottom = 10.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF006600)),
+                            onClick = {
+                                ongoingTripState.value = selectedTripState.value
+                                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                    if (!sheetState.isVisible) {
+                                        showBottomSheet = false
+                                        selectedTripState.value = null
+                                    }
+                                }
+                            }) {
+                            Text("Start trip")
+                        }
+                    }
+
+                    selectedTripState.value?.let { selectedTrip ->
+                        Text("Selected Trip: ${selectedTrip.routeName}")
+                        Text("Description: ${selectedTrip.routeDescription}")
+                        Text("Difficulty: ${selectedTrip.difficulty}")
+                    }
+
+                    Button(
+                        modifier = Modifier.padding(top = 14.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                        onClick = {
+                            selectedTripState.value?.let { viewModel.deleteTrip(it) }
+                            scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                if (!sheetState.isVisible) {
+                                    showBottomSheet = false
+                                    selectedTripState.value = null
+                                }
+                            }
+                        }) {
+                        Text("Delete trip")
+                    }
                 }
 
-                selectedTripState.value?.let { selectedTrip ->
-                    Text("Selected Trip: ${selectedTrip.routeName}")
-                    Text("Description: ${selectedTrip.routeDescription}")
-                    Text("Difficulty: ${selectedTrip.difficulty}")
-                }
             }
         }
     }

@@ -37,3 +37,4 @@ fun tripsToGeoJSONFeatureCollection(trips: List<Trip>): GeoJsonFeatureCollection
     val features = trips.map { tripToGeoJSONFeature(it) }
     return GeoJsonFeatureCollection("FeatureCollection", features)
 }
+

@@ -7,6 +7,7 @@ import kotlinx.coroutines.tasks.await
 import no.hiof.mariusca.stitur.model.Trip
 import no.hiof.mariusca.stitur.service.storage.TripStorageService
 import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.firestore.ktx.toObjects
 import javax.inject.Inject
 
 class TripStorageServiceImpl
@@ -18,6 +19,14 @@ constructor(private val firestore: FirebaseFirestore) : TripStorageService {
 
     override suspend fun get(tripId: String): Trip? =
         firestore.collection(TRIPS_COLLECTION).document(tripId).get().await().toObject()
+
+     override suspend fun getName(routeName: String): List<Trip> =
+        //firestore.collection(TRIPS_COLLECTION).whereArrayContains("routeName", routeName ).get().await().toObjects()
+    firestore.collection(TRIPS_COLLECTION).get().await().toObjects()
+    // Se du finner en bedre både å filtere på? Pr nå henter den alle!
+    //document(routeName.toString()).get().await().toObject()
+    // ekstra get som kan søke på navn -X
+    // for å få det til så du lage dette i denne klassen: Her ligger implementasjoner (sjekk bit for bit)
 
 
     override suspend fun save(trip: Trip): String =
