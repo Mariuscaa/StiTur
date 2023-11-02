@@ -91,7 +91,8 @@ fun NavigationApp() {
             NavHost(
                 navController = navController,
                 //startDestination = Screen.SignUp.route
-                startDestination = Screen.GeoTreasure.route
+                //startDestination = Screen.GeoTreasure.route
+                startDestination = Screen.SignUp.route
 
 
             ) {
@@ -100,19 +101,6 @@ fun NavigationApp() {
                 }
                 composable(Screen.StiturMap.route) {
 
-                   /*
-
-                    //val list = viewModel.trips.collectAsStateWithLifecycle(emptyList())
-                    val list = listOf(
-                        "Tur1",
-                        "Tur2",
-                        "Tur3",
-                        "Tur4",
-                        "Tur5",
-                        "Tur6"
-                    )
-
-                    */
 
 
 
