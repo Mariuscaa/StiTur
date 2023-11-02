@@ -54,6 +54,8 @@ fun SignUpScreen(
         .fillMaxWidth()
         .padding(16.dp, 4.dp)
 
+
+
     if (isAnonymous) {
         Column(
             modifier = modifier

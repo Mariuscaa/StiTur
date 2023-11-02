@@ -25,6 +25,7 @@ class SignUpViewModel @Inject constructor(private val accountService: AccountSer
 
     val isAnonymous = accountService.currentUser.map { it.isAnonymous }
 
+    val currentLoggedInUser = accountService.currentUser
 
     fun createAnonymousAccount() {
         viewModelScope.launch {

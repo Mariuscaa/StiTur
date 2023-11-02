@@ -203,10 +203,28 @@ fun StiturMapScreen(
                     }
                 }
             }
-        },
-    )
 
+        }
+    }
+/*
+@Composable
+fun creatingGeoTreasure(pos){
+val customMarkerImage = painterResource(id = R.drawable.your_custom_image) // Replace with your image resource ID
+Marker(
+MarkerState(position),
+title = "Halden",
+snippet = "Marker in Halden.",
+icon = customMarkerImage, // Set the custom image here
+onClick = {
+    // Handle the click event for the marker
+    Toast.makeText(context, "Custom marker clicked!", Toast.LENGTH_LONG).show()
 }
+)
+}
+Marker(
+MarkerState(position = halden), title = "Halden", snippet = "Marker in Halden."
+)
+*/
 
 
 @OptIn(MapsComposeExperimentalApi::class, ExperimentalMaterial3Api::class)
@@ -245,6 +263,13 @@ fun StiturMap(
             horizontalArrangement = Arrangement.End,
             modifier = Modifier.fillMaxWidth()
         ) {
+            Button(onClick = {
+                //creatingGeoTreasure(halden)
+
+            }) {
+                Text("New GeoTreasure")
+            }
+
             Button(
                 modifier = Modifier.alpha(if (isCreateTripMode.value) 1f else 0f),
                 onClick = {
@@ -314,6 +339,7 @@ fun StiturMap(
                 MarkerState(position = halden), title = "Halden", snippet = "Marker in Halden."
             )
 
+
             if (newTripPoints.isNotEmpty()) {
                 Polyline(
                     points = newTripPoints.toList(),
@@ -322,6 +348,7 @@ fun StiturMap(
                     visible = true,
                     width = 20.0f,
                     onClick = {
+
                         Toast.makeText(context, "This trip is not saved yet.", Toast.LENGTH_LONG)
                             .show()
                     })

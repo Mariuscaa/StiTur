@@ -27,6 +27,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import no.hiof.mariusca.stitur.R
+import no.hiof.mariusca.stitur.model.Profile
 import no.hiof.mariusca.stitur.signup.SignUpViewModel
 import no.hiof.mariusca.stitur.ui.screen.GeoTreasureScreen
 import no.hiof.mariusca.stitur.ui.screen.LeaderboardScreen
@@ -39,8 +40,16 @@ import no.hiof.mariusca.stitur.ui.screen.map.StiturMapScreen
 @Composable
 fun HomeScreen(viewModel: SignUpViewModel = hiltViewModel()) {
     val isAnonymous by viewModel.isAnonymous.collectAsState(initial = true)
+    // You can add logic here based on `isAnonymous`
+    if (isAnonymous) {
+        // Handle anonymous user
+    } else {
+        val user by viewModel.currentLoggedInUser.collectAsState(initial = Profile())
+        // Handle authenticated user
+    }
     Column (horizontalAlignment = Alignment.CenterHorizontally) {
         NavigationApp()
+
     }
 }
 
@@ -81,7 +90,8 @@ fun NavigationApp() {
         ) {
             NavHost(
                 navController = navController,
-                startDestination = Screen.SignUp.route
+                //startDestination = Screen.SignUp.route
+                startDestination = Screen.GeoTreasure.route
 
 
             ) {
