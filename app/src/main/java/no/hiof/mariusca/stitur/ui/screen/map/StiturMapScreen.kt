@@ -103,37 +103,27 @@ fun ColumnItem(item: String) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchView(
-    state: MutableState<TextFieldValue>,
-    placeHolder: String,
-    modifier: Modifier
+    state: MutableState<TextFieldValue>, placeHolder: String, modifier: Modifier
 ) {
-    TextField(
-        value = state.value,
-        onValueChange = { value ->
-            state.value = value
-        },
+    TextField(value = state.value, onValueChange = { value ->
+        state.value = value
+    },
 
         modifier
             .fillMaxWidth()
             .padding(80.dp, 50.dp, 80.dp, 0.dp)
             .clip(RoundedCornerShape(30.dp))
             .border(2.dp, Color.DarkGray, RoundedCornerShape(30.dp))
-            .height(50.dp),
-        leadingIcon = {
+            .height(50.dp), leadingIcon = {
             Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = "Search Icon"
+                imageVector = Icons.Default.Search, contentDescription = "Search Icon"
             )
-        },
-        placeholder = {
+        }, placeholder = {
             Text(text = placeHolder)
-        },
-        colors = TextFieldDefaults.textFieldColors(
+        }, colors = TextFieldDefaults.textFieldColors(
             containerColor = Color.White
 
-        ),
-        maxLines = 1,
-        singleLine = true
+        ), maxLines = 1, singleLine = true
     )
 
 }
@@ -141,8 +131,7 @@ fun SearchView(
 
 @Composable
 fun StiturMapScreen(
-    weatherIconClicked: () -> Unit,
-    modifier: Modifier = Modifier,
+    weatherIconClicked: () -> Unit, modifier: Modifier = Modifier,
     //list: List<String>,
     viewModel: StiturMapViewModel = hiltViewModel()
 ) {
@@ -187,9 +176,7 @@ fun StiturMapScreen(
                     mutableStateOf(TextFieldValue(""))
                 }
                 SearchView(
-                    state = textState,
-                    placeHolder = "Search for trailwalks!",
-                    modifier = modifier
+                    state = textState, placeHolder = "Search for trailwalks!", modifier = modifier
                 )
 
                 val searchedText = textState.value.text
@@ -203,9 +190,8 @@ fun StiturMapScreen(
                     }
                 }
             }
-
-        }
-    }
+        })
+}
 /*
 @Composable
 fun creatingGeoTreasure(pos){
@@ -260,8 +246,7 @@ fun StiturMap(
 
     Column {
         Row(
-            horizontalArrangement = Arrangement.End,
-            modifier = Modifier.fillMaxWidth()
+            horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()
         ) {
             Button(onClick = {
                 //creatingGeoTreasure(halden)
@@ -270,14 +255,12 @@ fun StiturMap(
                 Text("New GeoTreasure")
             }
 
-            Button(
-                modifier = Modifier.alpha(if (isCreateTripMode.value) 1f else 0f),
-                onClick = {
-                    isCreateTripMode.value = !isCreateTripMode.value
-                    if (!isCreateTripMode.value) {
-                        newTripPoints.clear()
-                    }
-                }) {
+            Button(modifier = Modifier.alpha(if (isCreateTripMode.value) 1f else 0f), onClick = {
+                isCreateTripMode.value = !isCreateTripMode.value
+                if (!isCreateTripMode.value) {
+                    newTripPoints.clear()
+                }
+            }) {
                 Text(if (isCreateTripMode.value) "Cancel" else "")
             }
 
@@ -300,8 +283,7 @@ fun StiturMap(
             }
         }
 
-        GoogleMap(
-            modifier = Modifier.fillMaxSize(),
+        GoogleMap(modifier = Modifier.fillMaxSize(),
             properties = MapProperties(isMyLocationEnabled = true),
             cameraPositionState = cameraPosition,
             onMapClick = { point ->
@@ -341,8 +323,7 @@ fun StiturMap(
 
 
             if (newTripPoints.isNotEmpty()) {
-                Polyline(
-                    points = newTripPoints.toList(),
+                Polyline(points = newTripPoints.toList(),
                     clickable = true,
                     color = Color.Red,
                     visible = true,
@@ -364,26 +345,22 @@ fun StiturMap(
             ) {
                 Column(modifier = Modifier.padding(10.dp, top = 0.dp, bottom = 16.dp)) {
                     Row(
-                        horizontalArrangement = Arrangement.End,
-                        modifier = Modifier.fillMaxWidth()
+                        horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()
                     ) {
-                        Button(
-                            modifier = Modifier.padding(end = 10.dp),
-                            onClick = {
-                                scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                    if (!sheetState.isVisible) {
-                                        showBottomSheet = false
-                                        selectedTripState.value = null
-                                    }
+                        Button(modifier = Modifier.padding(end = 10.dp), onClick = {
+                            scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                if (!sheetState.isVisible) {
+                                    showBottomSheet = false
+                                    selectedTripState.value = null
                                 }
-                            }) {
+                            }
+                        }) {
                             Text("Close (X)")
                         }
                     }
 
                     if (selectedTripState.value == ongoingTripState.value) {
-                        Button(
-                            modifier = Modifier.padding(bottom = 10.dp),
+                        Button(modifier = Modifier.padding(bottom = 10.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF006600)),
                             onClick = {
                                 ongoingTripState.value = null
@@ -397,8 +374,7 @@ fun StiturMap(
                             Text("End trip")
                         }
                     } else {
-                        Button(
-                            modifier = Modifier.padding(bottom = 10.dp),
+                        Button(modifier = Modifier.padding(bottom = 10.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF006600)),
                             onClick = {
                                 ongoingTripState.value = selectedTripState.value
@@ -419,8 +395,7 @@ fun StiturMap(
                         Text("Difficulty: ${selectedTrip.difficulty}")
                     }
 
-                    Button(
-                        modifier = Modifier.padding(top = 14.dp),
+                    Button(modifier = Modifier.padding(top = 14.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                         onClick = {
                             selectedTripState.value?.let { viewModel.deleteTrip(it) }
