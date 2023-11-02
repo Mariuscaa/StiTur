@@ -138,8 +138,17 @@ fun SearchView(
 fun StiturMapScreen(
     weatherIconClicked: () -> Unit,
     modifier: Modifier = Modifier,
-    list: List<String>
+    //list: List<String>,
+    viewModel: StiturMapViewModel = hiltViewModel()
 ) {
+    val filteredTrips = viewModel.filteredTrips
+
+    //viewModel: StiturMapViewModel = hiltViewModel()
+
+    //val activeTrips by viewModel.trips.collectAsStateWithLifecycle(emptyList())
+    //val selectedTripState = remember { mutableStateOf<Trip?>(null) }
+
+
     // Inspired by https://github.com/android/platform-samples/blob/main/samples/base/src/main/java/com/example/platform/base/PermissionBox.kt
     val permissions = listOf(
         Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -181,14 +190,10 @@ fun StiturMapScreen(
                 val searchedText = textState.value.text
 
                 if (searchedText.isNotBlank()) {
-
+                    viewModel.getCreatedTrip(searchedText)
                     LazyColumn(modifier = Modifier.padding(10.dp)) {
-                        items(items = list.filter {
-                            it.contains(searchedText, ignoreCase = true)
-                        }, key = { it }) { item ->
-                            ColumnItem(item = item)
-
-
+                        items(items = filteredTrips, key = { it.uid }) { item ->
+                            ColumnItem(item = item.routeName)
                         }
                     }
                 }
