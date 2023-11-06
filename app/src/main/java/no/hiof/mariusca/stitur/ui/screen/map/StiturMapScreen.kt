@@ -140,7 +140,7 @@ fun StiturMapScreen(
                     isCreateTripMode = isCreateTripMode,
                     newTripPoints = newTripPoints,
                     selectedTripState = selectedTripState
-                    )
+                )
 
                 IconButton(onClick = weatherIconClicked) {
 
@@ -211,7 +211,7 @@ fun StiturMap(
     isCreateTripMode: MutableState<Boolean>,
     newTripPoints: MutableList<LatLng>,
     selectedTripState: MutableState<Trip?>
-    ) {
+) {
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }

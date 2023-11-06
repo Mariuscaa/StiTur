@@ -54,41 +54,15 @@ fun MapBottomSheet(
                     }
                 }
 
-                if (selectedTripState.value == ongoingTripState.value) {
-                    Button(modifier = Modifier.padding(bottom = 10.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF006600)),
-                        onClick = {
-                            ongoingTripState.value = null
-                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                if (!sheetState.isVisible) {
-                                    toggleBottomSheet(false)
-                                    selectedTripState.value = null
-                                }
-                            }
-                        }) {
-                        Text("End trip")
-                    }
-                } else {
-                    Button(modifier = Modifier.padding(bottom = 10.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF006600)),
-                        onClick = {
-                            ongoingTripState.value = selectedTripState.value
-                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                if (!sheetState.isVisible) {
-                                    toggleBottomSheet(false)
-                                    selectedTripState.value = null
-                                }
-                            }
-                        }) {
-                        Text("Start trip")
-                    }
-                }
+                DynamicStartAndStopButton(
+                    selectedTripState,
+                    ongoingTripState,
+                    scope,
+                    sheetState,
+                    toggleBottomSheet
+                )
 
-                selectedTripState.value?.let { selectedTrip ->
-                    Text("Selected Trip: ${selectedTrip.routeName}")
-                    Text("Description: ${selectedTrip.routeDescription}")
-                    Text("Difficulty: ${selectedTrip.difficulty}")
-                }
+                TripOverview(selectedTripState)
 
                 Button(modifier = Modifier.padding(top = 14.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
@@ -106,5 +80,54 @@ fun MapBottomSheet(
             }
 
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DynamicStartAndStopButton(
+    selectedTripState: MutableState<Trip?>,
+    ongoingTripState: MutableState<Trip?>,
+    scope: CoroutineScope,
+    sheetState: SheetState,
+    toggleBottomSheet: (Boolean) -> Unit
+) {
+    if (selectedTripState.value == ongoingTripState.value) {
+        Button(modifier = Modifier.padding(bottom = 10.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF006600)),
+            onClick = {
+                ongoingTripState.value = null
+                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                    if (!sheetState.isVisible) {
+                        toggleBottomSheet(false)
+                        selectedTripState.value = null
+                    }
+                }
+            }) {
+            Text("End trip")
+        }
+    } else {
+        Button(modifier = Modifier.padding(bottom = 10.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF006600)),
+            onClick = {
+                ongoingTripState.value = selectedTripState.value
+                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                    if (!sheetState.isVisible) {
+                        toggleBottomSheet(false)
+                        selectedTripState.value = null
+                    }
+                }
+            }) {
+            Text("Start trip")
+        }
+    }
+}
+
+@Composable
+private fun TripOverview(selectedTripState: MutableState<Trip?>) {
+    selectedTripState.value?.let { selectedTrip ->
+        Text("Selected Trip: ${selectedTrip.routeName}")
+        Text("Description: ${selectedTrip.routeDescription}")
+        Text("Difficulty: ${selectedTrip.difficulty}")
     }
 }
