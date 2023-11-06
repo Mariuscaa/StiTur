@@ -3,6 +3,7 @@ package no.hiof.mariusca.stitur.ui.screen.map
 import android.Manifest
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -50,35 +51,19 @@ import no.hiof.mariusca.stitur.R
 import no.hiof.mariusca.stitur.model.Trip
 
 
-/*
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
-fun SearchBar() {
-
-    var text by remember { mutableStateOf("") }
-
-    TextField(
-        value = text,
-        onValueChange = { text = it },
-        label = { Text("Search for trailwalks!") },
-        leadingIcon = { Icon(Icons.Filled.Search, contentDescription = "Liste med turer") },
+fun ColumnItem(item: String, onItemClick: () -> Unit) {
+    Column(
         modifier = Modifier
-            .width(250.dp)
-            .height(50.dp)
-    )
-
-
-}
-
- */
-
-@Composable
-fun ColumnItem(item: String) {
-    Column(modifier = Modifier.padding(10.dp)) {
+            .clickable(onClick = onItemClick) // This makes the item clickable
+            .padding(10.dp)
+    ) {
         Text(text = item, modifier = Modifier.padding(vertical = 10.dp), fontSize = 22.sp)
         Divider()
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -176,7 +161,9 @@ fun StiturMapScreen(
                     viewModel.getCreatedTrip(searchedText)
                     LazyColumn(modifier = Modifier.padding(10.dp)) {
                         items(items = filteredTrips, key = { it.uid }) { item ->
-                            ColumnItem(item = item.routeName)
+                            ColumnItem(item = item.routeName, onItemClick = {
+                                selectedTripState.value = item // Update the selectedTripState
+                            })
                         }
                     }
                 }
