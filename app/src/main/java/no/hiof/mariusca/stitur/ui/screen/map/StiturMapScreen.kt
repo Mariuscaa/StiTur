@@ -1,13 +1,10 @@
 package no.hiof.mariusca.stitur.ui.screen.map
 
 import android.Manifest
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,13 +15,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -40,7 +34,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -51,19 +44,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.JointType
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.RoundCap
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapProperties
-import com.google.maps.android.compose.MapsComposeExperimentalApi
-import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.MarkerState
-import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
-import kotlinx.coroutines.launch
 import no.hiof.mariusca.stitur.R
-import no.hiof.mariusca.stitur.model.Coordinate
 import no.hiof.mariusca.stitur.model.Trip
 
 
@@ -117,9 +100,10 @@ fun SearchView(
             )
         }, placeholder = {
             Text(text = placeHolder)
-        }, colors = TextFieldDefaults.textFieldColors(
-            containerColor = Color.White
-
+        }, colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.White,
+            unfocusedContainerColor = Color.White,
+            disabledContainerColor = Color.White,
         ), maxLines = 1, singleLine = true
     )
 
@@ -129,16 +113,14 @@ fun SearchView(
 @Composable
 fun StiturMapScreen(
     weatherIconClicked: () -> Unit, modifier: Modifier = Modifier,
-    //list: List<String>,
     viewModel: StiturMapViewModel = hiltViewModel()
 ) {
     val filteredTrips = viewModel.filteredTrips
-
-    //viewModel: StiturMapViewModel = hiltViewModel()
-
-    //val activeTrips by viewModel.trips.collectAsStateWithLifecycle(emptyList())
-    //val selectedTripState = remember { mutableStateOf<Trip?>(null) }
-
+    val isCreateTripMode = remember { mutableStateOf(false) }
+    val newTripPoints = remember {
+        mutableStateListOf<LatLng>()
+    }
+    val selectedTripState = remember { mutableStateOf<Trip?>(null) }
 
     // Inspired by https://github.com/android/platform-samples/blob/main/samples/base/src/main/java/com/example/platform/base/PermissionBox.kt
     val permissions = listOf(
@@ -154,7 +136,11 @@ fun StiturMapScreen(
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
-                StiturMap()
+                StiturMap(
+                    isCreateTripMode = isCreateTripMode,
+                    newTripPoints = newTripPoints,
+                    selectedTripState = selectedTripState
+                    )
 
                 IconButton(onClick = weatherIconClicked) {
 
@@ -166,6 +152,11 @@ fun StiturMapScreen(
                             .align(Alignment.TopStart)
                     )
                 }
+                MapButtons(
+                    isCreateTripMode = isCreateTripMode,
+                    newTripPoints = newTripPoints,
+                    viewModel = viewModel
+                )
             }
             Column(modifier.fillMaxSize()) {
 
@@ -213,17 +204,19 @@ MarkerState(position = halden), title = "Halden", snippet = "Marker in Halden."
 */
 
 
-@OptIn(MapsComposeExperimentalApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StiturMap(
     viewModel: StiturMapViewModel = hiltViewModel(),
-) {
+    isCreateTripMode: MutableState<Boolean>,
+    newTripPoints: MutableList<LatLng>,
+    selectedTripState: MutableState<Trip?>
+    ) {
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
 
     val trips by viewModel.trips.collectAsStateWithLifecycle(emptyList())
-    val selectedTripState = remember { mutableStateOf<Trip?>(null) }
     val ongoingTripState = remember { mutableStateOf<Trip?>(null) }
 
     val halden = LatLng(59.1330, 11.3875)
@@ -232,10 +225,9 @@ fun StiturMap(
     }
 
     val context = LocalContext.current
-    val isCreateTripMode = remember { mutableStateOf(false) }
-    val newTripPoints = remember {
-        mutableStateListOf<LatLng>()
-    }
+
+    val toggleBottomSheet: (Boolean) -> Unit = { showBottomSheet = it }
+
 
     LaunchedEffect(selectedTripState.value) {
         if (selectedTripState.value != null) {
@@ -245,172 +237,24 @@ fun StiturMap(
     }
 
     Column {
-        Row(
-            horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()
-        ) {
-            Button(onClick = {
-                //creatingGeoTreasure(halden)
+        MapContent(
+            trips = trips,
+            selectedTripState = selectedTripState,
+            ongoingTripState = ongoingTripState,
+            cameraPosition = cameraPosition,
+            newTripPoints = newTripPoints,
+            context = context,
+            isCreateTripMode = isCreateTripMode
+        )
 
-            }) {
-                Text("New GeoTreasure")
-            }
-
-            Button(modifier = Modifier.alpha(if (isCreateTripMode.value) 1f else 0f), onClick = {
-                isCreateTripMode.value = !isCreateTripMode.value
-                if (!isCreateTripMode.value) {
-                    newTripPoints.clear()
-                }
-            }) {
-                Text(if (isCreateTripMode.value) "Cancel" else "")
-            }
-
-            Button(onClick = {
-                isCreateTripMode.value = !isCreateTripMode.value
-                if (!isCreateTripMode.value) {
-                    val newTrip = Trip(routeName = "New Trip",
-                        routeDescription = "Description of the new trip",
-                        difficulty = "Medium",
-                        coordinates = newTripPoints.map {
-                            Coordinate(
-                                it.latitude.toString(), it.longitude.toString()
-                            )
-                        })
-                    viewModel.createTrip(newTrip)
-                    newTripPoints.clear()
-                }
-            }) {
-                Text(if (isCreateTripMode.value) "Save trip" else "Create a new trip")
-            }
-        }
-
-        GoogleMap(modifier = Modifier.fillMaxSize(),
-            properties = MapProperties(isMyLocationEnabled = true),
-            cameraPositionState = cameraPosition,
-            onMapClick = { point ->
-                if (isCreateTripMode.value) {
-                    newTripPoints.add(point)
-                }
-            }) {
-
-            trips.forEach { trip ->
-                val polylinePoints = mutableListOf<LatLng>()
-                if (trip.coordinates.isNotEmpty()) {
-                    trip.coordinates.forEach { coordinate ->
-                        val markerPosition =
-                            LatLng(coordinate.lat.toDouble(), coordinate.long.toDouble())
-                        polylinePoints.add(markerPosition)
-                    }
-                    Polyline(points = polylinePoints.toList(),
-                        startCap = RoundCap(),
-                        endCap = RoundCap(),
-                        jointType = JointType.ROUND,
-                        clickable = true,
-                        color = if (trip == ongoingTripState.value) {
-                            Color(0xFF006600)
-                        } else {
-                            Color(0xFF000099)
-                        },
-                        width = 200.0f / cameraPosition.position.zoom,
-                        onClick = {
-                            selectedTripState.value = trip
-                        })
-                }
-            }
-
-            Marker(
-                MarkerState(position = halden), title = "Halden", snippet = "Marker in Halden."
-            )
-
-
-            if (newTripPoints.isNotEmpty()) {
-                Polyline(points = newTripPoints.toList(),
-                    clickable = true,
-                    color = Color.Red,
-                    visible = true,
-                    width = 20.0f,
-                    onClick = {
-
-                        Toast.makeText(context, "This trip is not saved yet.", Toast.LENGTH_LONG)
-                            .show()
-                    })
-            }
-        }
-
-        if (showBottomSheet) {
-            ModalBottomSheet(
-                onDismissRequest = {
-                    showBottomSheet = false
-                    selectedTripState.value = null
-                }, sheetState = sheetState
-            ) {
-                Column(modifier = Modifier.padding(10.dp, top = 0.dp, bottom = 16.dp)) {
-                    Row(
-                        horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Button(modifier = Modifier.padding(end = 10.dp), onClick = {
-                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                if (!sheetState.isVisible) {
-                                    showBottomSheet = false
-                                    selectedTripState.value = null
-                                }
-                            }
-                        }) {
-                            Text("Close (X)")
-                        }
-                    }
-
-                    if (selectedTripState.value == ongoingTripState.value) {
-                        Button(modifier = Modifier.padding(bottom = 10.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF006600)),
-                            onClick = {
-                                ongoingTripState.value = null
-                                scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                    if (!sheetState.isVisible) {
-                                        showBottomSheet = false
-                                        selectedTripState.value = null
-                                    }
-                                }
-                            }) {
-                            Text("End trip")
-                        }
-                    } else {
-                        Button(modifier = Modifier.padding(bottom = 10.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF006600)),
-                            onClick = {
-                                ongoingTripState.value = selectedTripState.value
-                                scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                    if (!sheetState.isVisible) {
-                                        showBottomSheet = false
-                                        selectedTripState.value = null
-                                    }
-                                }
-                            }) {
-                            Text("Start trip")
-                        }
-                    }
-
-                    selectedTripState.value?.let { selectedTrip ->
-                        Text("Selected Trip: ${selectedTrip.routeName}")
-                        Text("Description: ${selectedTrip.routeDescription}")
-                        Text("Difficulty: ${selectedTrip.difficulty}")
-                    }
-
-                    Button(modifier = Modifier.padding(top = 14.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-                        onClick = {
-                            selectedTripState.value?.let { viewModel.deleteTrip(it) }
-                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                if (!sheetState.isVisible) {
-                                    showBottomSheet = false
-                                    selectedTripState.value = null
-                                }
-                            }
-                        }) {
-                        Text("Delete trip")
-                    }
-                }
-
-            }
-        }
+        MapBottomSheet(
+            selectedTripState = selectedTripState,
+            sheetState = sheetState,
+            showBottomSheet = showBottomSheet,
+            toggleBottomSheet = toggleBottomSheet,
+            scope = scope,
+            ongoingTripState = ongoingTripState,
+            viewModel = viewModel
+        )
     }
 }
