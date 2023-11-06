@@ -7,7 +7,7 @@ data class TripHistory(
     @DocumentId val uid: String = "",
     val date: Date = Date(),
     val trip: Trip = Trip(),
-    val trackedDistanceKm: Double = 0.0,
-    val durationMinutes: Int = 0,
+    var trackedDistanceKm: Double = 0.0,
+    var durationMinutes: Int = 0,
     val pointsEarned: Int = 0
 )

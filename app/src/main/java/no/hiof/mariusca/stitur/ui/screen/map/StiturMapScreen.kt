@@ -49,9 +49,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.rememberCameraPositionState
 import no.hiof.mariusca.stitur.R
 import no.hiof.mariusca.stitur.model.Trip
-
-
-
+import no.hiof.mariusca.stitur.model.TripHistory
 @Composable
 fun ColumnItem(item: String, onItemClick: () -> Unit) {
     Column(
@@ -63,7 +61,6 @@ fun ColumnItem(item: String, onItemClick: () -> Unit) {
         Divider()
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -91,9 +88,7 @@ fun SearchView(
             disabledContainerColor = Color.White,
         ), maxLines = 1, singleLine = true
     )
-
 }
-
 
 @Composable
 fun StiturMapScreen(
@@ -190,7 +185,6 @@ MarkerState(position = halden), title = "Halden", snippet = "Marker in Halden."
 )
 */
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StiturMap(
@@ -215,6 +209,7 @@ fun StiturMap(
 
     val toggleBottomSheet: (Boolean) -> Unit = { showBottomSheet = it }
 
+    val newTripHistoryState = remember { mutableStateOf<TripHistory?>(null) }
 
     LaunchedEffect(selectedTripState.value) {
         if (selectedTripState.value != null) {
@@ -241,7 +236,8 @@ fun StiturMap(
             toggleBottomSheet = toggleBottomSheet,
             scope = scope,
             ongoingTripState = ongoingTripState,
-            viewModel = viewModel
+            viewModel = viewModel,
+            newTripHistoryState = newTripHistoryState
         )
     }
 }

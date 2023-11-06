@@ -18,7 +18,6 @@ class TripHistoryViewModel @Inject constructor(private val tripHistoryStorageSer
             tripHistoryStorageService.save(tripHistory)
         }
     }
-
     fun deleteTripHistory(tripHistory: TripHistory) {
         viewModelScope.launch {
             tripHistoryStorageService.delete(tripHistory.uid)
