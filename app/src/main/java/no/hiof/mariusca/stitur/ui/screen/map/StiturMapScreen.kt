@@ -56,7 +56,7 @@ import no.hiof.mariusca.stitur.model.Trip
 fun ColumnItem(item: String, onItemClick: () -> Unit) {
     Column(
         modifier = Modifier
-            .clickable(onClick = onItemClick) // This makes the item clickable
+            .clickable(onClick = onItemClick)
             .padding(10.dp)
     ) {
         Text(text = item, modifier = Modifier.padding(vertical = 10.dp), fontSize = 22.sp)
@@ -162,7 +162,7 @@ fun StiturMapScreen(
                     LazyColumn(modifier = Modifier.padding(10.dp)) {
                         items(items = filteredTrips, key = { it.uid }) { item ->
                             ColumnItem(item = item.routeName, onItemClick = {
-                                selectedTripState.value = item // Update the selectedTripState
+                                selectedTripState.value = item
                             })
                         }
                     }
