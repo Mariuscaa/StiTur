@@ -181,6 +181,7 @@ private fun TripOverview(selectedTripState: MutableState<Trip?>) {
         Text("Selected Trip: ${selectedTrip.routeName}")
         Text("Description: ${selectedTrip.routeDescription}")
         Text("Difficulty: ${selectedTrip.difficulty}")
+        Text("Length: ${selectedTrip.lengthInMeters} meters")
     }
 }
 
