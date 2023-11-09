@@ -1,6 +1,7 @@
 package no.hiof.mariusca.stitur.ui.screen.map
 
 import android.Manifest
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -44,10 +45,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.rememberCameraPositionState
 import no.hiof.mariusca.stitur.R
+import no.hiof.mariusca.stitur.model.Coordinate
 import no.hiof.mariusca.stitur.model.Trip
 import no.hiof.mariusca.stitur.model.TripHistory
 @Composable
@@ -206,6 +209,7 @@ Button(onClick = { addCustomImageMarker(halden) }) {
 
  */
 
+@SuppressLint("MissingPermission")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StiturMap(
@@ -232,6 +236,11 @@ fun StiturMap(
     val toggleBottomSheet: (Boolean) -> Unit = { showBottomSheet = it }
 
     val newTripHistoryState = remember { mutableStateOf<TripHistory?>(null) }
+    val gpsTripState = remember {mutableStateOf<Trip?>(null)}
+    val locationRequest = remember {
+        mutableStateOf<LocationRequest?>(null)
+    }
+
 
     LaunchedEffect(selectedTripState.value) {
         if (selectedTripState.value != null) {
@@ -249,7 +258,8 @@ fun StiturMap(
             cameraPosition = cameraPosition,
             newTripPoints = newTripPoints,
             context = context,
-            isCreateTripMode = isCreateTripMode
+            isCreateTripMode = isCreateTripMode,
+            gpsTripState = gpsTripState
         )
 
         MapBottomSheet(
@@ -260,8 +270,28 @@ fun StiturMap(
             scope = scope,
             ongoingTripState = ongoingTripState,
             viewModel = viewModel,
-            newTripHistoryState = newTripHistoryState
+            newTripHistoryState = newTripHistoryState,
+            gpsTripState = gpsTripState,
+            locationRequest = locationRequest
         )
+
+        // Only register the location updates effect when we have a request
+        if (locationRequest.value != null) {
+            LocationUpdatesEffect(locationRequest.value!!) { result ->
+                for (currentLocation in result.locations) {
+                    val newCoordinate = Coordinate(
+                        lat = currentLocation.latitude.toString(),
+                        long = currentLocation.longitude.toString()
+                    )
+
+                    // Check if the new coordinate is not already in the list
+                    if (!gpsTripState.value?.coordinates.orEmpty().contains(newCoordinate)) {
+                        val updatedCoordinates = (gpsTripState.value?.coordinates ?: emptyList()) + newCoordinate
+                        gpsTripState.value = gpsTripState.value?.copy(coordinates = updatedCoordinates)
+                    }
+                }
+            }
+        }
 
     }
 }

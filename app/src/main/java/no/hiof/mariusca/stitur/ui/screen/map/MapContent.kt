@@ -33,6 +33,7 @@ fun MapContent(
     newTripPoints: MutableList<LatLng>,
     context: Context,
     isCreateTripMode: MutableState<Boolean>,
+    gpsTripState: MutableState<Trip?>
 ) {
 
     val halden = LatLng(59.1330, 11.3875)
@@ -53,6 +54,29 @@ fun MapContent(
         )
 
         CreateNewTrip(newTripPoints, context)
+
+        if (gpsTripState.value != null) {
+            val polylinePoints = mutableListOf<LatLng>()
+
+            if (gpsTripState.value!!.coordinates.isNotEmpty()) {
+                gpsTripState.value!!.coordinates.forEach { coordinate ->
+                    val markerPosition =
+                        LatLng(coordinate.lat.toDouble(), coordinate.long.toDouble())
+                    polylinePoints.add(markerPosition)
+                }
+                Polyline(points = polylinePoints.toList(),
+                    startCap = RoundCap(),
+                    endCap = RoundCap(),
+                    jointType = JointType.ROUND,
+                    clickable = true,
+                    color = Color.Cyan,
+                    width = 20f,
+                    onClick = {
+                        //selectedTripState.value = trip
+                    })
+
+            }
+        }
     }
 }
 
