@@ -5,23 +5,26 @@ import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.tasks.await
 import no.hiof.mariusca.stitur.model.Profile
 import no.hiof.mariusca.stitur.service.storage.UserInfoStorageService
+import javax.inject.Inject
 
 class UserInfoStorageServiceImpl
+@Inject
 constructor(private val firestore: FirebaseFirestore) : UserInfoStorageService{
 
     override suspend fun getProfile(profileID: String): Profile? =
     firestore.collection(USER_INFO_COLLECTION).document(profileID).get().await().toObject()
 
 
-    override suspend fun save(profile: Profile): String =
-        firestore.collection(UserInfoStorageServiceImpl.USER_INFO_COLLECTION).add(profile).await().id
+    override suspend fun save(profile: Profile) {
+        firestore.collection(USER_INFO_COLLECTION).document(profile.userID).set(profile).await()
+    }
 
     override suspend fun update(profile: Profile) {
-        TODO("Not yet implemented")
+        firestore.collection(USER_INFO_COLLECTION).document(profile.userID).set(profile).await()
     }
 
     override suspend fun delete(userId: String) {
-        TODO("Not yet implemented")
+        firestore.collection(USER_INFO_COLLECTION).document(userId).delete().await()
     }
 
     companion object {

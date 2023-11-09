@@ -72,7 +72,8 @@ fun ShowGeoTreasure(geoTreasure: GeoTreasure){
             .fillMaxWidth()
     ) {
         Image(
-            painter = painterResource(id = R.drawable.adolphin),
+            //Den drawablen under skal endres til å bli noe annet
+            painter = painterResource(id = R.drawable.vector),
             contentDescription = null,
             modifier = Modifier
                 .size(60.dp)
