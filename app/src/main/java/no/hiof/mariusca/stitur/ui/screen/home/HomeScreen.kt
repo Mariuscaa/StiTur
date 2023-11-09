@@ -113,7 +113,7 @@ fun NavigationApp() {
 
                 }
                 composable(Screen.Profile.route) {
-                    ProfileScreen()
+                    ProfileScreen(navController = navController)
                 }
                 composable(Screen.SignUp.route) {
                     SignUpScreen(navController = navController)
