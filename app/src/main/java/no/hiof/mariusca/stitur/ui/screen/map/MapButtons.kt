@@ -1,14 +1,11 @@
 package no.hiof.mariusca.stitur.ui.screen.map
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
@@ -25,6 +22,7 @@ import com.google.android.gms.maps.model.LatLng
 import no.hiof.mariusca.stitur.R
 import no.hiof.mariusca.stitur.model.Coordinate
 import no.hiof.mariusca.stitur.model.Trip
+import no.hiof.mariusca.stitur.model.calculateDistanceMeters
 
 @Composable
 fun MapButtons(
@@ -81,20 +79,7 @@ fun MapButtons(
                 IconButton(
                     onClick = {
                         isCreateTripMode.value = !isCreateTripMode.value
-                        if (!isCreateTripMode.value) {
-                            val newTrip = Trip(
-                                routeName = "New Trip",
-                                routeDescription = "Description of the new trip",
-                                difficulty = "Medium",
-                                coordinates = newTripPoints.map {
-                                    Coordinate(
-                                        it.latitude.toString(), it.longitude.toString()
-                                    )
-                                }
-                            )
-                            viewModel.createTrip(newTrip)
-                            newTripPoints.clear()
-                        }
+
                     }
                 ) {
                     Image(
@@ -125,14 +110,26 @@ fun MapButtons(
                     Button(onClick = {
                         isCreateTripMode.value = !isCreateTripMode.value
                         if (!isCreateTripMode.value) {
-                            val newTrip = Trip(routeName = "New Trip",
+                            val coordinates = mutableListOf<Coordinate>()
+                            for (point in newTripPoints) {
+                                val coordinate = Coordinate(
+                                    point.latitude.toString(),
+                                    point.longitude.toString()
+                                )
+                                coordinates.add(coordinate)
+                            }
+                            val distance = calculateDistanceMeters(coordinates)
+                            val newTrip = Trip(
+                                routeName = "Temp name",
                                 routeDescription = "Description of the new trip",
                                 difficulty = "Medium",
+                                lengthInMeters = distance.toLong(),
                                 coordinates = newTripPoints.map {
                                     Coordinate(
                                         it.latitude.toString(), it.longitude.toString()
                                     )
-                                })
+                                }
+                            )
                             viewModel.createTrip(newTrip)
                             newTripPoints.clear()
                         }
