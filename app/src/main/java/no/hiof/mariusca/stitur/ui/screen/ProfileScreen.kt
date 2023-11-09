@@ -38,7 +38,7 @@ fun ProfileScreen(
             onClick = {
                 viewModel.onSignOutClick()
 
-                navController.navigate(route = Screen.SignUp.route) {
+                navController.navigate(route = Screen.SignIn.route) {
                     popUpTo(navController.graph.startDestinationId) {
                         inclusive = true
                     }

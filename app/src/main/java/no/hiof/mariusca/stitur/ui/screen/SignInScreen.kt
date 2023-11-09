@@ -1,6 +1,5 @@
 package no.hiof.mariusca.stitur.ui.screen
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,11 +10,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -28,7 +28,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -38,26 +37,23 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import no.hiof.mariusca.stitur.R
-import no.hiof.mariusca.stitur.model.Profile
 import no.hiof.mariusca.stitur.signup.SignUpViewModel
 import no.hiof.mariusca.stitur.ui.screen.home.Screen
 
 
-@Composable
-fun SignUpScreen(
-    modifier: Modifier = Modifier,
-    signViewModel: SignUpViewModel = hiltViewModel(),
-    profViewModel: ProfileViewModel = hiltViewModel(),
-    navController: NavController
+//ScreenTest
 
+@Composable
+fun SignInScreen(
+    modifier: Modifier = Modifier,
+    signInViewModel: SignUpViewModel = hiltViewModel(),
+    navController: NavController
 ) {
-    val uiState by signViewModel.uiState
-    val isAnonymous by signViewModel.isAnonymous.collectAsState(initial = true)
+    val uiState by signInViewModel.uiState
+    val isAnonymous by signInViewModel.isAnonymous.collectAsState(initial = true)
     val fieldModifier = Modifier
         .fillMaxWidth()
         .padding(16.dp, 4.dp)
-
-
 
     if (isAnonymous) {
         Column(
@@ -72,16 +68,12 @@ fun SignUpScreen(
                 Text(text = stringResource(id = uiState.errorMessage),
                     Modifier.padding(vertical = 8.dp))
 
-            EmailField(uiState.email, signViewModel::onEmailChange, fieldModifier)
-            UserNameField(uiState.userName, signViewModel::onUserNameChange, fieldModifier )
-            PasswordField(uiState.password, signViewModel::onPasswordChange, fieldModifier)
-
-            RepeatPasswordField(uiState.repeatPassword, signViewModel::onRepeatPasswordChange, fieldModifier)
+            EmailField(uiState.email, signInViewModel::onEmailChange, fieldModifier)
+            PasswordFieldSignIn(uiState.password, signInViewModel::onPasswordChange, fieldModifier)
 
             Row {
                 Button(
-                    // signViewModel.onLoginClick()
-                    onClick = { navController.navigate(Screen.SignIn.route)},
+                    onClick = { signInViewModel.onLoginClick() },
                     modifier = Modifier
                         .padding(16.dp, 8.dp),
                 ) {
@@ -89,13 +81,7 @@ fun SignUpScreen(
                 }
                 Button(
                     onClick = {
-                        signViewModel.onSignUpClick { userId ->
-                            if (userId != null) {
-                                val newProfile = Profile(userID = userId, false,signViewModel.uiState.value.userName)
-                                profViewModel.createUser(newProfile)
-                                navController.navigate(route = Screen.StiturMap.route)
-                            }
-                        }
+                        navController.navigate(Screen.SignUp.route)
                     },
                     modifier = Modifier
                         .padding(16.dp, 8.dp),
@@ -104,77 +90,50 @@ fun SignUpScreen(
                 }
             }
             Button(
-                onClick = {signViewModel.createAnonymousAccount()},
+                onClick = { signInViewModel.createAnonymousAccount() },
                 modifier = Modifier
-                    .padding(16.dp, 8.dp),)
+                    .padding(16.dp, 8.dp),
+            )
             {
                 Text(text = ("Continue as Anonymous"), fontSize = 16.sp)
             }
         }
-    }
-    else {
-
+    } else {
         navController.navigate(route = Screen.StiturMap.route)
-
     }
 }
 
+/*
 @Composable
-fun UserNameField(value: String, onNewValue: (String) -> Unit, modifier: Modifier = Modifier){
+private fun String.EmailField(onNewValue: (String) -> Unit, modifier: Modifier) {
     OutlinedTextField(
         singleLine = true,
         modifier = modifier,
-        value = value,
-        onValueChange = { onNewValue(it) },
-        placeholder = { Text(stringResource(R.string.user_name)) },
-        leadingIcon = { Icon(imageVector = Icons.Default.Face, contentDescription = "Email") }
-    )
-}
-
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun EmailField(value: String, onNewValue: (String) -> Unit, modifier: Modifier = Modifier) {
-    OutlinedTextField(
-        singleLine = true,
-        modifier = modifier,
-        value = value,
+        value = this,
         onValueChange = { onNewValue(it) },
         placeholder = { Text(stringResource(R.string.email)) },
         leadingIcon = { Icon(imageVector = Icons.Default.Email, contentDescription = "Email") }
     )
 }
 
+ */
+
 @Composable
-fun PasswordField(value: String, onNewValue: (String) -> Unit, modifier: Modifier = Modifier) {
+private fun PasswordFieldSignIn(value: String, onNewValue: (String) -> Unit, modifier: Modifier) {
     PasswordField(value, R.string.password, onNewValue, modifier)
 }
 
 @Composable
-fun RepeatPasswordField(
-    value: String,
-    onNewValue: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    PasswordField(value, R.string.repeat_password, onNewValue, modifier)
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
 private fun PasswordField(
     value: String,
-    @StringRes placeholder: Int,
+    placeholder: Int,
     onNewValue: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier
 ) {
-    var isVisible by remember { mutableStateOf(false) }
+    var isVisible: Boolean by remember { mutableStateOf(false) }
 
     val icon =
-        //Den drawablen under skal endres til å bli noe annet
-        if (isVisible) painterResource(R.drawable.profile)
-        //Den drawablen under skal endres til å bli noe annet
-        else painterResource(R.drawable.eye)
+        if (isVisible) Icons.Default.Lock else Icons.Default.Lock
 
     val visualTransformation =
         if (isVisible) VisualTransformation.None else PasswordVisualTransformation()
@@ -184,10 +143,10 @@ private fun PasswordField(
         value = value,
         onValueChange = { onNewValue(it) },
         placeholder = { Text(text = stringResource(placeholder)) },
-        leadingIcon = { Icon(imageVector = Icons.Default.Lock, contentDescription = "Lock") },
+        leadingIcon = { Icon(imageVector = icon, contentDescription = "Lock") },
         trailingIcon = {
             IconButton(onClick = { isVisible = !isVisible }) {
-                Icon(painter = icon, contentDescription = "Visibility")
+                Icon(imageVector = Icons.Default.Edit, contentDescription = "Visibility")
             }
         },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
