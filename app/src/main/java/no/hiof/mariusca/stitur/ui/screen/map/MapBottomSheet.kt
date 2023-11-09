@@ -16,20 +16,27 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import no.hiof.mariusca.stitur.model.Trip
+import no.hiof.mariusca.stitur.model.TripHistory
+import no.hiof.mariusca.stitur.ui.screen.tripHistory.TripHistoryViewModel
+import java.time.Duration
+import java.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapBottomSheet(
+    tripHistoryViewModel: TripHistoryViewModel = hiltViewModel(),
     selectedTripState: MutableState<Trip?>,
     sheetState: SheetState,
     showBottomSheet: Boolean,
     toggleBottomSheet: (Boolean) -> Unit,
     scope: CoroutineScope,
     ongoingTripState: MutableState<Trip?>,
-    viewModel: StiturMapViewModel
+    viewModel: StiturMapViewModel,
+    newTripHistoryState: MutableState<TripHistory?>
 ) {
     if (showBottomSheet) {
         ModalBottomSheet(
@@ -55,11 +62,13 @@ fun MapBottomSheet(
                 }
 
                 DynamicStartAndStopButton(
+                    tripHistoryViewModel,
                     selectedTripState,
                     ongoingTripState,
+                    newTripHistoryState,
                     scope,
                     sheetState,
-                    toggleBottomSheet
+                    toggleBottomSheet,
                 )
 
                 TripOverview(selectedTripState)
@@ -86,8 +95,10 @@ fun MapBottomSheet(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DynamicStartAndStopButton(
+    viewModel: TripHistoryViewModel,
     selectedTripState: MutableState<Trip?>,
     ongoingTripState: MutableState<Trip?>,
+    newTripHistoryState: MutableState<TripHistory?>,
     scope: CoroutineScope,
     sheetState: SheetState,
     toggleBottomSheet: (Boolean) -> Unit
@@ -96,6 +107,19 @@ private fun DynamicStartAndStopButton(
         Button(modifier = Modifier.padding(bottom = 10.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF006600)),
             onClick = {
+                val tripStartDate = newTripHistoryState.value?.date?.toInstant()
+                if (tripStartDate != null) {
+                    val currentInstant = Instant.now()
+                    val duration = Duration.between(tripStartDate, currentInstant)
+                    val minutes = duration.toMinutes()
+
+                    // Round properly by adding 0.5 and converting to integer
+                    val roundedMinutes = (minutes + 0.5).toInt()
+                    newTripHistoryState.value?.durationMinutes = roundedMinutes
+                }
+                newTripHistoryState.value?.trackedDistanceKm = 1.2
+                newTripHistoryState.value?.let { viewModel.createTripHistory(it) }
+                newTripHistoryState.value = null
                 ongoingTripState.value = null
                 scope.launch { sheetState.hide() }.invokeOnCompletion {
                     if (!sheetState.isVisible) {
@@ -111,6 +135,8 @@ private fun DynamicStartAndStopButton(
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF006600)),
             onClick = {
                 ongoingTripState.value = selectedTripState.value
+                newTripHistoryState.value =
+                    ongoingTripState.value?.let { TripHistory(trip = it, pointsEarned = 100) }
                 scope.launch { sheetState.hide() }.invokeOnCompletion {
                     if (!sheetState.isVisible) {
                         toggleBottomSheet(false)
