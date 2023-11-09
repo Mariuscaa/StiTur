@@ -27,10 +27,9 @@ abstract class ServiceModule {
     abstract fun provideGeoTreasureStorageService(impl: GeoTreasureStorageServiceImpl): GeoTreasureStorageService
 
     @Binds
-ProfileViewAndLogging
     abstract fun provideUserStorageService(impl: UserInfoStorageServiceImpl): UserInfoStorageService
 
-
+    @Binds
     abstract fun provideTripHistoryStorageService(impl: TripHistoryStorageServiceImpl): TripHistoryStorageService
 
     /*@Binds
