@@ -1,9 +1,6 @@
 package no.hiof.mariusca.stitur.ui.screen.map
 
-import android.Manifest
 import android.annotation.SuppressLint
-import android.os.Looper
-import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,28 +13,18 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleOwner
-import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import no.hiof.mariusca.stitur.model.Trip
 import no.hiof.mariusca.stitur.model.TripHistory
+import no.hiof.mariusca.stitur.model.calculateDistanceKM
 import no.hiof.mariusca.stitur.ui.screen.tripHistory.TripHistoryViewModel
 import java.time.Duration
 import java.time.Instant
@@ -147,10 +134,14 @@ private fun DynamicStartAndStopButton(
                     val roundedMinutes = (minutes + 0.5).toInt()
                     newTripHistoryState.value?.durationMinutes = roundedMinutes
                 }
-                newTripHistoryState.value?.trackedDistanceKm = 1.2
+                val distance = gpsTripState.value?.let { calculateDistanceKM(it.coordinates) }
+                if (distance != null) {
+                    newTripHistoryState.value?.trackedDistanceKm = distance
+                }
                 newTripHistoryState.value?.let { viewModel.createTripHistory(it) }
                 newTripHistoryState.value = null
                 ongoingTripState.value = null
+                gpsTripState.value = null
                 scope.launch { sheetState.hide() }.invokeOnCompletion {
                     if (!sheetState.isVisible) {
                         toggleBottomSheet(false)
@@ -193,43 +184,4 @@ private fun TripOverview(selectedTripState: MutableState<Trip?>) {
     }
 }
 
-@RequiresPermission(
-    anyOf = [Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION],
-)
-@Composable
-fun LocationUpdatesEffect(
-    locationRequest: LocationRequest,
-    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-    onUpdate: (result: LocationResult) -> Unit,
-) {
-    val context = LocalContext.current
-    val currentOnUpdate by rememberUpdatedState(newValue = onUpdate)
 
-    // Whenever on of these parameters changes, dispose and restart the effect.
-    DisposableEffect(locationRequest, lifecycleOwner) {
-        val locationClient = LocationServices.getFusedLocationProviderClient(context)
-        val locationCallback: LocationCallback = object : LocationCallback() {
-            override fun onLocationResult(result: LocationResult) {
-                currentOnUpdate(result)
-            }
-        }
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_START) {
-                locationClient.requestLocationUpdates(
-                    locationRequest, locationCallback, Looper.getMainLooper(),
-                )
-            } else if (event == Lifecycle.Event.ON_STOP) {
-                locationClient.removeLocationUpdates(locationCallback)
-            }
-        }
-
-        // Add the observer to the lifecycle
-        lifecycleOwner.lifecycle.addObserver(observer)
-
-        // When the effect leaves the Composition, remove the observer
-        onDispose {
-            locationClient.removeLocationUpdates(locationCallback)
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
-    }
-}
