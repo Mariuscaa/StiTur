@@ -10,8 +10,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -67,7 +69,7 @@ fun SignInScreen(
                     Modifier.padding(vertical = 8.dp))
 
             EmailField(uiState.email, signInViewModel::onEmailChange, fieldModifier)
-            PasswordField(uiState.password, signInViewModel::onPasswordChange, fieldModifier)
+            PasswordFieldSignIn(uiState.password, signInViewModel::onPasswordChange, fieldModifier)
 
             Row {
                 Button(
@@ -79,11 +81,7 @@ fun SignInScreen(
                 }
                 Button(
                     onClick = {
-                        signInViewModel.onSignUpClick { userId ->
-                            if (userId != null) {
-                                navController.navigate(route = Screen.StiturMap.route)
-                            }
-                        }
+                        navController.navigate(Screen.SignUp.route)
                     },
                     modifier = Modifier
                         .padding(16.dp, 8.dp),
@@ -105,6 +103,7 @@ fun SignInScreen(
     }
 }
 
+/*
 @Composable
 private fun String.EmailField(onNewValue: (String) -> Unit, modifier: Modifier) {
     OutlinedTextField(
@@ -116,6 +115,8 @@ private fun String.EmailField(onNewValue: (String) -> Unit, modifier: Modifier) 
         leadingIcon = { Icon(imageVector = Icons.Default.Email, contentDescription = "Email") }
     )
 }
+
+ */
 
 @Composable
 private fun PasswordFieldSignIn(value: String, onNewValue: (String) -> Unit, modifier: Modifier) {
@@ -145,7 +146,7 @@ private fun PasswordField(
         leadingIcon = { Icon(imageVector = icon, contentDescription = "Lock") },
         trailingIcon = {
             IconButton(onClick = { isVisible = !isVisible }) {
-                Icon(imageVector = Icons.Default.Favorite, contentDescription = "Visibility")
+                Icon(imageVector = Icons.Default.Edit, contentDescription = "Visibility")
             }
         },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),

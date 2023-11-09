@@ -63,7 +63,7 @@ sealed class Screen(val route: String, @StringRes val title: Int, val icon: Int)
 
     object SignUp : Screen("SignUp", R.string.SignUp, R.drawable.profile)
 
-    object SignIn : Screen("SignUp", R.string.SignUp, R.drawable.profile)
+    object SignIn : Screen("SignIn", R.string.SignUp, R.drawable.profile)
     object GeoTreasure : Screen("GeoTreasure", R.string.SignUp,R.drawable.maps)
 }
 
@@ -95,7 +95,7 @@ fun NavigationApp() {
                 navController = navController,
                 //startDestination = Screen.SignUp.route
                 //startDestination = Screen.GeoTreasure.route
-                startDestination = Screen.SignUp.route
+                startDestination = Screen.SignIn.route
 
 
             ) {

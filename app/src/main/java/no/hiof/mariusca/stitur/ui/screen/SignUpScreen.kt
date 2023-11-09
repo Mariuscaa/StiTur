@@ -80,7 +80,8 @@ fun SignUpScreen(
 
             Row {
                 Button(
-                    onClick = { signViewModel.onLoginClick() },
+                    // signViewModel.onLoginClick()
+                    onClick = { navController.navigate(Screen.SignIn.route)},
                     modifier = Modifier
                         .padding(16.dp, 8.dp),
                 ) {
@@ -173,7 +174,7 @@ private fun PasswordField(
         //Den drawablen under skal endres til å bli noe annet
         if (isVisible) painterResource(R.drawable.profile)
         //Den drawablen under skal endres til å bli noe annet
-        else painterResource(R.drawable.user_icon_woman)
+        else painterResource(R.drawable.eye)
 
     val visualTransformation =
         if (isVisible) VisualTransformation.None else PasswordVisualTransformation()
