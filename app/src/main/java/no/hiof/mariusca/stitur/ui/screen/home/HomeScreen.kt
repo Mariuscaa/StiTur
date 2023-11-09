@@ -32,6 +32,7 @@ import no.hiof.mariusca.stitur.signup.SignUpViewModel
 import no.hiof.mariusca.stitur.ui.screen.GeoTreasureScreen
 import no.hiof.mariusca.stitur.ui.screen.LeaderboardScreen
 import no.hiof.mariusca.stitur.ui.screen.ProfileScreen
+import no.hiof.mariusca.stitur.ui.screen.SignInScreen
 import no.hiof.mariusca.stitur.ui.screen.SignUpScreen
 import no.hiof.mariusca.stitur.ui.screen.WeatherScreen
 import no.hiof.mariusca.stitur.ui.screen.map.StiturMapScreen
@@ -61,6 +62,8 @@ sealed class Screen(val route: String, @StringRes val title: Int, val icon: Int)
     object Weather : Screen("weather", R.string.profile, R.drawable.ic_weathericon)
 
     object SignUp : Screen("SignUp", R.string.SignUp, R.drawable.profile)
+
+    object SignIn : Screen("SignUp", R.string.SignUp, R.drawable.profile)
     object GeoTreasure : Screen("GeoTreasure", R.string.SignUp,R.drawable.maps)
 }
 
@@ -117,6 +120,10 @@ fun NavigationApp() {
                 }
                 composable(Screen.SignUp.route) {
                     SignUpScreen(navController = navController)
+                }
+
+                composable(Screen.SignIn.route) {
+                    SignInScreen(navController = navController)
                 }
 
 
