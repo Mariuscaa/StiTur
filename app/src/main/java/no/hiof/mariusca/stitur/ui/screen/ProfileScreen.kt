@@ -15,27 +15,37 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import no.hiof.mariusca.stitur.signup.SignUpViewModel
+import no.hiof.mariusca.stitur.ui.screen.home.Screen
 
 
 @Composable
 fun ProfileScreen(
     viewModel: SignUpViewModel = hiltViewModel(),
-    profViewModel: ProfileViewModel = hiltViewModel()
+    profViewModel: ProfileViewModel = hiltViewModel(),
+    navController: NavController
 ) {
    profViewModel.getUserInfo(viewModel.currentLoggedInUserId)
     val filteredUser = profViewModel.filteredUsers
 
-
-    //val profile: Profile? = profViewModel.getUserInfo(viewModel.currentLoggedInUserId)
 
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.TopEnd
     ) {
         Button(
-            onClick = { viewModel.onSignOutClick() },
+            onClick = {
+                viewModel.onSignOutClick()
+
+                navController.navigate(route = Screen.SignUp.route) {
+                    popUpTo(navController.graph.startDestinationId) {
+                        inclusive = true
+                    }
+                }
+                      },
             modifier = Modifier.padding(16.dp, 8.dp),
+
         ) {
             Text(text = "Sign Out", fontSize = 16.sp)
         }
