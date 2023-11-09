@@ -12,6 +12,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import no.hiof.mariusca.stitur.R
+import no.hiof.mariusca.stitur.model.Profile
 import no.hiof.mariusca.stitur.signup.SignUpViewModel
 import no.hiof.mariusca.stitur.ui.screen.home.Screen
 
@@ -44,12 +46,13 @@ import no.hiof.mariusca.stitur.ui.screen.home.Screen
 @Composable
 fun SignUpScreen(
     modifier: Modifier = Modifier,
-    viewModel: SignUpViewModel = hiltViewModel(),
+    signViewModel: SignUpViewModel = hiltViewModel(),
+    profViewModel: ProfileViewModel = hiltViewModel(),
     navController: NavController
 
 ) {
-    val uiState by viewModel.uiState
-    val isAnonymous by viewModel.isAnonymous.collectAsState(initial = true)
+    val uiState by signViewModel.uiState
+    val isAnonymous by signViewModel.isAnonymous.collectAsState(initial = true)
     val fieldModifier = Modifier
         .fillMaxWidth()
         .padding(16.dp, 4.dp)
@@ -69,21 +72,30 @@ fun SignUpScreen(
                 Text(text = stringResource(id = uiState.errorMessage),
                     Modifier.padding(vertical = 8.dp))
 
-            EmailField(uiState.email, viewModel::onEmailChange, fieldModifier)
-            PasswordField(uiState.password, viewModel::onPasswordChange, fieldModifier)
+            EmailField(uiState.email, signViewModel::onEmailChange, fieldModifier)
+            UserNameField(uiState.userName, signViewModel::onUserNameChange, fieldModifier )
+            PasswordField(uiState.password, signViewModel::onPasswordChange, fieldModifier)
 
-            RepeatPasswordField(uiState.repeatPassword, viewModel::onRepeatPasswordChange, fieldModifier)
+            RepeatPasswordField(uiState.repeatPassword, signViewModel::onRepeatPasswordChange, fieldModifier)
 
             Row {
                 Button(
-                    onClick = { viewModel.onLoginClick() },
+                    onClick = { signViewModel.onLoginClick() },
                     modifier = Modifier
                         .padding(16.dp, 8.dp),
                 ) {
                     Text(text = stringResource(R.string.login), fontSize = 16.sp)
                 }
                 Button(
-                    onClick = { viewModel.onSignUpClick() },
+                    onClick = {
+                        signViewModel.onSignUpClick { userId ->
+                            if (userId != null) {
+                                val newProfile = Profile(userID = userId, false,signViewModel.uiState.value.userName)
+                                profViewModel.createUser(newProfile)
+                                navController.navigate(route = Screen.StiturMap.route)
+                            }
+                        }
+                    },
                     modifier = Modifier
                         .padding(16.dp, 8.dp),
                 ) {
@@ -91,7 +103,7 @@ fun SignUpScreen(
                 }
             }
             Button(
-                onClick = {viewModel.createAnonymousAccount()},
+                onClick = {signViewModel.createAnonymousAccount()},
                 modifier = Modifier
                     .padding(16.dp, 8.dp),)
             {
@@ -105,6 +117,19 @@ fun SignUpScreen(
 
     }
 }
+
+@Composable
+fun UserNameField(value: String, onNewValue: (String) -> Unit, modifier: Modifier = Modifier){
+    OutlinedTextField(
+        singleLine = true,
+        modifier = modifier,
+        value = value,
+        onValueChange = { onNewValue(it) },
+        placeholder = { Text(stringResource(R.string.user_name)) },
+        leadingIcon = { Icon(imageVector = Icons.Default.Face, contentDescription = "Email") }
+    )
+}
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -145,8 +170,10 @@ private fun PasswordField(
     var isVisible by remember { mutableStateOf(false) }
 
     val icon =
-        if (isVisible) painterResource(R.drawable.adolphin)
-        else painterResource(R.drawable.trashcan)
+        //Den drawablen under skal endres til å bli noe annet
+        if (isVisible) painterResource(R.drawable.profile)
+        //Den drawablen under skal endres til å bli noe annet
+        else painterResource(R.drawable.user_icon_woman)
 
     val visualTransformation =
         if (isVisible) VisualTransformation.None else PasswordVisualTransformation()

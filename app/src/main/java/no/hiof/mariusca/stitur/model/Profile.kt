@@ -1,11 +1,13 @@
 package no.hiof.mariusca.stitur.model
 
+import com.google.firebase.firestore.DocumentId
+
 data class Profile(
-    val userID: String = "",
+    @DocumentId val userID: String = "",
     val isAnonymous: Boolean = true,
     val username: String = "",
     val nickname: String = "",
-    val email: String = "",
+    //val email: String = "",
     val profileImageUrl: String = "",
 
     // Connected properties

@@ -16,7 +16,6 @@ class LeaderboardsDummyData {
             "Sindre",
             "Wocky boy",
             "sindrelh@hiof.no",
-            "",
             PersonalRanking(Tiers.SILVER, 250, 500, 750)
         )
 
@@ -25,7 +24,6 @@ class LeaderboardsDummyData {
             "Jason",
             "Json boy",
             "json@hiof.no",
-            "",
             PersonalRanking(Tiers.GOLD, 500,1250, 3500)
         )
 
@@ -34,7 +32,6 @@ class LeaderboardsDummyData {
             "Arne",
             "Weather boy",
             "weather@hiof.no",
-            "",
             PersonalRanking(Tiers.PLATINUM, dailyPoints = 800, 750, 10_000)
         )
 
@@ -43,7 +40,6 @@ class LeaderboardsDummyData {
             "NPC",
             "Generic NPC boy",
             "npc@hiof.no",
-            "",
             PersonalRanking(Tiers.DIAMOND, 250, 1500, 5000)
         )
 

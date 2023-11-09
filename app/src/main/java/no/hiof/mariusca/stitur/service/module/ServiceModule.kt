@@ -7,8 +7,10 @@ import dagger.hilt.components.SingletonComponent
 import no.hiof.mariusca.stitur.service.impl.AccountServiceImpl
 import no.hiof.mariusca.stitur.service.impl.GeoTreasureStorageServiceImpl
 import no.hiof.mariusca.stitur.service.impl.TripStorageServiceImpl
+import no.hiof.mariusca.stitur.service.impl.UserInfoStorageServiceImpl
 import no.hiof.mariusca.stitur.service.storage.GeoTreasureStorageService
 import no.hiof.mariusca.stitur.service.storage.TripStorageService
+import no.hiof.mariusca.stitur.service.storage.UserInfoStorageService
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -22,8 +24,8 @@ abstract class ServiceModule {
     @Binds
     abstract fun provideGeoTreasureStorageService(impl: GeoTreasureStorageServiceImpl): GeoTreasureStorageService
 
-    /*@Binds
-    abstract fun provideGeoTreasureStorageService(impl: UserInfoStorageServiceImpl): UserInfoStorageService
-*/
+    @Binds
+    abstract fun provideUserStorageService(impl: UserInfoStorageServiceImpl): UserInfoStorageService
+
 
 }

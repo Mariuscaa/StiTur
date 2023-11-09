@@ -12,16 +12,18 @@ class GeoTreasureStorageServiceImpl
 constructor(private val firestore: FirebaseFirestore) : GeoTreasureStorageService {
 
     override suspend fun delete(geoTreasureID: String) {
-        TODO("Not yet implemented")
+        firestore.collection(TREASURE_INFO_COLLECTION).document(geoTreasureID).delete().await()
     }
+
+
     override suspend fun save(treasure: GeoTreasure): String =
-        firestore.collection(GeoTreasureStorageServiceImpl.TREASURE_INFO_COLLECTION).add(treasure).await().id
+        firestore.collection(TREASURE_INFO_COLLECTION).add(treasure).await().id
     override suspend fun getGeoTreasure(geoTreasureID: String): GeoTreasure? =
-        firestore.collection(GeoTreasureStorageServiceImpl.TREASURE_INFO_COLLECTION).document(geoTreasureID).get().await().toObject()
+        firestore.collection(TREASURE_INFO_COLLECTION).document(geoTreasureID).get().await().toObject()
 
 
     override suspend fun update(treasure: GeoTreasure) {
-        TODO("Not yet implemented")
+        firestore.collection(TREASURE_INFO_COLLECTION).document(treasure.geoTreasureID).set(treasure).await()
     }
 
 

@@ -23,9 +23,14 @@ class SignUpViewModel @Inject constructor(private val accountService: AccountSer
     private val password
         get() = uiState.value.password
 
+    private val userName
+        get() = uiState.value.userName
+
     val isAnonymous = accountService.currentUser.map { it.isAnonymous }
 
     val currentLoggedInUser = accountService.currentUser
+
+    val currentLoggedInUserId = accountService.currentUserId
 
     fun createAnonymousAccount() {
         viewModelScope.launch {
@@ -41,6 +46,10 @@ class SignUpViewModel @Inject constructor(private val accountService: AccountSer
 
     fun onPasswordChange(newValue: String) {
         uiState.value = uiState.value.copy(password = newValue)
+    }
+
+    fun onUserNameChange(newValue: String) {
+        uiState.value = uiState.value.copy(userName = newValue)
     }
 
     fun onRepeatPasswordChange(newValue: String) {
@@ -73,7 +82,7 @@ class SignUpViewModel @Inject constructor(private val accountService: AccountSer
 
     }
 
-    fun onSignUpClick() {
+    fun onSignUpClick(completion: (String?) -> Unit) {
         if (!email.isValidEmail()) {
             uiState.value = uiState.value.copy(errorMessage = R.string.email_error)
             return
@@ -92,7 +101,9 @@ class SignUpViewModel @Inject constructor(private val accountService: AccountSer
                     try {
                         accountService.linkAccount(email, password) { error ->
                             if (error == null)
-                                return@linkAccount
+                                completion(accountService.currentUserId)
+
+                                //return@linkAccount
                         }
                     }
                     catch(e: Exception) {

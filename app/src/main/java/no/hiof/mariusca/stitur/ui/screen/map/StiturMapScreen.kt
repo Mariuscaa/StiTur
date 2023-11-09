@@ -212,12 +212,31 @@ MarkerState(position = halden), title = "Halden", snippet = "Marker in Halden."
 )
 */
 
+@Composable
+fun geoTreasure(location: LatLng){
+    val customImageMarkers = remember { mutableStateListOf<LatLng>() }
+    customImageMarkers.add(location)
+}
+/*
+@Composable
+fun onCustomImageMarkerClick(markerLocation: LatLng) {
+    // Handle the click, for example, show a toast or navigate to another screen
+    Toast.makeText(context, "Custom marker at $markerLocation clicked!", Toast.LENGTH_LONG).show()
+}
 
+ */
+/*
+Button(onClick = { addCustomImageMarker(halden) }) {
+    Text("Add Clickable Image")
+}
+
+ */
 @OptIn(MapsComposeExperimentalApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun StiturMap(
     viewModel: StiturMapViewModel = hiltViewModel(),
 ) {
+
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -248,13 +267,12 @@ fun StiturMap(
         Row(
             horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()
         ) {
-            Button(onClick = {
-                //creatingGeoTreasure(halden)
+            /*
+            Button(onClick = { geoTreasure(halden) }) {
 
-            }) {
-                Text("New GeoTreasure")
+                Text("Add Clickable Image")
             }
-
+*/
             Button(modifier = Modifier.alpha(if (isCreateTripMode.value) 1f else 0f), onClick = {
                 isCreateTripMode.value = !isCreateTripMode.value
                 if (!isCreateTripMode.value) {
