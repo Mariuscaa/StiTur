@@ -1,5 +1,6 @@
 package no.hiof.mariusca.stitur.ui.screen.map
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,13 +18,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.Priority
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import no.hiof.mariusca.stitur.model.Trip
 import no.hiof.mariusca.stitur.model.TripHistory
+import no.hiof.mariusca.stitur.model.calculateDistanceKM
 import no.hiof.mariusca.stitur.ui.screen.tripHistory.TripHistoryViewModel
 import java.time.Duration
 import java.time.Instant
+import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,8 +41,11 @@ fun MapBottomSheet(
     scope: CoroutineScope,
     ongoingTripState: MutableState<Trip?>,
     viewModel: StiturMapViewModel,
-    newTripHistoryState: MutableState<TripHistory?>
+    newTripHistoryState: MutableState<TripHistory?>,
+    gpsTripState: MutableState<Trip?>,
+    locationRequest: MutableState<LocationRequest?>
 ) {
+
     if (showBottomSheet) {
         ModalBottomSheet(
             onDismissRequest = {
@@ -69,6 +77,8 @@ fun MapBottomSheet(
                     scope,
                     sheetState,
                     toggleBottomSheet,
+                    gpsTripState,
+                    locationRequest
                 )
 
                 TripOverview(selectedTripState)
@@ -92,6 +102,7 @@ fun MapBottomSheet(
     }
 }
 
+@SuppressLint("MissingPermission")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DynamicStartAndStopButton(
@@ -101,12 +112,18 @@ private fun DynamicStartAndStopButton(
     newTripHistoryState: MutableState<TripHistory?>,
     scope: CoroutineScope,
     sheetState: SheetState,
-    toggleBottomSheet: (Boolean) -> Unit
+    toggleBottomSheet: (Boolean) -> Unit,
+    gpsTripState: MutableState<Trip?>,
+    locationRequest: MutableState<LocationRequest?>
 ) {
+
+
     if (selectedTripState.value == ongoingTripState.value) {
         Button(modifier = Modifier.padding(bottom = 10.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF006600)),
             onClick = {
+                locationRequest.value = null
+
                 val tripStartDate = newTripHistoryState.value?.date?.toInstant()
                 if (tripStartDate != null) {
                     val currentInstant = Instant.now()
@@ -117,10 +134,14 @@ private fun DynamicStartAndStopButton(
                     val roundedMinutes = (minutes + 0.5).toInt()
                     newTripHistoryState.value?.durationMinutes = roundedMinutes
                 }
-                newTripHistoryState.value?.trackedDistanceKm = 1.2
+                val distance = gpsTripState.value?.let { calculateDistanceKM(it.coordinates) }
+                if (distance != null) {
+                    newTripHistoryState.value?.trackedDistanceKm = distance
+                }
                 newTripHistoryState.value?.let { viewModel.createTripHistory(it) }
                 newTripHistoryState.value = null
                 ongoingTripState.value = null
+                gpsTripState.value = null
                 scope.launch { sheetState.hide() }.invokeOnCompletion {
                     if (!sheetState.isVisible) {
                         toggleBottomSheet(false)
@@ -134,6 +155,11 @@ private fun DynamicStartAndStopButton(
         Button(modifier = Modifier.padding(bottom = 10.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF006600)),
             onClick = {
+                gpsTripState.value = Trip()
+                locationRequest.value = LocationRequest.Builder(
+                    Priority.PRIORITY_HIGH_ACCURACY,
+                    TimeUnit.SECONDS.toMillis(5)
+                ).build()
                 ongoingTripState.value = selectedTripState.value
                 newTripHistoryState.value =
                     ongoingTripState.value?.let { TripHistory(trip = it, pointsEarned = 100) }
@@ -155,5 +181,8 @@ private fun TripOverview(selectedTripState: MutableState<Trip?>) {
         Text("Selected Trip: ${selectedTrip.routeName}")
         Text("Description: ${selectedTrip.routeDescription}")
         Text("Difficulty: ${selectedTrip.difficulty}")
+        Text("Length: ${selectedTrip.lengthInMeters} meters")
     }
 }
+
+

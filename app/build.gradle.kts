@@ -62,6 +62,9 @@ dependencies {
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
     ksp("com.google.dagger:hilt-compiler:2.47")
 
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+
+
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
     implementation("com.google.firebase:firebase-analytics-ktx")
