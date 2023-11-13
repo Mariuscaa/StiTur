@@ -10,11 +10,11 @@ import kotlin.math.sqrt
 
 data class Trip(
     @DocumentId val uid: String = "",
-    val coordinates: List<Coordinate> = emptyList(),
+    var coordinates: List<Coordinate> = emptyList(),
     val created: Timestamp? = null,
     var difficulty: String = "",
     val geometryType: String = "",
-    val lengthInMeters: Long = 0,
+    var lengthInMeters: Long = 0,
     var routeDescription: String = "",
     var routeName: String = "",
     val updated: Timestamp? = null

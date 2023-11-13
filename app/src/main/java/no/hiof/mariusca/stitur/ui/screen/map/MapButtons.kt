@@ -1,7 +1,6 @@
 package no.hiof.mariusca.stitur.ui.screen.map
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,8 +28,8 @@ import no.hiof.mariusca.stitur.model.calculateDistanceMeters
 fun MapButtons(
     isCreateTripMode: MutableState<Boolean>,
     newTripPoints: MutableList<LatLng>,
-    viewModel: StiturMapViewModel,
-    newTrip: MutableState<Trip?>
+    newTrip: MutableState<Trip?>,
+    openDialog: MutableState<Boolean>,
 ) {
     // Define the action to perform when the geoTreasure icon is clicked
     val geoTreasureIconClicked: () -> Unit = {
@@ -82,7 +81,6 @@ fun MapButtons(
                 IconButton(
                     onClick = {
                         isCreateTripMode.value = !isCreateTripMode.value
-
                     }
                 ) {
                     Image(
@@ -107,12 +105,11 @@ fun MapButtons(
                             }
                         }
                     ) {
-                        Text(if (isCreateTripMode.value) "Cancel" else "")
+                        Text("Cancel")
                     }
 
                     Button(onClick = {
-                        isCreateTripMode.value = !isCreateTripMode.value
-                        if (!isCreateTripMode.value) {
+                        if (isCreateTripMode.value) {
                             val coordinates = mutableListOf<Coordinate>()
                             for (point in newTripPoints) {
                                 val coordinate = Coordinate(
@@ -122,25 +119,31 @@ fun MapButtons(
                                 coordinates.add(coordinate)
                             }
                             val distance = calculateDistanceMeters(coordinates)
-                            newTrip.value = Trip(
-                                lengthInMeters = distance.toLong(),
-                                coordinates = newTripPoints.map {
+                            if (newTrip.value == null) {
+                                newTrip.value = Trip(
+                                    lengthInMeters = distance.toLong(),
+                                    coordinates = newTripPoints.map {
+                                        Coordinate(
+                                            it.latitude.toString(), it.longitude.toString()
+                                        )
+                                    }
+                                )
+                            } else {
+                                newTrip.value!!.lengthInMeters = distance.toLong()
+                                newTrip.value!!.coordinates = newTripPoints.map {
                                     Coordinate(
                                         it.latitude.toString(), it.longitude.toString()
                                     )
                                 }
-                            )
-
+                            }
                         }
+                        openDialog.value = true
                     }) {
                         Text("Save trip")
                     }
                 }
             }
-
         }
-
-
     }
 }
 

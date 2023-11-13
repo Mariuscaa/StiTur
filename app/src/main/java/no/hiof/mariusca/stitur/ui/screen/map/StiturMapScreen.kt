@@ -116,6 +116,8 @@ fun StiturMapScreen(
 
     val newTrip = remember { mutableStateOf<Trip?>(null) }
 
+    val openDialog = remember { mutableStateOf(false) }
+
     // Inspired by https://github.com/android/platform-samples/blob/main/samples/base/src/main/java/com/example/platform/base/PermissionBox.kt
     val permissions = listOf(
         Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -134,7 +136,8 @@ fun StiturMapScreen(
                     isCreateTripMode = isCreateTripMode,
                     newTripPoints = newTripPoints,
                     selectedTripState = selectedTripState,
-                    newTrip = newTrip
+                    newTrip = newTrip,
+                    openDialog = openDialog
                 )
 
                 IconButton(onClick = weatherIconClicked) {
@@ -150,8 +153,8 @@ fun StiturMapScreen(
                 MapButtons(
                     isCreateTripMode = isCreateTripMode,
                     newTripPoints = newTripPoints,
-                    viewModel = viewModel,
-                    newTrip = newTrip
+                    newTrip = newTrip,
+                    openDialog = openDialog
                 )
             }
             Column(modifier.fillMaxSize()) {
@@ -230,7 +233,8 @@ fun StiturMap(
     isCreateTripMode: MutableState<Boolean>,
     newTripPoints: MutableList<LatLng>,
     selectedTripState: MutableState<Trip?>,
-    newTrip: MutableState<Trip?>
+    newTrip: MutableState<Trip?>,
+    openDialog: MutableState<Boolean>,
 ) {
 
     val sheetState = rememberModalBottomSheetState()
@@ -255,9 +259,6 @@ fun StiturMap(
         mutableStateOf<LocationRequest?>(null)
     }
 
-    val openDialog = remember { mutableStateOf(true) }
-
-
 
     LaunchedEffect(selectedTripState.value) {
         if (selectedTripState.value != null) {
@@ -279,11 +280,9 @@ fun StiturMap(
             gpsTripState = gpsTripState
         )
 
-        // ...
         when {
-            // ...
             openDialog.value -> {
-                SaveTripDialog(openDialog, newTrip)
+                SaveTripDialog(openDialog, newTrip, viewModel, newTripPoints, isCreateTripMode)
             }
         }
 
@@ -324,12 +323,16 @@ fun StiturMap(
 }
 
 @Composable
-private fun SaveTripDialog(openDialog: MutableState<Boolean>, newTrip: MutableState<Trip?>) {
+private fun SaveTripDialog(
+    openDialog: MutableState<Boolean>,
+    newTrip: MutableState<Trip?>,
+    stiturMapViewModel: StiturMapViewModel,
+    newTripPoints: MutableList<LatLng>,
+    isCreateTripMode: MutableState<Boolean>,
+) {
     Dialog(
         onDismissRequest = { openDialog.value = false },
     ) {
-        var length by remember { mutableStateOf("123") }
-
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -349,15 +352,22 @@ private fun SaveTripDialog(openDialog: MutableState<Boolean>, newTrip: MutableSt
                 newTrip.value?.let { trip ->
                     OutlinedTextField(
                         value = trip.routeName,
-                        onValueChange = { trip.routeName = it },
+                        onValueChange = { newRouteName ->
+                            newTrip.value = trip.copy(routeName = newRouteName)
+                        },
                         label = { Text("Name") },
-                        modifier = Modifier.padding(15.dp)
+                        modifier = Modifier.padding(15.dp),
+                        isError = trip.routeName.isEmpty()
                     )
                 }
                 newTrip.value?.let { trip ->
                     OutlinedTextField(
                         value = trip.routeDescription,
-                        onValueChange = { trip.routeDescription = it },
+                        onValueChange = { newRouteDescription ->
+                            newTrip.value = trip.copy(routeDescription = newRouteDescription)
+                        },
+                        minLines = 2,
+                        maxLines = 2,
                         label = { Text("Description") },
                         modifier = Modifier.padding(15.dp)
                     )
@@ -365,8 +375,9 @@ private fun SaveTripDialog(openDialog: MutableState<Boolean>, newTrip: MutableSt
                 newTrip.value?.let { trip ->
                     OutlinedTextField(
                         value = trip.difficulty,
-                        onValueChange = { trip.difficulty = it },
-                        label = { Text("Difficulty") },
+                        onValueChange = { newDifficulty ->
+                            newTrip.value = trip.copy(difficulty = newDifficulty)
+                        }, label = { Text("Difficulty") },
                         modifier = Modifier.padding(15.dp)
                     )
                 }
@@ -376,7 +387,8 @@ private fun SaveTripDialog(openDialog: MutableState<Boolean>, newTrip: MutableSt
                         value = trip.lengthInMeters.toString(),
                         onValueChange = {},
                         label = { Text("Estimated length in meters.") },
-                        modifier = Modifier.padding(15.dp)
+                        modifier = Modifier.padding(15.dp),
+                        enabled = false
                     )
                 }
                 Row(
@@ -385,12 +397,14 @@ private fun SaveTripDialog(openDialog: MutableState<Boolean>, newTrip: MutableSt
                         .align(CenterHorizontally),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    Button(onClick = { /*TODO*/ }) {
+                    Button(onClick = { openDialog.value = false }) {
                         Text(text = "Cancel")
                     }
                     Button(onClick = {
-                       // viewModel.createTrip(newTrip)
-                       // newTripPoints.clear()
+                        newTrip.value?.let { stiturMapViewModel.createTrip(it) }
+                        newTripPoints.clear()
+                        openDialog.value = false
+                        isCreateTripMode.value = !isCreateTripMode.value
                     }) {
                         Text(text = "Save")
                     }
