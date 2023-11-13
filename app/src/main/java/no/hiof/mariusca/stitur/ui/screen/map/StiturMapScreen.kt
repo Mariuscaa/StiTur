@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -330,8 +329,8 @@ private fun SaveTripDialog(openAlertDialog: MutableState<Boolean>) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight()
-                .padding(top = 50.dp, bottom = 120.dp),
+                .height(600.dp)
+                .padding(),
             shape = RoundedCornerShape(16.dp),
         ) {
             Column {
