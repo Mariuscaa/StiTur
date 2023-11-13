@@ -12,9 +12,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -32,6 +38,9 @@ fun ProfileScreen(
     profViewModel: ProfileViewModel = hiltViewModel(),
     navController: NavController
 ) {
+    val isEditMode = remember { mutableStateOf(false) }
+    val newUsername = remember { mutableStateOf("") }
+
     profViewModel.getUserInfo(viewModel.currentLoggedInUserId)
     val filteredUser = profViewModel.filteredUsers
 
@@ -43,10 +52,64 @@ fun ProfileScreen(
             horizontalAlignment = Alignment.Start,
             modifier = Modifier.wrapContentSize()
         ) {
-            ProfileItem(drawableId = R.drawable._icon__person_, text = filteredUser.value.username.uppercase())
-            ProfileItem(drawableId = R.drawable._icon__history_, text = "Trip History")
-            ProfileItem(drawableId = R.drawable._icon__camera_slr_, text = "My GeoTreasures")
-            LogoutButton(viewModel, navController)
+            IconButton(onClick = { isEditMode.value = !isEditMode.value }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.eye),
+                    contentDescription = "Edit"
+                )
+            }
+
+            if (isEditMode.value) {
+                EditUsernameView(
+                    currentUsername = filteredUser.value.username,
+                    newUsername = newUsername,
+                    onUpdate = { updatedUsername ->
+                        // Update logic here
+                        isEditMode.value = false
+                    }
+                )
+            } else {
+
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.Start,
+                        modifier = Modifier.wrapContentSize()
+                    ) {
+                        ProfileItem(
+                            drawableId = R.drawable._icon__person_,
+                            text = filteredUser.value.username.uppercase()
+                        )
+                        ProfileItem(drawableId = R.drawable._icon__history_, text = "Trip History")
+                        ProfileItem(
+                            drawableId = R.drawable._icon__camera_slr_,
+                            text = "My GeoTreasures"
+                        )
+                        LogoutButton(viewModel, navController)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun EditUsernameView(
+    currentUsername: String,
+    newUsername: MutableState<String>,
+    onUpdate: (String) -> Unit
+) {
+    Column {
+        Text("Current Username: $currentUsername", style = MaterialTheme.typography.bodyMedium)
+        TextField(
+            value = newUsername.value,
+            onValueChange = { newUsername.value = it },
+            label = { Text("New Username") }
+        )
+        Button(onClick = { onUpdate(newUsername.value) }) {
+            Text("Update Username")
         }
     }
 }
