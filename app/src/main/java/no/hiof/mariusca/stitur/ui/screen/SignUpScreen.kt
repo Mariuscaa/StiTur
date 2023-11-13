@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -170,11 +171,11 @@ private fun PasswordField(
 ) {
     var isVisible by remember { mutableStateOf(false) }
 
-    val icon =
-        //Den drawablen under skal endres til å bli noe annet
-        if (isVisible) painterResource(R.drawable.powerbutton)
-        //Den drawablen under skal endres til å bli noe annet
-        else painterResource(R.drawable.eye)
+    val (icon, size) = if (isVisible) {
+        Pair(painterResource(R.drawable.eye), 34.dp)
+    } else {
+        Pair(painterResource(R.drawable.closedeye), 24.dp)
+    }
 
     val visualTransformation =
         if (isVisible) VisualTransformation.None else PasswordVisualTransformation()
@@ -187,7 +188,7 @@ private fun PasswordField(
         leadingIcon = { Icon(imageVector = Icons.Default.Lock, contentDescription = "Lock") },
         trailingIcon = {
             IconButton(onClick = { isVisible = !isVisible }) {
-                Icon(painter = icon, contentDescription = "Visibility")
+                Icon(painter = icon, contentDescription = "Visibility", modifier = Modifier.size(size))
             }
         },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
