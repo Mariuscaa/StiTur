@@ -12,11 +12,11 @@ data class Trip(
     @DocumentId val uid: String = "",
     val coordinates: List<Coordinate> = emptyList(),
     val created: Timestamp? = null,
-    val difficulty: String = "",
+    var difficulty: String = "",
     val geometryType: String = "",
     val lengthInMeters: Long = 0,
-    val routeDescription: String = "",
-    val routeName: String = "",
+    var routeDescription: String = "",
+    var routeName: String = "",
     val updated: Timestamp? = null
 )
 

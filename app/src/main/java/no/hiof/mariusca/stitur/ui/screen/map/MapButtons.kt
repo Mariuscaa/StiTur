@@ -29,7 +29,8 @@ import no.hiof.mariusca.stitur.model.calculateDistanceMeters
 fun MapButtons(
     isCreateTripMode: MutableState<Boolean>,
     newTripPoints: MutableList<LatLng>,
-    viewModel: StiturMapViewModel
+    viewModel: StiturMapViewModel,
+    newTrip: MutableState<Trip?>
 ) {
     // Define the action to perform when the geoTreasure icon is clicked
     val geoTreasureIconClicked: () -> Unit = {
@@ -121,10 +122,7 @@ fun MapButtons(
                                 coordinates.add(coordinate)
                             }
                             val distance = calculateDistanceMeters(coordinates)
-                            val newTrip = Trip(
-                                routeName = "Temp name",
-                                routeDescription = "Description of the new trip",
-                                difficulty = "Medium",
+                            newTrip.value = Trip(
                                 lengthInMeters = distance.toLong(),
                                 coordinates = newTripPoints.map {
                                     Coordinate(
@@ -132,8 +130,7 @@ fun MapButtons(
                                     )
                                 }
                             )
-                            viewModel.createTrip(newTrip)
-                            newTripPoints.clear()
+
                         }
                     }) {
                         Text("Save trip")

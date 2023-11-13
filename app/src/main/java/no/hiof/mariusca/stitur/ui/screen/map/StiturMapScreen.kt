@@ -114,6 +114,8 @@ fun StiturMapScreen(
     }
     val selectedTripState = remember { mutableStateOf<Trip?>(null) }
 
+    val newTrip = remember { mutableStateOf<Trip?>(null) }
+
     // Inspired by https://github.com/android/platform-samples/blob/main/samples/base/src/main/java/com/example/platform/base/PermissionBox.kt
     val permissions = listOf(
         Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -131,7 +133,8 @@ fun StiturMapScreen(
                 StiturMap(
                     isCreateTripMode = isCreateTripMode,
                     newTripPoints = newTripPoints,
-                    selectedTripState = selectedTripState
+                    selectedTripState = selectedTripState,
+                    newTrip = newTrip
                 )
 
                 IconButton(onClick = weatherIconClicked) {
@@ -147,7 +150,8 @@ fun StiturMapScreen(
                 MapButtons(
                     isCreateTripMode = isCreateTripMode,
                     newTripPoints = newTripPoints,
-                    viewModel = viewModel
+                    viewModel = viewModel,
+                    newTrip = newTrip
                 )
             }
             Column(modifier.fillMaxSize()) {
@@ -225,7 +229,8 @@ fun StiturMap(
     viewModel: StiturMapViewModel = hiltViewModel(),
     isCreateTripMode: MutableState<Boolean>,
     newTripPoints: MutableList<LatLng>,
-    selectedTripState: MutableState<Trip?>
+    selectedTripState: MutableState<Trip?>,
+    newTrip: MutableState<Trip?>
 ) {
 
     val sheetState = rememberModalBottomSheetState()
@@ -250,6 +255,9 @@ fun StiturMap(
         mutableStateOf<LocationRequest?>(null)
     }
 
+    val openDialog = remember { mutableStateOf(true) }
+
+
 
     LaunchedEffect(selectedTripState.value) {
         if (selectedTripState.value != null) {
@@ -271,13 +279,11 @@ fun StiturMap(
             gpsTripState = gpsTripState
         )
 
-        val openAlertDialog = remember { mutableStateOf(true) }
-
         // ...
         when {
             // ...
-            openAlertDialog.value -> {
-                SaveTripDialog(openAlertDialog)
+            openDialog.value -> {
+                SaveTripDialog(openDialog, newTrip)
             }
         }
 
@@ -318,12 +324,10 @@ fun StiturMap(
 }
 
 @Composable
-private fun SaveTripDialog(openAlertDialog: MutableState<Boolean>) {
+private fun SaveTripDialog(openDialog: MutableState<Boolean>, newTrip: MutableState<Trip?>) {
     Dialog(
-        onDismissRequest = { openAlertDialog.value = false },
+        onDismissRequest = { openDialog.value = false },
     ) {
-        var text by remember { mutableStateOf("") }
-
         var length by remember { mutableStateOf("123") }
 
         Card(
@@ -342,33 +346,39 @@ private fun SaveTripDialog(openAlertDialog: MutableState<Boolean>) {
                         .align(CenterHorizontally),
                     style = TextStyle(fontSize = 28.sp)
                 )
-                OutlinedTextField(
-                    value = text,
-                    onValueChange = { text = it },
-                    label = { Text("Name") },
-                    modifier = Modifier.padding(15.dp)
-                )
-                OutlinedTextField(
-                    value = text,
-                    onValueChange = { text = it },
-                    label = { Text("Description") },
-                    modifier = Modifier.padding(15.dp),
-                    maxLines = 4,
-                    minLines = 4
-                )
-                OutlinedTextField(
-                    value = text,
-                    onValueChange = { text = it },
-                    label = { Text("Difficulty") },
-                    modifier = Modifier.padding(15.dp),
-                )
-                OutlinedTextField(
-                    value = length,
-                    onValueChange = { length = it },
-                    label = { Text("Length in meters (calculated)") },
-                    modifier = Modifier.padding(15.dp),
-                    enabled = false
-                )
+                newTrip.value?.let { trip ->
+                    OutlinedTextField(
+                        value = trip.routeName,
+                        onValueChange = { trip.routeName = it },
+                        label = { Text("Name") },
+                        modifier = Modifier.padding(15.dp)
+                    )
+                }
+                newTrip.value?.let { trip ->
+                    OutlinedTextField(
+                        value = trip.routeDescription,
+                        onValueChange = { trip.routeDescription = it },
+                        label = { Text("Description") },
+                        modifier = Modifier.padding(15.dp)
+                    )
+                }
+                newTrip.value?.let { trip ->
+                    OutlinedTextField(
+                        value = trip.difficulty,
+                        onValueChange = { trip.difficulty = it },
+                        label = { Text("Difficulty") },
+                        modifier = Modifier.padding(15.dp)
+                    )
+                }
+
+                newTrip.value?.let { trip ->
+                    OutlinedTextField(
+                        value = trip.lengthInMeters.toString(),
+                        onValueChange = {},
+                        label = { Text("Estimated length in meters.") },
+                        modifier = Modifier.padding(15.dp)
+                    )
+                }
                 Row(
                     modifier = Modifier
                         .padding(10.dp)
@@ -378,7 +388,10 @@ private fun SaveTripDialog(openAlertDialog: MutableState<Boolean>) {
                     Button(onClick = { /*TODO*/ }) {
                         Text(text = "Cancel")
                     }
-                    Button(onClick = { /*TODO*/ }) {
+                    Button(onClick = {
+                       // viewModel.createTrip(newTrip)
+                       // newTripPoints.clear()
+                    }) {
                         Text(text = "Save")
                     }
                 }
