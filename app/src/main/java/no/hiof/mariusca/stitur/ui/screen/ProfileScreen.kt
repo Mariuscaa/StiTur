@@ -6,15 +6,22 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -32,8 +39,31 @@ fun ProfileScreen(
     profViewModel: ProfileViewModel = hiltViewModel(),
     navController: NavController
 ) {
+    val isEditMode = remember { mutableStateOf(false) }
+    val newUsername = remember { mutableStateOf("") }
+
     profViewModel.getUserInfo(viewModel.currentLoggedInUserId)
     val filteredUser = profViewModel.filteredUsers
+
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth(),
+        contentAlignment = Alignment.TopEnd
+    ) {
+        IconButton(
+            onClick = { isEditMode.value = !isEditMode.value },
+            modifier = Modifier.size(48.dp)
+        ) {
+            Icon(
+                painter = painterResource(
+                    id = if (isEditMode.value) R.drawable.x else R.drawable.editicon
+                ),
+                contentDescription = if (isEditMode.value) "Done" else "Edit",
+                modifier = Modifier.size(36.dp)
+            )
+        }
+    }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -43,13 +73,57 @@ fun ProfileScreen(
             horizontalAlignment = Alignment.Start,
             modifier = Modifier.wrapContentSize()
         ) {
-            ProfileItem(drawableId = R.drawable._icon__person_, text = filteredUser.value.username.uppercase())
-            ProfileItem(drawableId = R.drawable._icon__history_, text = "Trip History")
-            ProfileItem(drawableId = R.drawable._icon__camera_slr_, text = "My GeoTreasures")
-            LogoutButton(viewModel, navController)
+
+
+            if (isEditMode.value) {
+                EditUsernameView(
+                    currentUsername = filteredUser.value.username,
+                    newUsername = newUsername,
+                    userId = viewModel.currentLoggedInUserId,
+                    viewModel = profViewModel,
+                    onUsernameUpdated = {
+                        isEditMode.value = false
+                    }
+                )
+            } else {
+                ProfileItem(
+                    drawableId = R.drawable._icon__person_,
+                    text = filteredUser.value.username.uppercase()
+                )
+                ProfileItem(drawableId = R.drawable._icon__history_, text = "Trip History")
+                ProfileItem(drawableId = R.drawable._icon__camera_slr_, text = "My GeoTreasures")
+                LogoutButton(viewModel, navController)
+            }
         }
     }
 }
+
+
+
+@Composable
+fun EditUsernameView(
+    currentUsername: String,
+    newUsername: MutableState<String>,
+    userId: String,
+    viewModel: ProfileViewModel,
+    onUsernameUpdated: () -> Unit
+) {
+    Column {
+        Text("Current Username: $currentUsername", style = MaterialTheme.typography.bodyMedium)
+        TextField(
+            value = newUsername.value,
+            onValueChange = { newUsername.value = it },
+            label = { Text("New Username") }
+        )
+        Button(onClick = {
+            viewModel.updateUsername(userId, newUsername.value)
+            onUsernameUpdated()
+        }) {
+            Text("Update Username")
+        }
+    }
+}
+
 
 @Composable
 fun ProfileItem(drawableId: Int, text: String) {
