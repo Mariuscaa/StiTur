@@ -1,6 +1,7 @@
 package no.hiof.mariusca.stitur.ui.screen.map
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -66,11 +67,12 @@ fun MapButtons(
                 .align(Alignment.BottomStart)
                 .padding(start = 10.dp, bottom = 16.dp)
         ) {
+
             IconButton(
                 onClick = geoTreasureIconClicked,
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.game_icons_locked_chest),
+                    painter = painterResource(id = R.drawable.new_geotreasure2),
                     contentDescription = "GeoTreasure icon",
                     modifier = Modifier.size(48.dp)
                 )
@@ -83,7 +85,7 @@ fun MapButtons(
                     }
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable._icon__hiking_),
+                        painter = painterResource(id = R.drawable.create_new_trip),
                         contentDescription = "Hiking icon",
                         modifier = Modifier.size(48.dp)
                     )
