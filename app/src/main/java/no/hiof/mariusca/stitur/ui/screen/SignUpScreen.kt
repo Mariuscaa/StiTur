@@ -172,7 +172,7 @@ private fun PasswordField(
 
     val icon =
         //Den drawablen under skal endres til å bli noe annet
-        if (isVisible) painterResource(R.drawable.profile)
+        if (isVisible) painterResource(R.drawable.powerbutton)
         //Den drawablen under skal endres til å bli noe annet
         else painterResource(R.drawable.eye)
 
