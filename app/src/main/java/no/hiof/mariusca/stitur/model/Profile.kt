@@ -15,7 +15,7 @@ data class Profile(
     val friends: List<String> = emptyList(),
     val sentInvites: List<Friendship> = emptyList(),
     val receivedInvites: List<Friendship> = emptyList(),
-    val tripHistory: List<TripHistory> = emptyList(),
+    var tripHistory: List<TripHistory> = emptyList(),
     val favorites: List<Trip> = emptyList(),
     val geoTreasures: List<GeoTreasure> = emptyList()
 )
