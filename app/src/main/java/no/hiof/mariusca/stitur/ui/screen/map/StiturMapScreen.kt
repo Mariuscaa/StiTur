@@ -5,8 +5,10 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,10 +19,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -35,14 +40,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.location.LocationRequest
@@ -53,6 +61,7 @@ import no.hiof.mariusca.stitur.R
 import no.hiof.mariusca.stitur.model.Coordinate
 import no.hiof.mariusca.stitur.model.Trip
 import no.hiof.mariusca.stitur.model.TripHistory
+
 @Composable
 fun ColumnItem(item: String, onItemClick: () -> Unit) {
     Column(
@@ -105,6 +114,10 @@ fun StiturMapScreen(
     }
     val selectedTripState = remember { mutableStateOf<Trip?>(null) }
 
+    val newTrip = remember { mutableStateOf<Trip?>(null) }
+
+    val openDialog = remember { mutableStateOf(false) }
+
     // Inspired by https://github.com/android/platform-samples/blob/main/samples/base/src/main/java/com/example/platform/base/PermissionBox.kt
     val permissions = listOf(
         Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -122,7 +135,9 @@ fun StiturMapScreen(
                 StiturMap(
                     isCreateTripMode = isCreateTripMode,
                     newTripPoints = newTripPoints,
-                    selectedTripState = selectedTripState
+                    selectedTripState = selectedTripState,
+                    newTrip = newTrip,
+                    openDialog = openDialog
                 )
 
                 IconButton(onClick = weatherIconClicked) {
@@ -138,7 +153,8 @@ fun StiturMapScreen(
                 MapButtons(
                     isCreateTripMode = isCreateTripMode,
                     newTripPoints = newTripPoints,
-                    viewModel = viewModel
+                    newTrip = newTrip,
+                    openDialog = openDialog
                 )
             }
             Column(modifier.fillMaxSize()) {
@@ -190,7 +206,7 @@ MarkerState(position = halden), title = "Halden", snippet = "Marker in Halden."
 
 
 @Composable
-fun geoTreasure(location: LatLng){
+fun geoTreasure(location: LatLng) {
     val customImageMarkers = remember { mutableStateListOf<LatLng>() }
     customImageMarkers.add(location)
 }
@@ -216,7 +232,9 @@ fun StiturMap(
     viewModel: StiturMapViewModel = hiltViewModel(),
     isCreateTripMode: MutableState<Boolean>,
     newTripPoints: MutableList<LatLng>,
-    selectedTripState: MutableState<Trip?>
+    selectedTripState: MutableState<Trip?>,
+    newTrip: MutableState<Trip?>,
+    openDialog: MutableState<Boolean>,
 ) {
 
     val sheetState = rememberModalBottomSheetState()
@@ -236,7 +254,7 @@ fun StiturMap(
     val toggleBottomSheet: (Boolean) -> Unit = { showBottomSheet = it }
 
     val newTripHistoryState = remember { mutableStateOf<TripHistory?>(null) }
-    val gpsTripState = remember {mutableStateOf<Trip?>(null)}
+    val gpsTripState = remember { mutableStateOf<Trip?>(null) }
     val locationRequest = remember {
         mutableStateOf<LocationRequest?>(null)
     }
@@ -262,6 +280,12 @@ fun StiturMap(
             gpsTripState = gpsTripState
         )
 
+        when {
+            openDialog.value -> {
+                SaveTripDialog(openDialog, newTrip, viewModel, newTripPoints, isCreateTripMode)
+            }
+        }
+
         MapBottomSheet(
             selectedTripState = selectedTripState,
             sheetState = sheetState,
@@ -286,12 +310,106 @@ fun StiturMap(
 
                     // Check if the new coordinate is not already in the list
                     if (!gpsTripState.value?.coordinates.orEmpty().contains(newCoordinate)) {
-                        val updatedCoordinates = (gpsTripState.value?.coordinates ?: emptyList()) + newCoordinate
-                        gpsTripState.value = gpsTripState.value?.copy(coordinates = updatedCoordinates)
+                        val updatedCoordinates =
+                            (gpsTripState.value?.coordinates ?: emptyList()) + newCoordinate
+                        gpsTripState.value =
+                            gpsTripState.value?.copy(coordinates = updatedCoordinates)
                     }
                 }
             }
         }
 
+    }
+}
+
+@Composable
+private fun SaveTripDialog(
+    openDialog: MutableState<Boolean>,
+    newTrip: MutableState<Trip?>,
+    stiturMapViewModel: StiturMapViewModel,
+    newTripPoints: MutableList<LatLng>,
+    isCreateTripMode: MutableState<Boolean>,
+) {
+    Dialog(
+        onDismissRequest = { openDialog.value = false },
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(600.dp)
+                .padding(),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Column {
+
+                Text(
+                    text = "Save your trip",
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .align(CenterHorizontally),
+                    style = TextStyle(fontSize = 28.sp)
+                )
+                newTrip.value?.let { trip ->
+                    OutlinedTextField(
+                        value = trip.routeName,
+                        onValueChange = { newRouteName ->
+                            newTrip.value = trip.copy(routeName = newRouteName)
+                        },
+                        label = { Text("Name") },
+                        modifier = Modifier.padding(15.dp),
+                        isError = trip.routeName.isEmpty()
+                    )
+                }
+                newTrip.value?.let { trip ->
+                    OutlinedTextField(
+                        value = trip.routeDescription,
+                        onValueChange = { newRouteDescription ->
+                            newTrip.value = trip.copy(routeDescription = newRouteDescription)
+                        },
+                        minLines = 2,
+                        maxLines = 2,
+                        label = { Text("Description") },
+                        modifier = Modifier.padding(15.dp)
+                    )
+                }
+                newTrip.value?.let { trip ->
+                    OutlinedTextField(
+                        value = trip.difficulty,
+                        onValueChange = { newDifficulty ->
+                            newTrip.value = trip.copy(difficulty = newDifficulty)
+                        }, label = { Text("Difficulty") },
+                        modifier = Modifier.padding(15.dp)
+                    )
+                }
+
+                newTrip.value?.let { trip ->
+                    OutlinedTextField(
+                        value = trip.lengthInMeters.toString(),
+                        onValueChange = {},
+                        label = { Text("Estimated length in meters.") },
+                        modifier = Modifier.padding(15.dp),
+                        enabled = false
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .align(CenterHorizontally),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Button(onClick = { openDialog.value = false }) {
+                        Text(text = "Cancel")
+                    }
+                    Button(onClick = {
+                        newTrip.value?.let { stiturMapViewModel.createTrip(it) }
+                        newTripPoints.clear()
+                        openDialog.value = false
+                        isCreateTripMode.value = !isCreateTripMode.value
+                    }) {
+                        Text(text = "Save")
+                    }
+                }
+            }
+        }
     }
 }
