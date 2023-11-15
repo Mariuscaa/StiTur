@@ -3,9 +3,11 @@ package no.hiof.mariusca.stitur.service.impl
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.dataObjects
 import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.firestore.ktx.toObjects
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 import no.hiof.mariusca.stitur.model.LeaderboardEntry
+import no.hiof.mariusca.stitur.model.Trip
 import no.hiof.mariusca.stitur.service.storage.LeaderboardsService
 import javax.inject.Inject
 
@@ -50,6 +52,12 @@ constructor(private val firestore: FirebaseFirestore) : LeaderboardsService {
     override suspend fun delete(leaderboardEntryId: String){
         firestore.collection(LEADERBOARDS_DATA).document(leaderboardEntryId).delete().await()
     }
+
+    /**GET NAME
+     * Retrieving Leaderboard Entries by the property username from the collection and converting to object
+     * **/
+    override suspend fun getLeaderboardUsername(username: String): List<LeaderboardEntry> =
+        firestore.collection(LEADERBOARDS_DATA).get().await().toObjects()
 
     /** COMPANION OBJECT
      * Companion object holding a constant representing the firestore document collection "LeaderboardsData"*/

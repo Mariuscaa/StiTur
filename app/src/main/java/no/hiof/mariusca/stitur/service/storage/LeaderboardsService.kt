@@ -11,4 +11,5 @@ interface LeaderboardsService {
     suspend fun save(leaderboardEntry: LeaderboardEntry): String
     suspend fun update(leaderboardEntry: LeaderboardEntry)
     suspend fun delete(leaderboardEntryId: String)
+    suspend fun getLeaderboardUsername(username: String): List<LeaderboardEntry>
 }

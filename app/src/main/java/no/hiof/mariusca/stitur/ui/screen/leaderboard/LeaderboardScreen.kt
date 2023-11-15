@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,10 +40,21 @@ import no.hiof.mariusca.stitur.model.LeaderboardEntry
 @Composable
 fun LeaderboardScreen(viewModel: StiturLeaderboardsViewModel) {
 
-    // Collect flow of leaderboard entries
-    val leaderboardEntries by viewModel.leaderboardEntries.collectAsState(initial = listOf(
-        LeaderboardEntry(username = "Tester")
-    ))
+    // For Search bar:
+
+    var searchQuery by remember{
+        mutableStateOf("")
+    }
+
+    LaunchedEffect(searchQuery){
+        viewModel.getLeaderboardEntry(searchQuery.lowercase())
+    }
+
+    val filteredEntries = viewModel.filteredLeaderboards
+
+    // Collect flow of leaderboard entries and determine which list to display based on if query has content
+    val leaderboardEntries by viewModel.leaderboardEntries.collectAsState(initial = listOf())
+    val displayEntries = if(searchQuery.isBlank()) leaderboardEntries else filteredEntries
 
 
     val customBackgroundColor = Color(0xFF133c07)
@@ -56,14 +68,11 @@ fun LeaderboardScreen(viewModel: StiturLeaderboardsViewModel) {
     ) {
         TitleHeader()
         Spacer(modifier = Modifier.height(40.dp))
-        SearchBar()
+        SearchBar(searchQuery){
+            newQuery -> searchQuery = newQuery }
         Spacer(modifier = Modifier.height(40.dp))
 
-        DummyDataList(leaderboardEntries = leaderboardEntries)
-        //DummyDataList()
-        //val leaderboardsDummyData = LeaderboardsDummyData()
-        //val leaderboardEntries = leaderboardsDummyData.createDummyProfiles()
-
+        DummyDataList(leaderboardEntries = displayEntries)
     }
 }
 
@@ -76,8 +85,6 @@ fun DummyDataList(leaderboardEntries: List<LeaderboardEntry>){
         }
     }
 }
-
-
 
 @Composable
 fun TitleHeader(){
@@ -105,17 +112,23 @@ fun TitleHeader(){
 }
 
 @Composable
-fun SearchBar(){
-    var text by remember { mutableStateOf("")}
+fun SearchBar(query: String, onQueryChanged: (String) -> Unit){
+    var text by remember {
+        mutableStateOf(query)
+    }
 
     TextField(
         value = text,
-        onValueChange = {text = it},
+        onValueChange = {
+            text = it
+            onQueryChanged(it)
+        },
         label = {Text("Search for profiles!")},
         leadingIcon = {Icon(Icons.Filled.Search, contentDescription = null)},
         modifier = Modifier.width(250.dp)
     )
 }
+
 
 @Composable
 fun LeaderboardUserCard(leaderboardEntry: LeaderboardEntry){
@@ -138,7 +151,7 @@ fun LeaderboardUserCard(leaderboardEntry: LeaderboardEntry){
             modifier = Modifier.padding(end = 10.dp)
         )
 
-        Text(text = userName, //"Sindre",
+        Text(text = userName,
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
             modifier = Modifier.padding(end = 10.dp)
         )
@@ -162,11 +175,3 @@ fun LeaderboardUserCard(leaderboardEntry: LeaderboardEntry){
         }
     }
 }
-
-
-//@Preview
-//@Composable
-//fun PreviewLeaderboardScreen() {
-//val leaderboardsViewModel: StiturLeaderboardsViewModel = hiltViewModel()
-//LeaderboardScreen(viewModel = leaderboardsViewModel)
-//}
