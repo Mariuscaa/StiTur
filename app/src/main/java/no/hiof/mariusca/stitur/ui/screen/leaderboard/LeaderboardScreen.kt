@@ -40,8 +40,7 @@ import no.hiof.mariusca.stitur.model.LeaderboardEntry
 @Composable
 fun LeaderboardScreen(viewModel: StiturLeaderboardsViewModel) {
 
-    // For Search bar:
-
+    // State - Search bar:
     var searchQuery by remember{
         mutableStateOf("")
     }
