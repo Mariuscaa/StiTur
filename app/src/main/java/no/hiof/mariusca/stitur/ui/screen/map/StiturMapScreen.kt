@@ -412,19 +412,6 @@ fun StiturMap(
                             (gpsTripState.value?.coordinates ?: emptyList()) + newCoordinate
                         gpsTripState.value =
                             gpsTripState.value?.copy(coordinates = updatedCoordinates)
-
-                        val tempLatLng =
-                            LatLng(currentLocation.latitude, currentLocation.longitude)
-
-
-/*                        cameraPosition.animate(
-                            CameraUpdateFactory.newCameraPosition(
-                                CameraPosition.fromLatLngZoom(
-                                    tempLatLng,
-                                    14f
-                                )
-                            )
-                        )*/
                     }
                 }
             }
