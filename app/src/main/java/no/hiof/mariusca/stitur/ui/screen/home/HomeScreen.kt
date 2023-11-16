@@ -49,7 +49,7 @@ fun HomeScreen(viewModel: SignUpViewModel = hiltViewModel()) {
         val user by viewModel.currentLoggedInUser.collectAsState(initial = Profile())
         // Handle authenticated user
     }
-    Column (horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         NavigationApp()
 
     }
@@ -65,7 +65,7 @@ sealed class Screen(val route: String, @StringRes val title: Int, val icon: Int)
     object SignUp : Screen("SignUp", R.string.SignUp, R.drawable.powerbutton)
 
     object SignIn : Screen("SignIn", R.string.SignUp, R.drawable.powerbutton)
-    object GeoTreasure : Screen("GeoTreasure", R.string.SignUp,R.drawable.maps)
+    object GeoTreasure : Screen("GeoTreasure", R.string.SignUp, R.drawable.maps)
 }
 
 
@@ -89,7 +89,7 @@ fun NavigationApp() {
                 .padding(innerPadding)
                 .fillMaxSize(),
 
-                //.background(customBackgroundColor),
+            //.background(customBackgroundColor),
             contentAlignment = Alignment.BottomCenter
         ) {
             NavHost(
@@ -106,17 +106,12 @@ fun NavigationApp() {
                     LeaderboardScreen(viewModel = leaderboardsViewModel)
                 }
                 composable(Screen.StiturMap.route) {
-
-
-
-
-                    //Text("Profile", modifier = Modifier.padding(innerPadding))
-                    StiturMapScreen(weatherIconClicked = {
-                        navController.navigate(Screen.Weather.route)
-                    })
-                        //,list = list)
-
-
+                    StiturMapScreen(
+                        weatherIconClicked = {
+                            navController.navigate(Screen.Weather.route)
+                        },
+                        innerPadding = innerPadding
+                    )
                 }
                 composable(Screen.Profile.route) {
                     ProfileScreen(navController = navController)
@@ -164,13 +159,15 @@ fun BottomNavBar(navController: NavController, bottomNavigationScreen: List<Scre
                         //restoreState = true
 
 
-
                     }
                 },
-                icon = { Icon(painterResource(id = screen.icon), contentDescription = "Icon",
-                    modifier = Modifier
-                        .size(20.dp),
-                    ) },
+                icon = {
+                    Icon(
+                        painterResource(id = screen.icon), contentDescription = "Icon",
+                        modifier = Modifier
+                            .size(20.dp),
+                    )
+                },
 
                 label = {
                     Text(title)

@@ -1,10 +1,9 @@
 package no.hiof.mariusca.stitur.ui.screen.map
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -49,32 +48,21 @@ fun MapBottomSheet(
     viewModel: StiturMapViewModel,
     newTripHistoryState: MutableState<TripHistory?>,
     gpsTripState: MutableState<Trip?>,
-    locationRequest: MutableState<LocationRequest?>
+    locationRequest: MutableState<LocationRequest?>,
+    innerPadding: PaddingValues
 ) {
 
     if (showBottomSheet) {
         ModalBottomSheet(
+            modifier = Modifier
+                .offset(y = (-(innerPadding.calculateBottomPadding()) - 30.dp)),
             onDismissRequest = {
                 toggleBottomSheet(false)
                 selectedTripState.value = null
-            }, sheetState = sheetState
+            },
+            sheetState = sheetState,
         ) {
             Column(modifier = Modifier.padding(10.dp, top = 0.dp, bottom = 16.dp)) {
-                Row(
-                    horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()
-                ) {
-                    Button(modifier = Modifier.padding(end = 10.dp), onClick = {
-                        scope.launch { sheetState.hide() }.invokeOnCompletion {
-                            if (!sheetState.isVisible) {
-                                toggleBottomSheet(false)
-                                selectedTripState.value = null
-                            }
-                        }
-                    }) {
-                        Text("Close (X)")
-                    }
-                }
-
                 DynamicStartAndStopButton(
                     leaderboardsViewModel,
                     profileViewModel,
@@ -105,7 +93,6 @@ fun MapBottomSheet(
                     Text("Delete trip")
                 }
             }
-
         }
     }
 }
