@@ -110,7 +110,6 @@ fun NavigationApp() {
                         weatherIconClicked = {
                             navController.navigate(Screen.Weather.route)
                         },
-                        innerPadding = innerPadding
                     )
                 }
                 composable(Screen.Profile.route) {

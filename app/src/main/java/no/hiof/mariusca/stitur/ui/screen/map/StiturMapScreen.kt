@@ -8,7 +8,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -111,7 +110,6 @@ fun StiturMapScreen(
     weatherIconClicked: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: StiturMapViewModel = hiltViewModel(),
-    innerPadding: PaddingValues
 ) {
     val filteredTrips = viewModel.filteredTrips
     val isCreateTripMode = remember { mutableStateOf(false) }
@@ -146,7 +144,6 @@ fun StiturMapScreen(
                     selectedTreasureState = selectedTreasureState,
                     newTrip = newTrip,
                     openDialog = openDialog,
-                    innerPadding = innerPadding
                 )
 
                 IconButton(onClick = weatherIconClicked) {
@@ -246,7 +243,6 @@ fun StiturMap(
     selectedTreasureState: MutableState<GeoTreasure?>,
     newTrip: MutableState<Trip?>,
     openDialog: MutableState<Boolean>,
-    innerPadding: PaddingValues
 ) {
 
     val sheetState = rememberModalBottomSheetState()
@@ -312,7 +308,6 @@ fun StiturMap(
             newTripHistoryState = newTripHistoryState,
             gpsTripState = gpsTripState,
             locationRequest = locationRequest,
-            innerPadding = innerPadding
         )
 
         // Only register the location updates effect when we have a request
