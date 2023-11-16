@@ -37,9 +37,5 @@ abstract class ServiceModule {
     @Binds
     abstract fun provideLeaderboardsService(impl: LeaderboardsServiceImpl): LeaderboardsService
 
-    /*@Binds
-    abstract fun provideGeoTreasureStorageService(impl: UserInfoStorageServiceImpl): UserInfoStorageService
-*/
-
 
 }

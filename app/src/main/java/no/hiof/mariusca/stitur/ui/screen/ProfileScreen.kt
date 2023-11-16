@@ -39,11 +39,12 @@ fun ProfileScreen(
     profViewModel: ProfileViewModel = hiltViewModel(),
     navController: NavController
 ) {
+
     val isEditMode = remember { mutableStateOf(false) }
     val newUsername = remember { mutableStateOf("") }
 
     profViewModel.getUserInfo(viewModel.currentLoggedInUserId)
-    val filteredUser = profViewModel.filteredUsers
+    val filteredUser = profViewModel.filteredUser
 
 
     Box(
@@ -122,6 +123,7 @@ fun EditUsernameView(
             Text("Update Username")
         }
     }
+
 }
 
 

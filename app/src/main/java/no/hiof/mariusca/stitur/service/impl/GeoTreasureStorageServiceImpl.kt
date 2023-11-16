@@ -1,7 +1,9 @@
 package no.hiof.mariusca.stitur.service.impl
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.dataObjects
 import com.google.firebase.firestore.ktx.toObject
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 import no.hiof.mariusca.stitur.model.GeoTreasure
 import no.hiof.mariusca.stitur.service.storage.GeoTreasureStorageService
@@ -11,6 +13,9 @@ class GeoTreasureStorageServiceImpl
 @Inject
 constructor(private val firestore: FirebaseFirestore) : GeoTreasureStorageService {
 
+
+    override val treasures: Flow<List<GeoTreasure>>
+        get() = firestore.collection(TREASURE_INFO_COLLECTION).dataObjects()
     override suspend fun delete(geoTreasureID: String) {
         firestore.collection(TREASURE_INFO_COLLECTION).document(geoTreasureID).delete().await()
     }

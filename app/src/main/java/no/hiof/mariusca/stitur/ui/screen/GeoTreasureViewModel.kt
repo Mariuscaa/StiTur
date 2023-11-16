@@ -12,10 +12,21 @@ import javax.inject.Inject
 @HiltViewModel
 class GeoTreasureViewModel @Inject constructor (private val geoTreasureStorageService : GeoTreasureStorageService) :
     ViewModel(){
-
+    val treasures = geoTreasureStorageService.treasures
     fun createTreasure(treasure: GeoTreasure) {
         viewModelScope.launch {
             geoTreasureStorageService.save(treasure)
         }
     }
+
+
+
+    fun deleteTreasure(treasure: GeoTreasure) {
+        viewModelScope.launch {
+            geoTreasureStorageService.delete(treasure.geoTreasureID)
+        }
+    }
+
+
+
 }
