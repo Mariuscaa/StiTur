@@ -30,11 +30,11 @@ import no.hiof.mariusca.stitur.R
 import no.hiof.mariusca.stitur.model.Profile
 import no.hiof.mariusca.stitur.signup.SignUpViewModel
 import no.hiof.mariusca.stitur.ui.screen.GeoTreasureScreen
-import no.hiof.mariusca.stitur.ui.screen.leaderboard.LeaderboardScreen
 import no.hiof.mariusca.stitur.ui.screen.ProfileScreen
 import no.hiof.mariusca.stitur.ui.screen.SignInScreen
 import no.hiof.mariusca.stitur.ui.screen.SignUpScreen
 import no.hiof.mariusca.stitur.ui.screen.WeatherScreen
+import no.hiof.mariusca.stitur.ui.screen.leaderboard.LeaderboardScreen
 import no.hiof.mariusca.stitur.ui.screen.leaderboard.StiturLeaderboardsViewModel
 import no.hiof.mariusca.stitur.ui.screen.map.StiturMapScreen
 
