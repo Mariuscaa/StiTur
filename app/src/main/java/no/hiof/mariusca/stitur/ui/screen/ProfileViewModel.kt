@@ -12,14 +12,14 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor (private val userInfoStorageService: UserInfoStorageService) :
     ViewModel(){
-    var filteredUsers = mutableStateOf(Profile())
+    var filteredUser = mutableStateOf(Profile())
         fun getUserInfo(user: String){
             viewModelScope.launch{
 
                 val temp = userInfoStorageService.getProfile(user)
 
                 if (temp != null) {
-                        filteredUsers.value = temp
+                    filteredUser.value = temp
                     }
 
 

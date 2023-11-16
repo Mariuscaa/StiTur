@@ -51,8 +51,11 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.rememberCameraPositionState
 import no.hiof.mariusca.stitur.R
 import no.hiof.mariusca.stitur.model.Coordinate
+import no.hiof.mariusca.stitur.model.GeoTreasure
 import no.hiof.mariusca.stitur.model.Trip
 import no.hiof.mariusca.stitur.model.TripHistory
+import no.hiof.mariusca.stitur.ui.screen.GeoTreasureViewModel
+
 @Composable
 fun ColumnItem(item: String, onItemClick: () -> Unit) {
     Column(
@@ -93,6 +96,9 @@ fun SearchView(
     )
 }
 
+
+
+
 @Composable
 fun StiturMapScreen(
     weatherIconClicked: () -> Unit, modifier: Modifier = Modifier,
@@ -104,6 +110,7 @@ fun StiturMapScreen(
         mutableStateListOf<LatLng>()
     }
     val selectedTripState = remember { mutableStateOf<Trip?>(null) }
+    val selectedTreasureState = remember { mutableStateOf<GeoTreasure?>(null) }
 
     // Inspired by https://github.com/android/platform-samples/blob/main/samples/base/src/main/java/com/example/platform/base/PermissionBox.kt
     val permissions = listOf(
@@ -122,7 +129,8 @@ fun StiturMapScreen(
                 StiturMap(
                     isCreateTripMode = isCreateTripMode,
                     newTripPoints = newTripPoints,
-                    selectedTripState = selectedTripState
+                    selectedTripState = selectedTripState,
+                    selectedTreasureState = selectedTreasureState
                 )
 
                 IconButton(onClick = weatherIconClicked) {
@@ -214,15 +222,18 @@ Button(onClick = { addCustomImageMarker(halden) }) {
 @Composable
 fun StiturMap(
     viewModel: StiturMapViewModel = hiltViewModel(),
+    treasureViewModel: GeoTreasureViewModel = hiltViewModel(),
     isCreateTripMode: MutableState<Boolean>,
     newTripPoints: MutableList<LatLng>,
-    selectedTripState: MutableState<Trip?>
+    selectedTripState: MutableState<Trip?>,
+    selectedTreasureState: MutableState<GeoTreasure?>
 ) {
 
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
 
+    val treasures by treasureViewModel.treasures.collectAsStateWithLifecycle(emptyList())
     val trips by viewModel.trips.collectAsStateWithLifecycle(emptyList())
     val ongoingTripState = remember { mutableStateOf<Trip?>(null) }
 
@@ -259,7 +270,9 @@ fun StiturMap(
             newTripPoints = newTripPoints,
             context = context,
             isCreateTripMode = isCreateTripMode,
-            gpsTripState = gpsTripState
+            gpsTripState = gpsTripState,
+            treasure = treasures,
+            selectedTreasureState = selectedTreasureState
         )
 
         MapBottomSheet(

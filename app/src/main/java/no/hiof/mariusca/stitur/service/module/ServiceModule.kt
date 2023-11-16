@@ -32,9 +32,5 @@ abstract class ServiceModule {
     @Binds
     abstract fun provideTripHistoryStorageService(impl: TripHistoryStorageServiceImpl): TripHistoryStorageService
 
-    /*@Binds
-    abstract fun provideGeoTreasureStorageService(impl: UserInfoStorageServiceImpl): UserInfoStorageService
-*/
-
 
 }

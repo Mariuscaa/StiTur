@@ -27,7 +27,7 @@ fun ProfileScreen(
     navController: NavController
 ) {
    profViewModel.getUserInfo(viewModel.currentLoggedInUserId)
-    val filteredUser = profViewModel.filteredUsers
+    val filteredUser = profViewModel.filteredUser
 
 
     Box(
@@ -53,6 +53,7 @@ fun ProfileScreen(
     Box(modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center)
     {
+        //Kan legge til mer her for å endre passord og Username
         Text(
             text = "Profile",
             style = MaterialTheme.typography.headlineLarge
