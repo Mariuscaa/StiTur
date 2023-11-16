@@ -2,7 +2,11 @@ package no.hiof.mariusca.stitur.ui.screen.map
 
 import android.Manifest
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,6 +16,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,7 +30,9 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -47,6 +54,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -58,6 +67,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.delay
 import no.hiof.mariusca.stitur.R
 import no.hiof.mariusca.stitur.model.Coordinate
 import no.hiof.mariusca.stitur.model.GeoTreasure
@@ -174,7 +184,7 @@ fun StiturMapScreen(
                     selectedTripState = selectedTripState
                 )
             }
-            Column(modifier.fillMaxSize()) {
+            Column(modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
 
                 val textState = remember {
                     mutableStateOf(TextFieldValue(""))
@@ -196,6 +206,48 @@ fun StiturMapScreen(
                                 selectedTripState.value = item
                             })
                         }
+                    }
+                }
+                var showInstruction by remember { mutableStateOf(false) }
+
+                LaunchedEffect(isCreateTripMode.value) {
+                    if (isCreateTripMode.value) {
+                        showInstruction = true
+                        delay(3000)
+                        showInstruction = false
+                    } else {
+                        showInstruction = false
+                    }
+                }
+                AnimatedVisibility(
+                    visible = showInstruction,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    Column {
+                        Box(
+                            modifier = Modifier
+                                .padding(top = 50.dp)
+                                .background(color = Color.White, shape = RoundedCornerShape(12.dp))
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                        ) {
+                            Text(
+                                text = "Tap to draw your route!",
+                                fontSize = 28.sp,
+                                color = Color.Black,
+                                fontFamily = FontFamily.SansSerif,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        Image(
+                            painter = painterResource(id = R.drawable.tap),
+                            contentDescription = "Tap instruction",
+                            modifier = Modifier
+                                .size(180.dp)
+                                .padding(top = 20.dp, end = 70.dp)
+                                .align(Alignment.End)
+                        )
+
                     }
                 }
             }
@@ -279,9 +331,6 @@ fun StiturMap(
     val locationRequest = remember {
         mutableStateOf<LocationRequest?>(null)
     }
-
-
-
     LaunchedEffect(selectedTripState.value) {
         if (selectedTripState.value != null) {
             val startCoordinate = selectedTripState.value!!.coordinates[0]
@@ -301,7 +350,6 @@ fun StiturMap(
     }
 
     Column {
-
         MapContent(
             trips = trips,
             selectedTripState = selectedTripState,
@@ -335,7 +383,6 @@ fun StiturMap(
             locationRequest = locationRequest,
         )
 
-        // Only register the location updates effect when we have a request
         if (locationRequest.value != null) {
             LocationUpdatesEffect(locationRequest.value!!) { result ->
                 for (currentLocation in result.locations) {
@@ -344,7 +391,7 @@ fun StiturMap(
                         long = currentLocation.longitude.toString()
                     )
 
-                    // Check if the new coordinate is not already in the list
+                    // Checks if the new coordinate is not already in the list
                     if (!gpsTripState.value?.coordinates.orEmpty().contains(newCoordinate)) {
                         val updatedCoordinates =
                             (gpsTripState.value?.coordinates ?: emptyList()) + newCoordinate
@@ -353,6 +400,26 @@ fun StiturMap(
                     }
                 }
             }
+        }
+
+    }
+}
+
+@Composable
+fun CustomToast(message: String) {
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = Color.Black.copy(alpha = 0.8f)
+    ) {
+        Box(
+            modifier = Modifier.offset(y = (-16).dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = message,
+                style = MaterialTheme.typography.headlineLarge,
+                fontSize = 16.sp
+            )
         }
 
     }
