@@ -44,7 +44,7 @@ class ProfileViewModel @Inject constructor (private val userInfoStorageService: 
 
     fun updateUsername(userId: String, newUsername: String) {
         viewModelScope.launch {
-            val currentUserProfile = filteredUsers.value.copy(username = newUsername)
+            val currentUserProfile = filteredUser.value.copy(username = newUsername)
             userInfoStorageService.update(currentUserProfile)
             // Optionally, you can fetch the updated profile again to ensure UI is updated
             getUserInfo(userId)
