@@ -30,6 +30,8 @@ fun MapButtons(
     newTripPoints: MutableList<LatLng>,
     newTrip: MutableState<Trip?>,
     openDialog: MutableState<Boolean>,
+    ongoingTripState: MutableState<Trip?>,
+    selectedTripState: MutableState<Trip?>
 ) {
     // Define the action to perform when the geoTreasure icon is clicked
     val geoTreasureIconClicked: () -> Unit = {
@@ -67,6 +69,17 @@ fun MapButtons(
                 .align(Alignment.BottomStart)
                 .padding(start = 10.dp, bottom = 16.dp)
         ) {
+            if (ongoingTripState.value != null) {
+                IconButton(
+                    onClick = {selectedTripState.value = ongoingTripState.value},
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.start),
+                        contentDescription = "Active trip",
+                        modifier = Modifier.size(48.dp)
+                    )
+                }
+            }
 
             IconButton(
                 onClick = geoTreasureIconClicked,

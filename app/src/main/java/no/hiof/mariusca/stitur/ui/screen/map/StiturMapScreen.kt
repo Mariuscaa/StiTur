@@ -120,6 +120,7 @@ fun StiturMapScreen(
     val selectedTreasureState = remember { mutableStateOf<GeoTreasure?>(null) }
 
     val newTrip = remember { mutableStateOf<Trip?>(null) }
+    val ongoingTripState = remember { mutableStateOf<Trip?>(null) }
 
     val openDialog = remember { mutableStateOf(false) }
 
@@ -144,6 +145,7 @@ fun StiturMapScreen(
                     selectedTreasureState = selectedTreasureState,
                     newTrip = newTrip,
                     openDialog = openDialog,
+                    ongoingTripState = ongoingTripState
                 )
 
                 IconButton(onClick = weatherIconClicked) {
@@ -160,7 +162,9 @@ fun StiturMapScreen(
                     isCreateTripMode = isCreateTripMode,
                     newTripPoints = newTripPoints,
                     newTrip = newTrip,
-                    openDialog = openDialog
+                    openDialog = openDialog,
+                    ongoingTripState = ongoingTripState,
+                    selectedTripState = selectedTripState
                 )
             }
             Column(modifier.fillMaxSize()) {
@@ -243,6 +247,7 @@ fun StiturMap(
     selectedTreasureState: MutableState<GeoTreasure?>,
     newTrip: MutableState<Trip?>,
     openDialog: MutableState<Boolean>,
+    ongoingTripState: MutableState<Trip?>
 ) {
 
     val sheetState = rememberModalBottomSheetState()
@@ -251,7 +256,6 @@ fun StiturMap(
 
     val treasures by treasureViewModel.treasures.collectAsStateWithLifecycle(emptyList())
     val trips by viewModel.trips.collectAsStateWithLifecycle(emptyList())
-    val ongoingTripState = remember { mutableStateOf<Trip?>(null) }
 
     val halden = LatLng(59.1330, 11.3875)
     val cameraPosition = rememberCameraPositionState() {
