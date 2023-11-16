@@ -2,7 +2,11 @@ package no.hiof.mariusca.stitur.ui.screen.map
 
 import android.Manifest
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -47,6 +51,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,9 +60,11 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.delay
 import no.hiof.mariusca.stitur.R
 import no.hiof.mariusca.stitur.model.Coordinate
 import no.hiof.mariusca.stitur.model.GeoTreasure
@@ -120,6 +128,7 @@ fun StiturMapScreen(
     val selectedTreasureState = remember { mutableStateOf<GeoTreasure?>(null) }
 
     val newTrip = remember { mutableStateOf<Trip?>(null) }
+    val ongoingTripState = remember { mutableStateOf<Trip?>(null) }
 
     val openDialog = remember { mutableStateOf(false) }
 
@@ -128,15 +137,22 @@ fun StiturMapScreen(
         Manifest.permission.ACCESS_COARSE_LOCATION,
         Manifest.permission.ACCESS_FINE_LOCATION,
     )
+
+    val cameraFollowingGps = remember { mutableStateOf(false) }
+
+    // Does not work well. Just white for the most part when loading. Not sure why.
+    val isLoading = remember { mutableStateOf(true) }
+    if (isLoading.value) {
+        Text(text = "Loading..", fontSize = 22.sp)
+    }
     PermissionBox(
         permissions = permissions,
         requiredPermissions = listOf(permissions.first()),
         onGranted = {
-            // TODO: Make loading gif / skeleton
-            var showLoading by remember { mutableStateOf(true) }
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
+
                 StiturMap(
                     isCreateTripMode = isCreateTripMode,
                     newTripPoints = newTripPoints,
@@ -144,6 +160,9 @@ fun StiturMapScreen(
                     selectedTreasureState = selectedTreasureState,
                     newTrip = newTrip,
                     openDialog = openDialog,
+                    ongoingTripState = ongoingTripState,
+                    isLoading = isLoading,
+                    cameraFollowingGps = cameraFollowingGps
                 )
 
                 IconButton(onClick = weatherIconClicked) {
@@ -160,10 +179,13 @@ fun StiturMapScreen(
                     isCreateTripMode = isCreateTripMode,
                     newTripPoints = newTripPoints,
                     newTrip = newTrip,
-                    openDialog = openDialog
+                    openDialog = openDialog,
+                    ongoingTripState = ongoingTripState,
+                    selectedTripState = selectedTripState,
+                    cameraFollowingGps = cameraFollowingGps
                 )
             }
-            Column(modifier.fillMaxSize()) {
+            Column(modifier.fillMaxSize(), horizontalAlignment = CenterHorizontally) {
 
                 val textState = remember {
                     mutableStateOf(TextFieldValue(""))
@@ -185,6 +207,51 @@ fun StiturMapScreen(
                                 selectedTripState.value = item
                             })
                         }
+                    }
+                }
+                var showInstruction by remember { mutableStateOf(false) }
+
+
+                LaunchedEffect(isCreateTripMode.value) {
+                    if (isCreateTripMode.value) {
+                        showInstruction = true
+                        delay(3000)
+                        showInstruction = false
+                    } else {
+                        showInstruction = false
+                    }
+                }
+
+
+                AnimatedVisibility(
+                    visible = showInstruction,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    Column {
+                        Box(
+                            modifier = Modifier
+                                .padding(top = 50.dp)
+                                .background(color = Color.White, shape = RoundedCornerShape(12.dp))
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                        ) {
+                            Text(
+                                text = "Tap to draw your route!",
+                                fontSize = 28.sp,
+                                color = Color.Black,
+                                fontFamily = FontFamily.SansSerif,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        Image(
+                            painter = painterResource(id = R.drawable.tap),
+                            contentDescription = "Tap instruction",
+                            modifier = Modifier
+                                .size(180.dp)
+                                .padding(top = 20.dp, end = 70.dp)
+                                .align(Alignment.End)
+                        )
+
                     }
                 }
             }
@@ -243,6 +310,9 @@ fun StiturMap(
     selectedTreasureState: MutableState<GeoTreasure?>,
     newTrip: MutableState<Trip?>,
     openDialog: MutableState<Boolean>,
+    ongoingTripState: MutableState<Trip?>,
+    isLoading: MutableState<Boolean>,
+    cameraFollowingGps: MutableState<Boolean>
 ) {
 
     val sheetState = rememberModalBottomSheetState()
@@ -251,11 +321,10 @@ fun StiturMap(
 
     val treasures by treasureViewModel.treasures.collectAsStateWithLifecycle(emptyList())
     val trips by viewModel.trips.collectAsStateWithLifecycle(emptyList())
-    val ongoingTripState = remember { mutableStateOf<Trip?>(null) }
 
     val halden = LatLng(59.1330, 11.3875)
     val cameraPosition = rememberCameraPositionState() {
-        position = CameraPosition.fromLatLngZoom(halden, 12f)
+        position = CameraPosition.fromLatLngZoom(halden, 13f)
     }
 
     val context = LocalContext.current
@@ -267,17 +336,45 @@ fun StiturMap(
     val locationRequest = remember {
         mutableStateOf<LocationRequest?>(null)
     }
-
-
     LaunchedEffect(selectedTripState.value) {
         if (selectedTripState.value != null) {
+            val startCoordinate = selectedTripState.value!!.coordinates[0]
+            val startLatLng =
+                LatLng(startCoordinate.lat.toDouble(), startCoordinate.long.toDouble())
+
+            cameraPosition.animate(
+                CameraUpdateFactory.newCameraPosition(
+                    CameraPosition.fromLatLngZoom(
+                        startLatLng,
+                        14f
+                    )
+                )
+            )
             sheetState.show()
             showBottomSheet = true
         }
     }
 
-    Column {
+    if (cameraFollowingGps.value) {
+        LaunchedEffect(gpsTripState.value?.coordinates) {
+            if (gpsTripState.value?.coordinates?.isNotEmpty() == true) {
+                val lastCoordinate = gpsTripState.value!!.coordinates.last()
+                val startLatLng =
+                    LatLng(lastCoordinate.lat.toDouble(), lastCoordinate.long.toDouble())
 
+                cameraPosition.animate(
+                    CameraUpdateFactory.newCameraPosition(
+                        CameraPosition.fromLatLngZoom(
+                            startLatLng,
+                            14f
+                        )
+                    )
+                )
+            }
+        }
+    }
+
+    Column {
         MapContent(
             trips = trips,
             selectedTripState = selectedTripState,
@@ -288,7 +385,8 @@ fun StiturMap(
             isCreateTripMode = isCreateTripMode,
             gpsTripState = gpsTripState,
             treasure = treasures,
-            selectedTreasureState = selectedTreasureState
+            selectedTreasureState = selectedTreasureState,
+            isLoading = isLoading
         )
 
         when {
@@ -310,7 +408,6 @@ fun StiturMap(
             locationRequest = locationRequest,
         )
 
-        // Only register the location updates effect when we have a request
         if (locationRequest.value != null) {
             LocationUpdatesEffect(locationRequest.value!!) { result ->
                 for (currentLocation in result.locations) {
@@ -319,7 +416,7 @@ fun StiturMap(
                         long = currentLocation.longitude.toString()
                     )
 
-                    // Check if the new coordinate is not already in the list
+                    // Checks if the new coordinate is not already in the list
                     if (!gpsTripState.value?.coordinates.orEmpty().contains(newCoordinate)) {
                         val updatedCoordinates =
                             (gpsTripState.value?.coordinates ?: emptyList()) + newCoordinate

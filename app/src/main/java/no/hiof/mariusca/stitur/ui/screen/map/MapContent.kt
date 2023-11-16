@@ -40,7 +40,8 @@ fun MapContent(
     isCreateTripMode: MutableState<Boolean>,
     gpsTripState: MutableState<Trip?>,
     treasure: List<GeoTreasure>,
-    selectedTreasureState: MutableState<GeoTreasure?>
+    selectedTreasureState: MutableState<GeoTreasure?>,
+    isLoading: MutableState<Boolean>
 ) {
 
     val halden = LatLng(59.1330, 11.3875)
@@ -52,7 +53,8 @@ fun MapContent(
             if (isCreateTripMode.value) {
                 newTripPoints.add(point)
             }
-        }) {
+        },
+        onMapLoaded = {isLoading.value = false}) {
 
         Marker(
             MarkerState(position = halden), title = "Halden", snippet = "Marker in Halden."
@@ -179,8 +181,11 @@ private fun CreateAllTrips(
                 clickable = true,
                 color = if (trip == ongoingTripState.value) {
                     Color(0xFF006600)
+                } else if (trip == selectedTripState.value) {
+                    Color(0xFF5B37D1)
                 } else {
                     Color(0xFF000099)
+
                 },
                 width = 200.0f / cameraPosition.position.zoom,
                 onClick = {

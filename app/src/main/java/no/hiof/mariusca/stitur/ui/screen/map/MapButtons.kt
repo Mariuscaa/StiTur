@@ -1,6 +1,7 @@
 package no.hiof.mariusca.stitur.ui.screen.map
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,6 +31,9 @@ fun MapButtons(
     newTripPoints: MutableList<LatLng>,
     newTrip: MutableState<Trip?>,
     openDialog: MutableState<Boolean>,
+    ongoingTripState: MutableState<Trip?>,
+    selectedTripState: MutableState<Trip?>,
+    cameraFollowingGps: MutableState<Boolean>
 ) {
     // Define the action to perform when the geoTreasure icon is clicked
     val geoTreasureIconClicked: () -> Unit = {
@@ -67,6 +71,43 @@ fun MapButtons(
                 .align(Alignment.BottomStart)
                 .padding(start = 10.dp, bottom = 16.dp)
         ) {
+            if (ongoingTripState.value != null) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    IconButton(
+                        onClick = { selectedTripState.value = ongoingTripState.value },
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.start),
+                            contentDescription = "Active trip",
+                            modifier = Modifier.size(48.dp)
+                        )
+                    }
+
+                    if (cameraFollowingGps.value) {
+                        IconButton(
+                            onClick = { cameraFollowingGps.value = false },
+                            modifier = Modifier.padding(end = 10.dp)
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.eye),
+                                contentDescription = "Unlock Camera",
+                                modifier = Modifier.size(48.dp)
+                            )
+                        }
+                    } else {
+                        IconButton(
+                            onClick = { cameraFollowingGps.value = true },
+                            modifier = Modifier.padding(end = 10.dp)
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.closedeye),
+                                contentDescription = "Lock Camera",
+                                modifier = Modifier.size(48.dp)
+                            )
+                        }
+                    }
+                }
+            }
 
             IconButton(
                 onClick = geoTreasureIconClicked,
