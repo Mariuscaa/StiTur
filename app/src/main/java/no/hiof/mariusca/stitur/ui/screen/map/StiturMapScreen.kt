@@ -138,6 +138,8 @@ fun StiturMapScreen(
         Manifest.permission.ACCESS_FINE_LOCATION,
     )
 
+    val cameraFollowingGps = remember { mutableStateOf(false) }
+
     // Does not work well. Just white for the most part when loading. Not sure why.
     val isLoading = remember { mutableStateOf(true) }
     if (isLoading.value) {
@@ -159,7 +161,8 @@ fun StiturMapScreen(
                     newTrip = newTrip,
                     openDialog = openDialog,
                     ongoingTripState = ongoingTripState,
-                    isLoading = isLoading
+                    isLoading = isLoading,
+                    cameraFollowingGps = cameraFollowingGps
                 )
 
                 IconButton(onClick = weatherIconClicked) {
@@ -178,7 +181,8 @@ fun StiturMapScreen(
                     newTrip = newTrip,
                     openDialog = openDialog,
                     ongoingTripState = ongoingTripState,
-                    selectedTripState = selectedTripState
+                    selectedTripState = selectedTripState,
+                    cameraFollowingGps = cameraFollowingGps
                 )
             }
             Column(modifier.fillMaxSize(), horizontalAlignment = CenterHorizontally) {
@@ -207,6 +211,7 @@ fun StiturMapScreen(
                 }
                 var showInstruction by remember { mutableStateOf(false) }
 
+
                 LaunchedEffect(isCreateTripMode.value) {
                     if (isCreateTripMode.value) {
                         showInstruction = true
@@ -216,6 +221,8 @@ fun StiturMapScreen(
                         showInstruction = false
                     }
                 }
+
+
                 AnimatedVisibility(
                     visible = showInstruction,
                     enter = fadeIn(),
@@ -304,7 +311,8 @@ fun StiturMap(
     newTrip: MutableState<Trip?>,
     openDialog: MutableState<Boolean>,
     ongoingTripState: MutableState<Trip?>,
-    isLoading: MutableState<Boolean>
+    isLoading: MutableState<Boolean>,
+    cameraFollowingGps: MutableState<Boolean>
 ) {
 
     val sheetState = rememberModalBottomSheetState()
@@ -347,20 +355,22 @@ fun StiturMap(
         }
     }
 
-    LaunchedEffect(gpsTripState.value?.coordinates) {
-        if (gpsTripState.value?.coordinates?.isNotEmpty() == true) {
-            val lastCoordinate = gpsTripState.value!!.coordinates.last()
-            val startLatLng =
-                LatLng(lastCoordinate.lat.toDouble(), lastCoordinate.long.toDouble())
+    if (cameraFollowingGps.value) {
+        LaunchedEffect(gpsTripState.value?.coordinates) {
+            if (gpsTripState.value?.coordinates?.isNotEmpty() == true) {
+                val lastCoordinate = gpsTripState.value!!.coordinates.last()
+                val startLatLng =
+                    LatLng(lastCoordinate.lat.toDouble(), lastCoordinate.long.toDouble())
 
-            cameraPosition.animate(
-                CameraUpdateFactory.newCameraPosition(
-                    CameraPosition.fromLatLngZoom(
-                        startLatLng,
-                        14f
+                cameraPosition.animate(
+                    CameraUpdateFactory.newCameraPosition(
+                        CameraPosition.fromLatLngZoom(
+                            startLatLng,
+                            14f
+                        )
                     )
                 )
-            )
+            }
         }
     }
 
