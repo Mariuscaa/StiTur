@@ -122,7 +122,7 @@ private fun DynamicStartAndStopButton(
     locationRequest: MutableState<LocationRequest?>
 ) {
     profileViewModel.getUserInfo(signUpViewModel.currentLoggedInUserId)
-    val loggedInProfile = profileViewModel.filteredUsers
+    val loggedInProfile = profileViewModel.filteredUser
 
     if (selectedTripState.value == ongoingTripState.value) {
         Button(modifier = Modifier.padding(bottom = 10.dp),
