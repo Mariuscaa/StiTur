@@ -10,24 +10,44 @@ import no.hiof.mariusca.stitur.service.storage.UserInfoStorageService
 import javax.inject.Inject
 
 @HiltViewModel
+
 class ProfileViewModel @Inject constructor (private val userInfoStorageService: UserInfoStorageService) :
     ViewModel(){
     var filteredUser = mutableStateOf(Profile())
         fun getUserInfo(user: String){
             viewModelScope.launch{
 
-                val temp = userInfoStorageService.getProfile(user)
+
+            val temp = userInfoStorageService.getProfile(user)
+
 
                 if (temp != null) {
                     filteredUser.value = temp
                     }
 
 
-            }
+
         }
+    }
+
     fun createUser(user: Profile) {
         viewModelScope.launch {
             userInfoStorageService.save(user)
         }
     }
+
+    fun updateUser (user: Profile) {
+        viewModelScope.launch {
+            userInfoStorageService.update(user)
+        }
     }
+
+    fun updateUsername(userId: String, newUsername: String) {
+        viewModelScope.launch {
+            val currentUserProfile = filteredUsers.value.copy(username = newUsername)
+            userInfoStorageService.update(currentUserProfile)
+            // Optionally, you can fetch the updated profile again to ensure UI is updated
+            getUserInfo(userId)
+        }
+    }
+}

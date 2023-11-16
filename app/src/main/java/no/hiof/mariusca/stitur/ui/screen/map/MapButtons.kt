@@ -28,7 +28,8 @@ import no.hiof.mariusca.stitur.model.calculateDistanceMeters
 fun MapButtons(
     isCreateTripMode: MutableState<Boolean>,
     newTripPoints: MutableList<LatLng>,
-    viewModel: StiturMapViewModel
+    newTrip: MutableState<Trip?>,
+    openDialog: MutableState<Boolean>,
 ) {
     // Define the action to perform when the geoTreasure icon is clicked
     val geoTreasureIconClicked: () -> Unit = {
@@ -66,11 +67,12 @@ fun MapButtons(
                 .align(Alignment.BottomStart)
                 .padding(start = 10.dp, bottom = 16.dp)
         ) {
+
             IconButton(
                 onClick = geoTreasureIconClicked,
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.game_icons_locked_chest),
+                    painter = painterResource(id = R.drawable.new_geotreasure2),
                     contentDescription = "GeoTreasure icon",
                     modifier = Modifier.size(48.dp)
                 )
@@ -79,11 +81,10 @@ fun MapButtons(
                 IconButton(
                     onClick = {
                         isCreateTripMode.value = !isCreateTripMode.value
-
                     }
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable._icon__hiking_),
+                        painter = painterResource(id = R.drawable.create_new_trip),
                         contentDescription = "Hiking icon",
                         modifier = Modifier.size(48.dp)
                     )
@@ -104,12 +105,11 @@ fun MapButtons(
                             }
                         }
                     ) {
-                        Text(if (isCreateTripMode.value) "Cancel" else "")
+                        Text("Cancel")
                     }
 
                     Button(onClick = {
-                        isCreateTripMode.value = !isCreateTripMode.value
-                        if (!isCreateTripMode.value) {
+                        if (isCreateTripMode.value) {
                             val coordinates = mutableListOf<Coordinate>()
                             for (point in newTripPoints) {
                                 val coordinate = Coordinate(
@@ -119,29 +119,31 @@ fun MapButtons(
                                 coordinates.add(coordinate)
                             }
                             val distance = calculateDistanceMeters(coordinates)
-                            val newTrip = Trip(
-                                routeName = "Temp name",
-                                routeDescription = "Description of the new trip",
-                                difficulty = "Medium",
-                                lengthInMeters = distance.toLong(),
-                                coordinates = newTripPoints.map {
+                            if (newTrip.value == null) {
+                                newTrip.value = Trip(
+                                    lengthInMeters = distance.toLong(),
+                                    coordinates = newTripPoints.map {
+                                        Coordinate(
+                                            it.latitude.toString(), it.longitude.toString()
+                                        )
+                                    }
+                                )
+                            } else {
+                                newTrip.value!!.lengthInMeters = distance.toLong()
+                                newTrip.value!!.coordinates = newTripPoints.map {
                                     Coordinate(
                                         it.latitude.toString(), it.longitude.toString()
                                     )
                                 }
-                            )
-                            viewModel.createTrip(newTrip)
-                            newTripPoints.clear()
+                            }
                         }
+                        openDialog.value = true
                     }) {
                         Text("Save trip")
                     }
                 }
             }
-
         }
-
-
     }
 }
 

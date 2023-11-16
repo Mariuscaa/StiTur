@@ -1,4 +1,4 @@
-package no.hiof.mariusca.stitur.ui.screen
+package no.hiof.mariusca.stitur.ui.screen.leaderboard
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,12 +16,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,15 +33,28 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import no.hiof.mariusca.stitur.R
-import no.hiof.mariusca.stitur.leaderboards.LeaderboardsDummyData
-import no.hiof.mariusca.stitur.model.Profile
-
+import no.hiof.mariusca.stitur.model.LeaderboardEntry
 @Composable
-fun LeaderboardScreen() {
+fun LeaderboardScreen(viewModel: StiturLeaderboardsViewModel) {
+
+    // State - Search bar:
+    var searchQuery by remember{
+        mutableStateOf("")
+    }
+
+    LaunchedEffect(searchQuery){
+        viewModel.getLeaderboardEntry(searchQuery.lowercase())
+    }
+
+    val filteredEntries = viewModel.filteredLeaderboards
+
+    // Collect flow of leaderboard entries and determine which list to display based on if query has content
+    val leaderboardEntries by viewModel.leaderboardEntries.collectAsState(initial = listOf())
+    val displayEntries = if(searchQuery.isBlank()) leaderboardEntries else filteredEntries
+
 
     val customBackgroundColor = Color(0xFF133c07)
 
@@ -53,29 +67,20 @@ fun LeaderboardScreen() {
     ) {
         TitleHeader()
         Spacer(modifier = Modifier.height(40.dp))
-        SearchBar()
+        SearchBar(searchQuery){
+            newQuery -> searchQuery = newQuery }
         Spacer(modifier = Modifier.height(40.dp))
-        //DummyDataList()
 
-        val leaderboardsDummyData = LeaderboardsDummyData()
-        val profiles = leaderboardsDummyData.createDummyProfiles()
-        DummyDataList(profiles = profiles)
+        DummyDataList(leaderboardEntries = displayEntries)
     }
 }
 
 @Composable
-fun DummyDataList(profiles: List<Profile>){
+fun DummyDataList(leaderboardEntries: List<LeaderboardEntry>){
 
-    //val users = listOf("Sindre", "Shvan", "Jon", "Marius")
-
-    LazyColumn{
-        items(profiles){profile ->
-            LeaderboardUserCard(
-                userName = profile.username,
-                userTotalPoints = profile.personalRanking.totalPoints
-
-
-            )
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        items(leaderboardEntries) { leaderboardEntry ->
+            LeaderboardUserCard(leaderboardEntry = leaderboardEntry)
         }
     }
 }
@@ -105,22 +110,31 @@ fun TitleHeader(){
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBar(){
-    var text by remember { mutableStateOf("")}
+fun SearchBar(query: String, onQueryChanged: (String) -> Unit){
+    var text by remember {
+        mutableStateOf(query)
+    }
 
     TextField(
         value = text,
-        onValueChange = {text = it},
+        onValueChange = {
+            text = it
+            onQueryChanged(it)
+        },
         label = {Text("Search for profiles!")},
         leadingIcon = {Icon(Icons.Filled.Search, contentDescription = null)},
         modifier = Modifier.width(250.dp)
     )
 }
 
+
 @Composable
-fun LeaderboardUserCard(userName: String, userTotalPoints: Int){
+fun LeaderboardUserCard(leaderboardEntry: LeaderboardEntry){
+
+    val userName = leaderboardEntry.username
+    val userTotalPoints = leaderboardEntry.personalRanking.totalPoints
+
     Row(verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .padding(all = 6.dp)
@@ -136,7 +150,7 @@ fun LeaderboardUserCard(userName: String, userTotalPoints: Int){
             modifier = Modifier.padding(end = 10.dp)
         )
 
-        Text(text = userName, //"Sindre",
+        Text(text = userName,
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
             modifier = Modifier.padding(end = 10.dp)
         )
@@ -159,10 +173,4 @@ fun LeaderboardUserCard(userName: String, userTotalPoints: Int){
             )
         }
     }
-}
-
-@Preview
-@Composable
-fun PreviewLeaderboardScreen() {
-    LeaderboardScreen()
 }

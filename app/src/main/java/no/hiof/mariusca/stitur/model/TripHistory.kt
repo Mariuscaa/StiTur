@@ -12,10 +12,11 @@ import kotlin.math.sqrt
 data class TripHistory(
     @DocumentId val uid: String = "",
     val date: Date = Date(),
-    val trip: Trip = Trip(),
+    val tripId: String = "",
+    var trackedTrip: Trip = Trip(),
     var trackedDistanceKm: Double = 0.0,
     var durationMinutes: Int = 0,
-    val pointsEarned: Int = 0
+    var pointsEarned: Int = 0
 )
 
 fun calculateDistanceKM(coordinates: List<Coordinate>): Double {

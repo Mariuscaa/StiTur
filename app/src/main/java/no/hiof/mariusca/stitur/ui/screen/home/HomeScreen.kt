@@ -30,11 +30,12 @@ import no.hiof.mariusca.stitur.R
 import no.hiof.mariusca.stitur.model.Profile
 import no.hiof.mariusca.stitur.signup.SignUpViewModel
 import no.hiof.mariusca.stitur.ui.screen.GeoTreasureScreen
-import no.hiof.mariusca.stitur.ui.screen.LeaderboardScreen
+import no.hiof.mariusca.stitur.ui.screen.leaderboard.LeaderboardScreen
 import no.hiof.mariusca.stitur.ui.screen.ProfileScreen
 import no.hiof.mariusca.stitur.ui.screen.SignInScreen
 import no.hiof.mariusca.stitur.ui.screen.SignUpScreen
 import no.hiof.mariusca.stitur.ui.screen.WeatherScreen
+import no.hiof.mariusca.stitur.ui.screen.leaderboard.StiturLeaderboardsViewModel
 import no.hiof.mariusca.stitur.ui.screen.map.StiturMapScreen
 
 
@@ -56,14 +57,14 @@ fun HomeScreen(viewModel: SignUpViewModel = hiltViewModel()) {
 
 //Alle sidene i prosjektet
 sealed class Screen(val route: String, @StringRes val title: Int, val icon: Int) {
-    object Leaderboard : Screen("leaderboard", R.string.leaderboard, R.drawable.vector)
-    object StiturMap : Screen("maps", R.string.stiturMap, R.drawable.maps)
-    object Profile : Screen("profile", R.string.profile, R.drawable.profile)
+    object Leaderboard : Screen("Leaderboard", R.string.leaderboard, R.drawable.vector)
+    object StiturMap : Screen("Maps", R.string.stiturMap, R.drawable.maps)
+    object Profile : Screen("Profile", R.string.profile, R.drawable._icon__person_)
     object Weather : Screen("weather", R.string.profile, R.drawable.ic_weathericon)
 
-    object SignUp : Screen("SignUp", R.string.SignUp, R.drawable.profile)
+    object SignUp : Screen("SignUp", R.string.SignUp, R.drawable.powerbutton)
 
-    object SignIn : Screen("SignIn", R.string.SignUp, R.drawable.profile)
+    object SignIn : Screen("SignIn", R.string.SignUp, R.drawable.powerbutton)
     object GeoTreasure : Screen("GeoTreasure", R.string.SignUp,R.drawable.maps)
 }
 
@@ -100,7 +101,9 @@ fun NavigationApp() {
 
             ) {
                 composable(Screen.Leaderboard.route) {
-                    LeaderboardScreen()
+
+                    val leaderboardsViewModel: StiturLeaderboardsViewModel = hiltViewModel()
+                    LeaderboardScreen(viewModel = leaderboardsViewModel)
                 }
                 composable(Screen.StiturMap.route) {
 

@@ -1,19 +1,17 @@
 package no.hiof.mariusca.stitur.ui.screen
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -28,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -120,20 +119,13 @@ private fun String.EmailField(onNewValue: (String) -> Unit, modifier: Modifier) 
 
 @Composable
 private fun PasswordFieldSignIn(value: String, onNewValue: (String) -> Unit, modifier: Modifier) {
-    PasswordField(value, R.string.password, onNewValue, modifier)
-}
+    var isVisible by remember { mutableStateOf(false) }
 
-@Composable
-private fun PasswordField(
-    value: String,
-    placeholder: Int,
-    onNewValue: (String) -> Unit,
-    modifier: Modifier
-) {
-    var isVisible: Boolean by remember { mutableStateOf(false) }
-
-    val icon =
-        if (isVisible) Icons.Default.Lock else Icons.Default.Lock
+    val (icon, size) = if (isVisible) {
+        Pair(painterResource(R.drawable.eye), 34.dp) // Adjust size as needed
+    } else {
+        Pair(painterResource(R.drawable.closedeye), 24.dp) // Adjust size as needed
+    }
 
     val visualTransformation =
         if (isVisible) VisualTransformation.None else PasswordVisualTransformation()
@@ -142,11 +134,15 @@ private fun PasswordField(
         modifier = modifier,
         value = value,
         onValueChange = { onNewValue(it) },
-        placeholder = { Text(text = stringResource(placeholder)) },
-        leadingIcon = { Icon(imageVector = icon, contentDescription = "Lock") },
+        placeholder = { Text(stringResource(R.string.password)) },
+        leadingIcon = { Icon(imageVector = Icons.Default.Lock, contentDescription = "Lock") },
         trailingIcon = {
             IconButton(onClick = { isVisible = !isVisible }) {
-                Icon(imageVector = Icons.Default.Edit, contentDescription = "Visibility")
+                Image(
+                    painter = icon,
+                    contentDescription = "Toggle visibility",
+                    modifier = Modifier.size(size)
+                )
             }
         },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
