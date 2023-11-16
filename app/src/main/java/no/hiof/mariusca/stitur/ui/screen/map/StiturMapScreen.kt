@@ -54,6 +54,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.rememberCameraPositionState
@@ -259,7 +260,7 @@ fun StiturMap(
 
     val halden = LatLng(59.1330, 11.3875)
     val cameraPosition = rememberCameraPositionState() {
-        position = CameraPosition.fromLatLngZoom(halden, 12f)
+        position = CameraPosition.fromLatLngZoom(halden, 13f)
     }
 
     val context = LocalContext.current
@@ -273,8 +274,14 @@ fun StiturMap(
     }
 
 
+
     LaunchedEffect(selectedTripState.value) {
         if (selectedTripState.value != null) {
+            val startCoordinate = selectedTripState.value!!.coordinates[0]
+            val startLatLng = LatLng(startCoordinate.lat.toDouble(), startCoordinate.long.toDouble())
+            cameraPosition.animate(
+                CameraUpdateFactory.newCameraPosition(CameraPosition.fromLatLngZoom(startLatLng, 14f))
+            )
             sheetState.show()
             showBottomSheet = true
         }
