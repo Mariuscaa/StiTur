@@ -130,15 +130,20 @@ fun StiturMapScreen(
         Manifest.permission.ACCESS_COARSE_LOCATION,
         Manifest.permission.ACCESS_FINE_LOCATION,
     )
+
+    // Does not work well. Just white for the most part when loading. Not sure why.
+    val isLoading = remember { mutableStateOf(true) }
+    if (isLoading.value) {
+        Text(text = "Loading..", fontSize = 22.sp)
+    }
     PermissionBox(
         permissions = permissions,
         requiredPermissions = listOf(permissions.first()),
         onGranted = {
-            // TODO: Make loading gif / skeleton
-            var showLoading by remember { mutableStateOf(true) }
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
+
                 StiturMap(
                     isCreateTripMode = isCreateTripMode,
                     newTripPoints = newTripPoints,
@@ -146,7 +151,8 @@ fun StiturMapScreen(
                     selectedTreasureState = selectedTreasureState,
                     newTrip = newTrip,
                     openDialog = openDialog,
-                    ongoingTripState = ongoingTripState
+                    ongoingTripState = ongoingTripState,
+                    isLoading = isLoading
                 )
 
                 IconButton(onClick = weatherIconClicked) {
@@ -248,7 +254,8 @@ fun StiturMap(
     selectedTreasureState: MutableState<GeoTreasure?>,
     newTrip: MutableState<Trip?>,
     openDialog: MutableState<Boolean>,
-    ongoingTripState: MutableState<Trip?>
+    ongoingTripState: MutableState<Trip?>,
+    isLoading: MutableState<Boolean>
 ) {
 
     val sheetState = rememberModalBottomSheetState()
@@ -278,9 +285,15 @@ fun StiturMap(
     LaunchedEffect(selectedTripState.value) {
         if (selectedTripState.value != null) {
             val startCoordinate = selectedTripState.value!!.coordinates[0]
-            val startLatLng = LatLng(startCoordinate.lat.toDouble(), startCoordinate.long.toDouble())
+            val startLatLng =
+                LatLng(startCoordinate.lat.toDouble(), startCoordinate.long.toDouble())
             cameraPosition.animate(
-                CameraUpdateFactory.newCameraPosition(CameraPosition.fromLatLngZoom(startLatLng, 14f))
+                CameraUpdateFactory.newCameraPosition(
+                    CameraPosition.fromLatLngZoom(
+                        startLatLng,
+                        14f
+                    )
+                )
             )
             sheetState.show()
             showBottomSheet = true
@@ -299,7 +312,8 @@ fun StiturMap(
             isCreateTripMode = isCreateTripMode,
             gpsTripState = gpsTripState,
             treasure = treasures,
-            selectedTreasureState = selectedTreasureState
+            selectedTreasureState = selectedTreasureState,
+            isLoading = isLoading
         )
 
         when {
