@@ -127,7 +127,7 @@ private fun DynamicStartAndStopButton(
     locationRequest: MutableState<LocationRequest?>
 ) {
     profileViewModel.getUserInfo(signUpViewModel.currentLoggedInUserId)
-    val loggedInProfile = profileViewModel.filteredUsers
+    val loggedInProfile = profileViewModel.filteredUser
 
     leaderboardsViewModel.getUserInfo(signUpViewModel.currentLoggedInUserId)
     val loggedInLeaderboardEntry = leaderboardsViewModel.filteredUser
