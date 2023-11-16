@@ -2,8 +2,6 @@ package no.hiof.mariusca.stitur.ui.screen.map
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -31,6 +29,7 @@ import no.hiof.mariusca.stitur.ui.screen.ProfileViewModel
 import no.hiof.mariusca.stitur.ui.screen.leaderboard.StiturLeaderboardsViewModel
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,13 +48,10 @@ fun MapBottomSheet(
     newTripHistoryState: MutableState<TripHistory?>,
     gpsTripState: MutableState<Trip?>,
     locationRequest: MutableState<LocationRequest?>,
-    innerPadding: PaddingValues
 ) {
 
     if (showBottomSheet) {
         ModalBottomSheet(
-            modifier = Modifier
-                .offset(y = (-(innerPadding.calculateBottomPadding()) - 30.dp)),
             onDismissRequest = {
                 toggleBottomSheet(false)
                 selectedTripState.value = null
@@ -204,6 +200,14 @@ private fun finishTrip(
             (1000 * newTripHistoryState.value!!.trackedDistanceKm + 0.5).toInt()
         loggedInLeaderboardEntry.value.personalRanking.totalPoints += newTripHistoryState.value!!.pointsEarned
         leaderboardsViewModel.updateLeaderboardEntry(loggedInLeaderboardEntry.value)
+
+        newTripHistoryState.value!!.tripId = selectedTripState.value?.uid.toString()
+        newTripHistoryState.value!!.trackedTrip.routeName =
+            selectedTripState.value?.routeName.toString()
+        newTripHistoryState.value!!.trackedTrip.difficulty =
+            selectedTripState.value?.difficulty.toString()
+        newTripHistoryState.value!!.trackedTrip.routeDescription =
+            selectedTripState.value?.routeDescription.toString()
 
         val temp: MutableList<TripHistory> = loggedInProfile.value.tripHistory.toMutableList()
         temp.add(newTripHistoryState.value!!)
