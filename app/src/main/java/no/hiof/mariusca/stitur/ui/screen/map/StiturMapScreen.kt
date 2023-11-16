@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,9 +29,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -184,7 +181,7 @@ fun StiturMapScreen(
                     selectedTripState = selectedTripState
                 )
             }
-            Column(modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(modifier.fillMaxSize(), horizontalAlignment = CenterHorizontally) {
 
                 val textState = remember {
                     mutableStateOf(TextFieldValue(""))
@@ -336,6 +333,7 @@ fun StiturMap(
             val startCoordinate = selectedTripState.value!!.coordinates[0]
             val startLatLng =
                 LatLng(startCoordinate.lat.toDouble(), startCoordinate.long.toDouble())
+
             cameraPosition.animate(
                 CameraUpdateFactory.newCameraPosition(
                     CameraPosition.fromLatLngZoom(
@@ -346,6 +344,23 @@ fun StiturMap(
             )
             sheetState.show()
             showBottomSheet = true
+        }
+    }
+
+    LaunchedEffect(gpsTripState.value?.coordinates) {
+        if (gpsTripState.value?.coordinates?.isNotEmpty() == true) {
+            val lastCoordinate = gpsTripState.value!!.coordinates.last()
+            val startLatLng =
+                LatLng(lastCoordinate.lat.toDouble(), lastCoordinate.long.toDouble())
+
+            cameraPosition.animate(
+                CameraUpdateFactory.newCameraPosition(
+                    CameraPosition.fromLatLngZoom(
+                        startLatLng,
+                        14f
+                    )
+                )
+            )
         }
     }
 
@@ -397,29 +412,22 @@ fun StiturMap(
                             (gpsTripState.value?.coordinates ?: emptyList()) + newCoordinate
                         gpsTripState.value =
                             gpsTripState.value?.copy(coordinates = updatedCoordinates)
+
+                        val tempLatLng =
+                            LatLng(currentLocation.latitude, currentLocation.longitude)
+
+
+/*                        cameraPosition.animate(
+                            CameraUpdateFactory.newCameraPosition(
+                                CameraPosition.fromLatLngZoom(
+                                    tempLatLng,
+                                    14f
+                                )
+                            )
+                        )*/
                     }
                 }
             }
-        }
-
-    }
-}
-
-@Composable
-fun CustomToast(message: String) {
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = Color.Black.copy(alpha = 0.8f)
-    ) {
-        Box(
-            modifier = Modifier.offset(y = (-16).dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = message,
-                style = MaterialTheme.typography.headlineLarge,
-                fontSize = 16.sp
-            )
         }
 
     }
