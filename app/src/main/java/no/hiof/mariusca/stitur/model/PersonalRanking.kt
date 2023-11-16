@@ -1,6 +1,7 @@
 package no.hiof.mariusca.stitur.model
 
 enum class Tiers {
+    ALL,
     SILVER,
     GOLD,
     PLATINUM,
