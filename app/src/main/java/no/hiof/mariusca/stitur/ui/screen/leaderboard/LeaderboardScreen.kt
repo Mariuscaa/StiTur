@@ -37,6 +37,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import no.hiof.mariusca.stitur.R
 import no.hiof.mariusca.stitur.model.LeaderboardEntry
+import no.hiof.mariusca.stitur.model.Tiers
+
 @Composable
 fun LeaderboardScreen(viewModel: StiturLeaderboardsViewModel) {
 
@@ -45,8 +47,12 @@ fun LeaderboardScreen(viewModel: StiturLeaderboardsViewModel) {
         mutableStateOf("")
     }
 
-    LaunchedEffect(searchQuery){
-        viewModel.getLeaderboardEntry(searchQuery.lowercase())
+    var tierState by remember{
+        mutableStateOf(Tiers.ALL)
+    }
+
+    LaunchedEffect(searchQuery, tierState){
+        viewModel.getLeaderboardEntry(searchQuery.lowercase(), tierState)
     }
 
     val filteredEntries = viewModel.filteredLeaderboards

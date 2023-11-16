@@ -10,19 +10,18 @@ import no.hiof.mariusca.stitur.service.storage.UserInfoStorageService
 import javax.inject.Inject
 
 @HiltViewModel
-
-class ProfileViewModel @Inject constructor (private val userInfoStorageService: UserInfoStorageService) :
-    ViewModel(){
+class ProfileViewModel @Inject constructor(private val userInfoStorageService: UserInfoStorageService) :
+    ViewModel() {
     var filteredUser = mutableStateOf(Profile())
-        fun getUserInfo(user: String){
-            viewModelScope.launch{
 
+
+    fun getUserInfo(user: String) {
+        viewModelScope.launch {
             val temp = userInfoStorageService.getProfile(user)
-                if (temp != null) {
-                    filteredUser.value = temp
-                    }
 
-
+            if (temp != null) {
+                filteredUser.value = temp
+            }
 
         }
     }

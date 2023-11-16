@@ -7,7 +7,6 @@ import com.google.firebase.firestore.ktx.toObjects
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 import no.hiof.mariusca.stitur.model.LeaderboardEntry
-import no.hiof.mariusca.stitur.model.Trip
 import no.hiof.mariusca.stitur.service.storage.LeaderboardsService
 import javax.inject.Inject
 
@@ -62,6 +61,6 @@ constructor(private val firestore: FirebaseFirestore) : LeaderboardsService {
     /** COMPANION OBJECT
      * Companion object holding a constant representing the firestore document collection "LeaderboardsData"*/
     companion object{
-        private const val LEADERBOARDS_DATA = "LeaderboardsData"
+        private const val LEADERBOARDS_DATA = "LeaderboardEntry"
     }
 }

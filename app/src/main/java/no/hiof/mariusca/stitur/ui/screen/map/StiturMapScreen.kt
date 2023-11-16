@@ -105,12 +105,11 @@ fun SearchView(
 }
 
 
-
-
 @Composable
 fun StiturMapScreen(
-    weatherIconClicked: () -> Unit, modifier: Modifier = Modifier,
-    viewModel: StiturMapViewModel = hiltViewModel()
+    weatherIconClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: StiturMapViewModel = hiltViewModel(),
 ) {
     val filteredTrips = viewModel.filteredTrips
     val isCreateTripMode = remember { mutableStateOf(false) }
@@ -144,8 +143,7 @@ fun StiturMapScreen(
                     selectedTripState = selectedTripState,
                     selectedTreasureState = selectedTreasureState,
                     newTrip = newTrip,
-                    openDialog = openDialog
-
+                    openDialog = openDialog,
                 )
 
                 IconButton(onClick = weatherIconClicked) {
@@ -244,7 +242,7 @@ fun StiturMap(
     selectedTripState: MutableState<Trip?>,
     selectedTreasureState: MutableState<GeoTreasure?>,
     newTrip: MutableState<Trip?>,
-    openDialog: MutableState<Boolean>
+    openDialog: MutableState<Boolean>,
 ) {
 
     val sheetState = rememberModalBottomSheetState()
@@ -309,7 +307,7 @@ fun StiturMap(
             viewModel = viewModel,
             newTripHistoryState = newTripHistoryState,
             gpsTripState = gpsTripState,
-            locationRequest = locationRequest
+            locationRequest = locationRequest,
         )
 
         // Only register the location updates effect when we have a request

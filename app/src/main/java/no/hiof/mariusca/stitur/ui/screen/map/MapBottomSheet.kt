@@ -1,10 +1,7 @@
 package no.hiof.mariusca.stitur.ui.screen.map
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -22,14 +19,17 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.Priority
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import no.hiof.mariusca.stitur.model.LeaderboardEntry
 import no.hiof.mariusca.stitur.model.Profile
 import no.hiof.mariusca.stitur.model.Trip
 import no.hiof.mariusca.stitur.model.TripHistory
 import no.hiof.mariusca.stitur.model.calculateDistanceKM
 import no.hiof.mariusca.stitur.signup.SignUpViewModel
 import no.hiof.mariusca.stitur.ui.screen.ProfileViewModel
+import no.hiof.mariusca.stitur.ui.screen.leaderboard.StiturLeaderboardsViewModel
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,6 +37,7 @@ import java.util.concurrent.TimeUnit
 fun MapBottomSheet(
     profileViewModel: ProfileViewModel = hiltViewModel(),
     signUpViewModel: SignUpViewModel = hiltViewModel(),
+    leaderboardsViewModel: StiturLeaderboardsViewModel = hiltViewModel(),
     selectedTripState: MutableState<Trip?>,
     sheetState: SheetState,
     showBottomSheet: Boolean,
@@ -46,7 +47,7 @@ fun MapBottomSheet(
     viewModel: StiturMapViewModel,
     newTripHistoryState: MutableState<TripHistory?>,
     gpsTripState: MutableState<Trip?>,
-    locationRequest: MutableState<LocationRequest?>
+    locationRequest: MutableState<LocationRequest?>,
 ) {
 
     if (showBottomSheet) {
@@ -54,25 +55,12 @@ fun MapBottomSheet(
             onDismissRequest = {
                 toggleBottomSheet(false)
                 selectedTripState.value = null
-            }, sheetState = sheetState
+            },
+            sheetState = sheetState,
         ) {
             Column(modifier = Modifier.padding(10.dp, top = 0.dp, bottom = 16.dp)) {
-                Row(
-                    horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()
-                ) {
-                    Button(modifier = Modifier.padding(end = 10.dp), onClick = {
-                        scope.launch { sheetState.hide() }.invokeOnCompletion {
-                            if (!sheetState.isVisible) {
-                                toggleBottomSheet(false)
-                                selectedTripState.value = null
-                            }
-                        }
-                    }) {
-                        Text("Close (X)")
-                    }
-                }
-
                 DynamicStartAndStopButton(
+                    leaderboardsViewModel,
                     profileViewModel,
                     signUpViewModel,
                     selectedTripState,
@@ -101,7 +89,6 @@ fun MapBottomSheet(
                     Text("Delete trip")
                 }
             }
-
         }
     }
 }
@@ -110,6 +97,7 @@ fun MapBottomSheet(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DynamicStartAndStopButton(
+    leaderboardsViewModel: StiturLeaderboardsViewModel,
     profileViewModel: ProfileViewModel,
     signUpViewModel: SignUpViewModel,
     selectedTripState: MutableState<Trip?>,
@@ -124,11 +112,16 @@ private fun DynamicStartAndStopButton(
     profileViewModel.getUserInfo(signUpViewModel.currentLoggedInUserId)
     val loggedInProfile = profileViewModel.filteredUser
 
+    leaderboardsViewModel.getUserInfo(signUpViewModel.currentLoggedInUserId)
+    val loggedInLeaderboardEntry = leaderboardsViewModel.filteredUser
+
     if (selectedTripState.value == ongoingTripState.value) {
         Button(modifier = Modifier.padding(bottom = 10.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF006600)),
             onClick = {
                 finishTrip(
+                    leaderboardsViewModel,
+                    loggedInLeaderboardEntry,
                     locationRequest,
                     newTripHistoryState,
                     gpsTripState,
@@ -149,8 +142,7 @@ private fun DynamicStartAndStopButton(
             onClick = {
                 gpsTripState.value = Trip()
                 locationRequest.value = LocationRequest.Builder(
-                    Priority.PRIORITY_HIGH_ACCURACY,
-                    TimeUnit.SECONDS.toMillis(5)
+                    Priority.PRIORITY_HIGH_ACCURACY, TimeUnit.SECONDS.toMillis(5)
                 ).build()
                 ongoingTripState.value = selectedTripState.value
                 newTripHistoryState.value =
@@ -170,6 +162,8 @@ private fun DynamicStartAndStopButton(
 
 @OptIn(ExperimentalMaterial3Api::class)
 private fun finishTrip(
+    leaderboardsViewModel: StiturLeaderboardsViewModel,
+    loggedInLeaderboardEntry: MutableState<LeaderboardEntry>,
     locationRequest: MutableState<LocationRequest?>,
     newTripHistoryState: MutableState<TripHistory?>,
     gpsTripState: MutableState<Trip?>,
@@ -200,12 +194,22 @@ private fun finishTrip(
     if (distance != null) {
         newTripHistoryState.value?.trackedDistanceKm = distance
     }
+
     newTripHistoryState.value?.let {
         newTripHistoryState.value!!.pointsEarned =
             (1000 * newTripHistoryState.value!!.trackedDistanceKm + 0.5).toInt()
-        loggedInProfile.value.personalRanking.totalPoints += newTripHistoryState.value!!.pointsEarned
-        val temp: MutableList<TripHistory> =
-            loggedInProfile.value.tripHistory.toMutableList()
+        loggedInLeaderboardEntry.value.personalRanking.totalPoints += newTripHistoryState.value!!.pointsEarned
+        leaderboardsViewModel.updateLeaderboardEntry(loggedInLeaderboardEntry.value)
+
+        newTripHistoryState.value!!.tripId = selectedTripState.value?.uid.toString()
+        newTripHistoryState.value!!.trackedTrip.routeName =
+            selectedTripState.value?.routeName.toString()
+        newTripHistoryState.value!!.trackedTrip.difficulty =
+            selectedTripState.value?.difficulty.toString()
+        newTripHistoryState.value!!.trackedTrip.routeDescription =
+            selectedTripState.value?.routeDescription.toString()
+
+        val temp: MutableList<TripHistory> = loggedInProfile.value.tripHistory.toMutableList()
         temp.add(newTripHistoryState.value!!)
         loggedInProfile.value.tripHistory = temp.toList()
         profileViewModel.updateUser(loggedInProfile.value)
