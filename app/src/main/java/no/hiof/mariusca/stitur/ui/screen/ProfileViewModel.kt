@@ -13,6 +13,8 @@ import javax.inject.Inject
 class ProfileViewModel @Inject constructor(private val userInfoStorageService: UserInfoStorageService) :
     ViewModel() {
     var filteredUser = mutableStateOf(Profile())
+
+
     fun getUserInfo(user: String) {
         viewModelScope.launch {
             val temp = userInfoStorageService.getProfile(user)
@@ -20,6 +22,7 @@ class ProfileViewModel @Inject constructor(private val userInfoStorageService: U
             if (temp != null) {
                 filteredUser.value = temp
             }
+
         }
     }
 
@@ -39,7 +42,6 @@ class ProfileViewModel @Inject constructor(private val userInfoStorageService: U
         viewModelScope.launch {
             val currentUserProfile = filteredUser.value.copy(username = newUsername)
             userInfoStorageService.update(currentUserProfile)
-            // Optionally, you can fetch the updated profile again to ensure UI is updated
             getUserInfo(userId)
         }
     }

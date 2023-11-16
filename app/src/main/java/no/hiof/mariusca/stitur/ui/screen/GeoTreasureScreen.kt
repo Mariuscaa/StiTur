@@ -52,14 +52,13 @@ fun GeoTreasureScreen(signupviewModel: SignUpViewModel = hiltViewModel(), geotre
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(16.dp)
         )
-        val dummyGeoLocation = GeoLocation("2f", "11.4050194", "59.1342646")
+        val dummyGeoLocation = GeoLocation("2f", "11.353666857294389", "59.12283718051173")
         val dummyTreasure = GeoTreasure("1e", "SommerTur", "En fin tur i sommer", "en url fra firebase kanskje", dummyGeoLocation)
         GeoTreasures.add(dummyTreasure)
         geotreasureviewModel.createTreasure(dummyTreasure)
         ShowGeoTreasure(dummyTreasure)
     }
 }
-
 @Composable
 fun ShowGeoTreasure(geoTreasure: GeoTreasure){
     Row(

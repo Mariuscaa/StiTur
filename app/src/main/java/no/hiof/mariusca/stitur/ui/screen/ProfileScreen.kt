@@ -1,6 +1,7 @@
 package no.hiof.mariusca.stitur.ui.screen
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,7 +13,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -25,11 +33,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import no.hiof.mariusca.stitur.R
+import no.hiof.mariusca.stitur.model.Profile
+import no.hiof.mariusca.stitur.model.TripHistory
 import no.hiof.mariusca.stitur.signup.SignUpViewModel
 import no.hiof.mariusca.stitur.ui.screen.home.Screen
 
@@ -41,6 +52,7 @@ fun ProfileScreen(
 ) {
 
     val isEditMode = remember { mutableStateOf(false) }
+    val showTripHistoryScreen = remember { mutableStateOf(false) }
     val newUsername = remember { mutableStateOf("") }
 
     profViewModel.getUserInfo(viewModel.currentLoggedInUserId)
@@ -89,9 +101,19 @@ fun ProfileScreen(
             } else {
                 ProfileItem(
                     drawableId = R.drawable._icon__person_,
-                    text = filteredUser.value.username.uppercase()
+                    text = filteredUser.value.username.uppercase(),
+
                 )
-                ProfileItem(drawableId = R.drawable._icon__history_, text = "Trip History")
+
+
+                if (showTripHistoryScreen.value) {
+                    TripHistoryScreen(filteredUser.value)
+                }
+                ProfileItem(drawableId = R.drawable._icon__history_, text = "Trip History",
+                    onClick = {
+                    showTripHistoryScreen.value = true
+
+                })
                 ProfileItem(drawableId = R.drawable._icon__camera_slr_, text = "My GeoTreasures")
                 LogoutButton(viewModel, navController)
             }
@@ -128,11 +150,12 @@ fun EditUsernameView(
 
 
 @Composable
-fun ProfileItem(drawableId: Int, text: String) {
+fun ProfileItem(drawableId: Int, text: String, onClick: () -> Unit = {}) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .wrapContentSize()
+            .clickable(onClick = onClick)
     ) {
         Image(
             painter = painterResource(id = drawableId),
@@ -173,3 +196,73 @@ fun LogoutButton(
         Text(text = "Sign Out", fontSize = 24.sp)
     }
 }
+
+@Composable
+fun TripHistoryCard(tripHistory: TripHistory) {
+    Card(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.maps),
+                contentDescription = "Map Thumbnail",
+                modifier = Modifier.size(60.dp)
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Column {
+                Text(
+                    text = tripHistory.trackedTrip.routeName,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                Row {
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = "Points",
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Text(text = "${tripHistory.pointsEarned}")
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(
+                        imageVector = Icons.Default.ArrowForward,
+                        contentDescription = "Distance",
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Text(text = "${tripHistory.trackedDistanceKm} km")
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = "Duration",
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Text(text = "${tripHistory.durationMinutes} min")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun TripHistoryScreen(loggedInProfile: Profile) {
+    Column {
+        Text(
+            text = "Trip history",
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.padding(16.dp)
+        )
+        LazyColumn {
+            items(loggedInProfile.tripHistory) { tripHistory ->
+                TripHistoryCard(tripHistory = tripHistory)
+            }
+        }
+        }
+    }
+
+
+
