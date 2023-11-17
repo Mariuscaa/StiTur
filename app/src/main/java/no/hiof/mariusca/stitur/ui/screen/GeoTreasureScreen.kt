@@ -21,7 +21,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import no.hiof.mariusca.stitur.R
@@ -53,10 +52,10 @@ fun GeoTreasureScreen(signupviewModel: SignUpViewModel = hiltViewModel(), geotre
             modifier = Modifier.padding(16.dp)
         )
         val dummyGeoLocation = GeoLocation("2f", "11.353666857294389", "59.12283718051173")
-        val dummyTreasure = GeoTreasure("1e", "SommerTur", "En fin tur i sommer", "en url fra firebase kanskje", dummyGeoLocation)
+        /*val dummyTreasure = GeoTreasure("1e", "SommerTur", "En fin tur i sommer", "en url fra firebase kanskje", dummyGeoLocation)
         GeoTreasures.add(dummyTreasure)
         geotreasureviewModel.createTreasure(dummyTreasure)
-        ShowGeoTreasure(dummyTreasure)
+        ShowGeoTreasure(dummyTreasure)*/
     }
 }
 @Composable
@@ -103,11 +102,11 @@ fun createDummyGeoLocation(): Any {
     return GeoLocation("2f", "11.4050194", "59.1342646")
 }
 
-fun createDummyTreasure(geoLocation: Any): GeoTreasure {
+fun createDummyTreasure(geoLocation: no.hiof.mariusca.stitur.model.GeoLocation): GeoTreasure {
 
     return GeoTreasure("1e", "SommerTur", "En fin tur i sommer", "en url fra firebase kanskje", geoLocation)
 }
-
+/*
 @Preview
 @Composable
 fun PreviewShowGeoTreasure() {
@@ -115,3 +114,5 @@ fun PreviewShowGeoTreasure() {
     val dummyTreasure = GeoTreasure("1e", "SommerTur", "En fin tur i sommer", "en url fra firebase kanskje", dummyGeoLocation)
     ShowGeoTreasure(dummyTreasure)
 }
+
+ */

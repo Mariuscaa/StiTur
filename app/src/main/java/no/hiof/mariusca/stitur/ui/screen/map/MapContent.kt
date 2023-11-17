@@ -24,9 +24,9 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.Polyline
 import no.hiof.mariusca.stitur.R
+import no.hiof.mariusca.stitur.model.GeoLocation
 import no.hiof.mariusca.stitur.model.GeoTreasure
 import no.hiof.mariusca.stitur.model.Trip
-import no.hiof.mariusca.stitur.ui.screen.GeoLocation
 import no.hiof.mariusca.stitur.ui.screen.GeoTreasureViewModel
 
 @Composable
@@ -209,7 +209,7 @@ private fun LoadGeoTreasures(
     val treasureIcon = bitmapDescriptorFromVector(
         context, R.drawable.game_icons_locked_chest
     )
-
+    Log.v("GeoTreasurePosition", geoTreasures.toString())
     geoTreasures.forEach { geoTreasure ->
         if (geoTreasure.geoLocation is GeoLocation) {
             Log.v("GeoTreasurePosition", geoTreasure.title)
@@ -217,14 +217,15 @@ private fun LoadGeoTreasures(
             Log.v("GeoTreasurePosition", geoTreasure.geoLocation.longitude)
             val geoLocation = geoTreasure.geoLocation as GeoLocation
             val markerPosition = LatLng(
+                geoLocation.latitude.toDouble(),
                 geoLocation.longitude.toDouble(),
-                geoLocation.latitude.toDouble()
+
             )
 
             Marker(
                 state = MarkerState(position = markerPosition),
                 title = geoTreasure.title,
-                //icon = treasureIcon,
+                icon = treasureIcon,
                 anchor = Offset(0.5f, 0.5f),
                 onClick = {
                     selectedGeoTreasureState.value = geoTreasure
@@ -236,18 +237,12 @@ private fun LoadGeoTreasures(
 }
 
 
-fun createDummyTreasure(geoLocation: Any): GeoTreasure {
+fun createDummyTreasure(geoLocation: GeoLocation): GeoTreasure {
 
     return GeoTreasure("1e", "SommerTur", "En fin tur i sommer", "en url fra firebase kanskje", geoLocation)
 }
 
-fun generateRandomID(length: Int): String {
-    val charPool: List<Char> = ('A'..'Z') + ('a'..'z') + ('0'..'9')
-    return (1..length)
-        .map { _ -> kotlin.random.Random.nextInt(0, charPool.size) }
-        .map(charPool::get)
-        .joinToString("")
-}
+
 
 @Composable
 private fun CreateGeotreasure(
@@ -258,10 +253,9 @@ private fun CreateGeotreasure(
 
 
 ) {
-    val randomID = generateRandomID(10)
     //OPPRETTER GEOTREASURE HER
-    val NewGeoLocation = GeoLocation(generateRandomID(10), "11.4050194", "59.1342646")
-    val NewTreasure = GeoTreasure(generateRandomID(10), "SommerTur", "En fin tur i sommer", "en url fra firebase kanskje", NewGeoLocation)
+    //val NewGeoLocation = GeoLocation(generateRandomID(10), "11.4050194", "59.1342646")
+    //val NewTreasure = GeoTreasure(generateRandomID(10), "SommerTur", "En fin tur i sommer", "en url fra firebase kanskje", NewGeoLocation)
 
     //val NewGeoLocation = GeoLocation("2f", "11.4050194", "59.1342646")
     //val NewTreasure = GeoTreasure("1e", "SommerTur", "En fin tur i sommer", "en url fra firebase kanskje", NewGeoLocation)
