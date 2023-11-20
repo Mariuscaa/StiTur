@@ -42,6 +42,6 @@ constructor(private val firestore: FirebaseFirestore) : TripStorageService {
     }
 
     companion object {
-        private const val TRIPS_COLLECTION = "GeoJsonFeatures"
+        private const val TRIPS_COLLECTION = "Trips"
     }
 }
