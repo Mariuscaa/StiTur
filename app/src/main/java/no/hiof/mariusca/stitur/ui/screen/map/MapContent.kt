@@ -144,7 +144,7 @@ private fun CreateAllTrips(
     context: Context
 ) {
     val startIcon = bitmapDescriptorFromVector(
-        context, R.drawable.start
+        context, R.drawable.start_flag
     )
 
     val endIcon = bitmapDescriptorFromVector(
