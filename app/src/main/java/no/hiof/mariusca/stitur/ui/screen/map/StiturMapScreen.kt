@@ -9,10 +9,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,13 +21,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -50,16 +45,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -71,6 +65,7 @@ import no.hiof.mariusca.stitur.model.GeoTreasure
 import no.hiof.mariusca.stitur.model.Trip
 import no.hiof.mariusca.stitur.model.TripHistory
 import no.hiof.mariusca.stitur.ui.screen.GeoTreasureViewModel
+import java.util.concurrent.TimeUnit
 
 @Composable
 fun ColumnItem(item: String, onItemClick: () -> Unit) {
@@ -128,9 +123,14 @@ fun StiturMapScreen(
     val selectedTreasureState = remember { mutableStateOf<GeoTreasure?>(null) }
 
     val newTrip = remember { mutableStateOf<Trip?>(null) }
+    val newGeoTreasure = remember { mutableStateOf<GeoTreasure?>(null) }
+
     val ongoingTripState = remember { mutableStateOf<Trip?>(null) }
 
-    val openDialog = remember { mutableStateOf(false) }
+    val openSaveTripDialog = remember { mutableStateOf(false) }
+
+    val openSaveGeoTreasureDialog = remember { mutableStateOf(false) }
+
 
     // Inspired by https://github.com/android/platform-samples/blob/main/samples/base/src/main/java/com/example/platform/base/PermissionBox.kt
     val permissions = listOf(
@@ -159,10 +159,12 @@ fun StiturMapScreen(
                     selectedTripState = selectedTripState,
                     selectedTreasureState = selectedTreasureState,
                     newTrip = newTrip,
-                    openDialog = openDialog,
+                    openSaveTripDialog = openSaveTripDialog,
                     ongoingTripState = ongoingTripState,
                     isLoading = isLoading,
-                    cameraFollowingGps = cameraFollowingGps
+                    cameraFollowingGps = cameraFollowingGps,
+                    openSaveGeoTreasureDialog = openSaveGeoTreasureDialog,
+                    newGeoTreasure = newGeoTreasure
                 )
 
                 IconButton(onClick = weatherIconClicked) {
@@ -179,10 +181,12 @@ fun StiturMapScreen(
                     isCreateTripMode = isCreateTripMode,
                     newTripPoints = newTripPoints,
                     newTrip = newTrip,
-                    openDialog = openDialog,
+                    openNewTripDialog = openSaveTripDialog,
                     ongoingTripState = ongoingTripState,
                     selectedTripState = selectedTripState,
-                    cameraFollowingGps = cameraFollowingGps
+                    cameraFollowingGps = cameraFollowingGps,
+                    openNewGeoTreasureDialog = openSaveGeoTreasureDialog,
+                    newGeoTreasure = newGeoTreasure
                 )
             }
             Column(modifier.fillMaxSize(), horizontalAlignment = CenterHorizontally) {
@@ -251,52 +255,11 @@ fun StiturMapScreen(
                                 .padding(top = 20.dp, end = 70.dp)
                                 .align(Alignment.End)
                         )
-
                     }
                 }
             }
         })
 }
-/*
-@Composable
-fun creatingGeoTreasure(pos){
-val customMarkerImage = painterResource(id = R.drawable.your_custom_image) // Replace with your image resource ID
-Marker(
-MarkerState(position),
-title = "Halden",
-snippet = "Marker in Halden.",
-icon = customMarkerImage, // Set the custom image here
-onClick = {
-    // Handle the click event for the marker
-    Toast.makeText(context, "Custom marker clicked!", Toast.LENGTH_LONG).show()
-}
-)
-}
-Marker(
-MarkerState(position = halden), title = "Halden", snippet = "Marker in Halden."
-)
-*/
-
-
-@Composable
-fun geoTreasure(location: LatLng) {
-    val customImageMarkers = remember { mutableStateListOf<LatLng>() }
-    customImageMarkers.add(location)
-}
-/*
-@Composable
-fun onCustomImageMarkerClick(markerLocation: LatLng) {
-    // Handle the click, for example, show a toast or navigate to another screen
-    Toast.makeText(context, "Custom marker at $markerLocation clicked!", Toast.LENGTH_LONG).show()
-}
-
- */
-/*
-Button(onClick = { addCustomImageMarker(halden) }) {
-    Text("Add Clickable Image")
-}
-
- */
 
 @SuppressLint("MissingPermission")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -309,10 +272,12 @@ fun StiturMap(
     selectedTripState: MutableState<Trip?>,
     selectedTreasureState: MutableState<GeoTreasure?>,
     newTrip: MutableState<Trip?>,
-    openDialog: MutableState<Boolean>,
+    openSaveTripDialog: MutableState<Boolean>,
     ongoingTripState: MutableState<Trip?>,
     isLoading: MutableState<Boolean>,
-    cameraFollowingGps: MutableState<Boolean>
+    cameraFollowingGps: MutableState<Boolean>,
+    openSaveGeoTreasureDialog: MutableState<Boolean>,
+    newGeoTreasure: MutableState<GeoTreasure?>,
 ) {
 
     val sheetState = rememberModalBottomSheetState()
@@ -336,6 +301,9 @@ fun StiturMap(
     val locationRequest = remember {
         mutableStateOf<LocationRequest?>(null)
     }
+    val latestCoordinate = remember { mutableStateOf<LatLng?>(null) }
+
+
     LaunchedEffect(selectedTripState.value) {
         if (selectedTripState.value != null) {
             val startCoordinate = selectedTripState.value!!.coordinates[0]
@@ -390,10 +358,35 @@ fun StiturMap(
         )
 
         when {
-            openDialog.value -> {
-                SaveTripDialog(openDialog, newTrip, viewModel, newTripPoints, isCreateTripMode)
+            openSaveTripDialog.value -> {
+                SaveTripDialog(
+                    openSaveTripDialog,
+                    newTrip,
+                    viewModel,
+                    newTripPoints,
+                    isCreateTripMode
+                )
             }
         }
+
+        when {
+            openSaveGeoTreasureDialog.value -> {
+                if (locationRequest.value == null) {
+                    locationRequest.value = LocationRequest.Builder(
+                        Priority.PRIORITY_HIGH_ACCURACY, TimeUnit.SECONDS.toMillis(60)
+                    ).build()
+                }
+                SaveGeoTreasureDialog(
+                    openSaveGeoTreasureDialog,
+                    newGeoTreasure,
+                    treasureViewModel,
+                    latestCoordinate,
+                    locationRequest
+                )
+            }
+        }
+
+
 
         MapBottomSheet(
             selectedTripState = selectedTripState,
@@ -408,8 +401,11 @@ fun StiturMap(
             locationRequest = locationRequest,
         )
 
+
         if (locationRequest.value != null) {
             LocationUpdatesEffect(locationRequest.value!!) { result ->
+                latestCoordinate.value =
+                    result.lastLocation?.let { LatLng(it.latitude, it.longitude) }
                 for (currentLocation in result.locations) {
                     val newCoordinate = Coordinate(
                         lat = currentLocation.latitude.toString(),
@@ -426,98 +422,7 @@ fun StiturMap(
                 }
             }
         }
-
     }
 }
 
-@Composable
-private fun SaveTripDialog(
-    openDialog: MutableState<Boolean>,
-    newTrip: MutableState<Trip?>,
-    stiturMapViewModel: StiturMapViewModel,
-    newTripPoints: MutableList<LatLng>,
-    isCreateTripMode: MutableState<Boolean>,
-) {
-    Dialog(
-        onDismissRequest = { openDialog.value = false },
-    ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(600.dp)
-                .padding(),
-            shape = RoundedCornerShape(16.dp),
-        ) {
-            Column {
 
-                Text(
-                    text = "Save your trip",
-                    modifier = Modifier
-                        .padding(12.dp)
-                        .align(CenterHorizontally),
-                    style = TextStyle(fontSize = 28.sp)
-                )
-                newTrip.value?.let { trip ->
-                    OutlinedTextField(
-                        value = trip.routeName,
-                        onValueChange = { newRouteName ->
-                            newTrip.value = trip.copy(routeName = newRouteName)
-                        },
-                        label = { Text("Name") },
-                        modifier = Modifier.padding(15.dp),
-                        isError = trip.routeName.isEmpty()
-                    )
-                }
-                newTrip.value?.let { trip ->
-                    OutlinedTextField(
-                        value = trip.routeDescription,
-                        onValueChange = { newRouteDescription ->
-                            newTrip.value = trip.copy(routeDescription = newRouteDescription)
-                        },
-                        minLines = 2,
-                        maxLines = 2,
-                        label = { Text("Description") },
-                        modifier = Modifier.padding(15.dp)
-                    )
-                }
-                newTrip.value?.let { trip ->
-                    OutlinedTextField(
-                        value = trip.difficulty,
-                        onValueChange = { newDifficulty ->
-                            newTrip.value = trip.copy(difficulty = newDifficulty)
-                        }, label = { Text("Difficulty") },
-                        modifier = Modifier.padding(15.dp)
-                    )
-                }
-
-                newTrip.value?.let { trip ->
-                    OutlinedTextField(
-                        value = trip.lengthInMeters.toString(),
-                        onValueChange = {},
-                        label = { Text("Estimated length in meters.") },
-                        modifier = Modifier.padding(15.dp),
-                        enabled = false
-                    )
-                }
-                Row(
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .align(CenterHorizontally),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    Button(onClick = { openDialog.value = false }) {
-                        Text(text = "Cancel")
-                    }
-                    Button(onClick = {
-                        newTrip.value?.let { stiturMapViewModel.createTrip(it) }
-                        newTripPoints.clear()
-                        openDialog.value = false
-                        isCreateTripMode.value = !isCreateTripMode.value
-                    }) {
-                        Text(text = "Save")
-                    }
-                }
-            }
-        }
-    }
-}

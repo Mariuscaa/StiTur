@@ -28,7 +28,7 @@ constructor(private val firestore: FirebaseFirestore) : GeoTreasureStorageServic
 
 
     override suspend fun update(treasure: GeoTreasure) {
-        firestore.collection(TREASURE_INFO_COLLECTION).document(treasure.geoTreasureID).set(treasure).await()
+        firestore.collection(TREASURE_INFO_COLLECTION).document(treasure.uid).set(treasure).await()
     }
 
 
