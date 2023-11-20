@@ -4,10 +4,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,11 +60,10 @@ fun SaveGeoTreasureDialog(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(600.dp),
+                .padding(4.dp, top = 50.dp),
             shape = RoundedCornerShape(16.dp),
         ) {
-            Column {
-
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = "Save your GeoTreasure",
                     modifier = Modifier
@@ -79,7 +79,6 @@ fun SaveGeoTreasureDialog(
                         },
                         label = { Text("GeoTreasue Title") },
                         modifier = Modifier.padding(15.dp),
-                        isError = geoTreasure.title.isEmpty()
                     )
                 }
                 newGeoTreasure.value?.let { geoTreasure ->
@@ -93,19 +92,21 @@ fun SaveGeoTreasureDialog(
                         minLines = 2,
                         maxLines = 2,
                         modifier = Modifier.padding(15.dp),
-                        isError = geoTreasure.textContent.isEmpty()
                     )
                 }
                 Row(
                     modifier = Modifier
-                        .padding(10.dp)
+                        .padding(10.dp, bottom = 30.dp)
                         .align(Alignment.CenterHorizontally),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    Button(onClick = {
-                        openDialog.value = false
-                        locationRequest.value = null
-                    }) {
+                    Button(
+                        onClick = {
+                            openDialog.value = false
+                            locationRequest.value = null
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+                    ) {
                         Text(text = "Cancel")
                     }
                     Button(onClick = {
