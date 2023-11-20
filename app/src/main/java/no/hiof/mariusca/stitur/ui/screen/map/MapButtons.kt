@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.LatLng
 import no.hiof.mariusca.stitur.R
 import no.hiof.mariusca.stitur.model.Coordinate
+import no.hiof.mariusca.stitur.model.GeoTreasure
 import no.hiof.mariusca.stitur.model.Trip
 import no.hiof.mariusca.stitur.model.calculateDistanceMeters
 
@@ -30,36 +31,13 @@ fun MapButtons(
     isCreateTripMode: MutableState<Boolean>,
     newTripPoints: MutableList<LatLng>,
     newTrip: MutableState<Trip?>,
-    openDialog: MutableState<Boolean>,
+    openNewTripDialog: MutableState<Boolean>,
     ongoingTripState: MutableState<Trip?>,
     selectedTripState: MutableState<Trip?>,
-    cameraFollowingGps: MutableState<Boolean>
+    cameraFollowingGps: MutableState<Boolean>,
+    openNewGeoTreasureDialog: MutableState<Boolean>,
+    newGeoTreasure: MutableState<GeoTreasure?>,
 ) {
-    // Define the action to perform when the geoTreasure icon is clicked
-    val geoTreasureIconClicked: () -> Unit = {
-        // Perform the desired action when the icon is clicked
-        // For example, you can show a dialog or navigate to a different screen.
-    }
-
-    /*
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = 25.dp)
-        ) {
-            IconButton(
-                onClick = geoTreasureIconClicked,
-                modifier = Modifier.align(Alignment.BottomStart)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.game_icons_locked_chest),
-                    contentDescription = "GeoTreasure icon",
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-        }
-
-     */
 
     Box(
         modifier = Modifier
@@ -110,7 +88,10 @@ fun MapButtons(
             }
 
             IconButton(
-                onClick = geoTreasureIconClicked,
+                onClick = {
+                    openNewGeoTreasureDialog.value = true
+                    newGeoTreasure.value = GeoTreasure()
+                },
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.new_geotreasure2),
@@ -178,7 +159,7 @@ fun MapButtons(
                                 }
                             }
                         }
-                        openDialog.value = true
+                        openNewTripDialog.value = true
                     }) {
                         Text("Save trip")
                     }

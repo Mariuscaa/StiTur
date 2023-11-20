@@ -3,7 +3,7 @@ package no.hiof.mariusca.stitur.model
 import com.google.firebase.firestore.DocumentId
 
 data class GeoTreasure(
-    @DocumentId val geoTreasureID: String = "",
+    @DocumentId val uid: String = "",
     val title: String = "",
     val textContent: String = "",
     val pictureUrl: String = "",
@@ -11,7 +11,6 @@ data class GeoTreasure(
 )
 
 data class GeoLocation (
-    val geoLocationID: String = "",
     val longitude: String = "",
     val latitude: String = ""
 )

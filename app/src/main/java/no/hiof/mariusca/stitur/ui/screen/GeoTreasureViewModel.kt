@@ -8,7 +8,6 @@ import no.hiof.mariusca.stitur.model.GeoTreasure
 import no.hiof.mariusca.stitur.service.storage.GeoTreasureStorageService
 import javax.inject.Inject
 
-
 @HiltViewModel
 class GeoTreasureViewModel @Inject constructor (private val geoTreasureStorageService : GeoTreasureStorageService) :
     ViewModel(){
@@ -18,15 +17,9 @@ class GeoTreasureViewModel @Inject constructor (private val geoTreasureStorageSe
             geoTreasureStorageService.save(treasure)
         }
     }
-
-
-
     fun deleteTreasure(treasure: GeoTreasure) {
         viewModelScope.launch {
-            geoTreasureStorageService.delete(treasure.geoTreasureID)
+            geoTreasureStorageService.delete(treasure.uid)
         }
     }
-
-
-
 }
