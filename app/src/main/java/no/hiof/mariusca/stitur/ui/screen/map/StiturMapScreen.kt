@@ -9,6 +9,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -119,6 +120,11 @@ fun StiturMapScreen(
     modifier: Modifier = Modifier,
     viewModel: StiturMapViewModel = hiltViewModel(),
 ) {
+
+    var isSearchActive by remember { mutableStateOf(false) }
+
+
+
     val filteredTrips = viewModel.filteredTrips
     val isCreateTripMode = remember { mutableStateOf(false) }
     val newTripPoints = remember {
@@ -198,17 +204,34 @@ fun StiturMapScreen(
 
                 val searchedText = textState.value.text.lowercase()
 
-                if (searchedText.isNotBlank()) {
+                if (searchedText.isNotBlank() && isSearchActive) {
 
                     viewModel.getCreatedTrip(searchedText)
-                    LazyColumn(modifier = Modifier.padding(10.dp)) {
+                    LazyColumn(modifier = Modifier
+                        .padding(10.dp)
+                        .background(color = Color.White)
+                        .clickable(indication = null, interactionSource = remember { MutableInteractionSource() }) {
+
+                        }) {
                         items(items = filteredTrips, key = { it.uid }) { item ->
                             ColumnItem(item = item.routeName, onItemClick = {
                                 selectedTripState.value = item
+                                isSearchActive = false
                             })
                         }
                     }
                 }
+
+                if (isSearchActive) {
+                    Box(modifier = Modifier
+                        .fillMaxSize()
+                        .clickable {
+                            isSearchActive = false
+                        }, contentAlignment = Alignment.TopCenter) {
+                    }
+                }
+
+
                 var showInstruction by remember { mutableStateOf(false) }
 
 
@@ -222,6 +245,9 @@ fun StiturMapScreen(
                     }
                 }
 
+                LaunchedEffect(textState.value) {
+                    isSearchActive = textState.value.text.isNotBlank()
+                }
 
                 AnimatedVisibility(
                     visible = showInstruction,
