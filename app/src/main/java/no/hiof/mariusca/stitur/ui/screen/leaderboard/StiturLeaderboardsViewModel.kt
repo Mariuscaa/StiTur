@@ -76,6 +76,8 @@ class StiturLeaderboardsViewModel @Inject constructor(private val leaderboardsSe
             }
 
         }
+
+        filteredLeaderboards.sortByDescending { it.personalRanking.totalPoints }
     }
 
     fun updateLeaderboardEntry(leaderboardEntry: LeaderboardEntry) {

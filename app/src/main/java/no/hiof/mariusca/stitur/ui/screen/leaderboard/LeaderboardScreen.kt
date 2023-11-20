@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -59,10 +60,15 @@ fun LeaderboardScreen(viewModel: StiturLeaderboardsViewModel) {
 
     // Collect flow of leaderboard entries and determine which list to display based on if query has content
     val leaderboardEntries by viewModel.leaderboardEntries.collectAsState(initial = listOf())
-    val displayEntries = if(searchQuery.isBlank()) leaderboardEntries else filteredEntries
+
+    // Display leaderboard entries sorted by total points in descending order:
+    val displayEntries = if(searchQuery.isBlank()) leaderboardEntries.sortedByDescending { it.personalRanking.totalPoints }
+    else filteredEntries
 
 
     val customBackgroundColor = Color(0xFF133c07)
+
+
 
     Column(
         modifier = Modifier
@@ -74,17 +80,21 @@ fun LeaderboardScreen(viewModel: StiturLeaderboardsViewModel) {
         TitleHeader()
         Spacer(modifier = Modifier.height(40.dp))
         SearchBar(searchQuery){
-            newQuery -> searchQuery = newQuery }
+                newQuery -> searchQuery = newQuery }
         Spacer(modifier = Modifier.height(40.dp))
 
-        DummyDataList(leaderboardEntries = displayEntries)
+        LeaderboardEntryDataList(leaderboardEntries = displayEntries)
     }
 }
 
 @Composable
-fun DummyDataList(leaderboardEntries: List<LeaderboardEntry>){
+fun LeaderboardEntryDataList(leaderboardEntries: List<LeaderboardEntry>){
 
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
+    LazyColumn(modifier = Modifier
+        .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+
+    ) {
         items(leaderboardEntries) { leaderboardEntry ->
             LeaderboardUserCard(leaderboardEntry = leaderboardEntry)
         }
