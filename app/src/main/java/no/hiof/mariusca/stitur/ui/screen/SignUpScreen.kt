@@ -93,7 +93,6 @@ fun SignUpScreen(
                             if (userId != null) {
                                 val newProfile = Profile(userID = userId, false,signViewModel.uiState.value.userName)
                                 profViewModel.createUser(newProfile)
-                                navController.navigate(route = Screen.StiturMap.route)
                             }
                         }
                     },
