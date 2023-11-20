@@ -59,6 +59,7 @@ fun ProfileScreen(
     val filteredUser = profViewModel.filteredUser
 
 
+
     Box(
         modifier = Modifier
             .fillMaxWidth(),
@@ -79,7 +80,7 @@ fun ProfileScreen(
     }
 
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().padding(30.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -102,18 +103,26 @@ fun ProfileScreen(
                 ProfileItem(
                     drawableId = R.drawable._icon__person_,
                     text = filteredUser.value.username.uppercase(),
+                    onClick = {
+                        showTripHistoryScreen.value = !showTripHistoryScreen.value
+
+                    }
 
                 )
 
 
-                if (showTripHistoryScreen.value) {
-                    TripHistoryScreen(filteredUser.value)
-                }
+
+
                 ProfileItem(drawableId = R.drawable._icon__history_, text = "Trip History",
                     onClick = {
-                    showTripHistoryScreen.value = true
+                    showTripHistoryScreen.value = !showTripHistoryScreen.value
 
                 })
+                if (showTripHistoryScreen.value) {
+                    TripHistoryScreen(filteredUser.value
+                    )
+
+                }
                 ProfileItem(drawableId = R.drawable._icon__camera_slr_, text = "My GeoTreasures")
                 LogoutButton(viewModel, navController)
             }
@@ -251,18 +260,28 @@ fun TripHistoryCard(tripHistory: TripHistory) {
 @Composable
 fun TripHistoryScreen(loggedInProfile: Profile) {
     Column {
-        Text(
-            text = "Trip history",
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.padding(16.dp)
-        )
-        LazyColumn {
-            items(loggedInProfile.tripHistory) { tripHistory ->
-                TripHistoryCard(tripHistory = tripHistory)
+          if (loggedInProfile.tripHistory.isEmpty()){
+              Text(
+                  text = "You have no trips to show",
+                  style = MaterialTheme.typography.bodyLarge.copy(fontSize = 24.sp),
+                  )
+          }
+            else{
+              LazyColumn {
+              items(loggedInProfile.tripHistory) { tripHistory ->
+                  TripHistoryCard(tripHistory = tripHistory)
+              }
+              }
             }
-        }
-        }
     }
+}
 
+
+
+
+@Composable
+fun GeoTreasureScreen(){
+
+}
 
 
