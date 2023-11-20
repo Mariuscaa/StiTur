@@ -81,7 +81,6 @@ fun SignUpScreen(
 
             Row {
                 Button(
-                    // signViewModel.onLoginClick()
                     onClick = { navController.navigate(Screen.SignIn.route)},
                     modifier = Modifier
                         .padding(16.dp, 8.dp),
@@ -103,13 +102,6 @@ fun SignUpScreen(
                 ) {
                     Text(text = stringResource(R.string.create_account), fontSize = 16.sp)
                 }
-            }
-            Button(
-                onClick = {signViewModel.createAnonymousAccount()},
-                modifier = Modifier
-                    .padding(16.dp, 8.dp),)
-            {
-                Text(text = ("Continue as Anonymous"), fontSize = 16.sp)
             }
         }
     }

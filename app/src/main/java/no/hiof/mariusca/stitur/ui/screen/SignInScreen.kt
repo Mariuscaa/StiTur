@@ -40,7 +40,6 @@ import no.hiof.mariusca.stitur.signup.SignUpViewModel
 import no.hiof.mariusca.stitur.ui.screen.home.Screen
 
 
-//ScreenTest
 
 @Composable
 fun SignInScreen(
@@ -88,43 +87,21 @@ fun SignInScreen(
                     Text(text = stringResource(R.string.create_account), fontSize = 16.sp)
                 }
             }
-            Button(
-                onClick = { signInViewModel.createAnonymousAccount() },
-                modifier = Modifier
-                    .padding(16.dp, 8.dp),
-            )
-            {
-                Text(text = ("Continue as Anonymous"), fontSize = 16.sp)
-            }
+
         }
     } else {
         navController.navigate(route = Screen.StiturMap.route)
     }
 }
 
-/*
-@Composable
-private fun String.EmailField(onNewValue: (String) -> Unit, modifier: Modifier) {
-    OutlinedTextField(
-        singleLine = true,
-        modifier = modifier,
-        value = this,
-        onValueChange = { onNewValue(it) },
-        placeholder = { Text(stringResource(R.string.email)) },
-        leadingIcon = { Icon(imageVector = Icons.Default.Email, contentDescription = "Email") }
-    )
-}
-
- */
-
 @Composable
 private fun PasswordFieldSignIn(value: String, onNewValue: (String) -> Unit, modifier: Modifier) {
     var isVisible by remember { mutableStateOf(false) }
 
     val (icon, size) = if (isVisible) {
-        Pair(painterResource(R.drawable.eye), 34.dp) // Adjust size as needed
+        Pair(painterResource(R.drawable.eye), 34.dp)
     } else {
-        Pair(painterResource(R.drawable.closedeye), 24.dp) // Adjust size as needed
+        Pair(painterResource(R.drawable.closedeye), 24.dp)
     }
 
     val visualTransformation =
