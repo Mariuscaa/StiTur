@@ -117,6 +117,12 @@ fun StiturMapScreen(
     modifier: Modifier = Modifier,
     viewModel: StiturMapViewModel = hiltViewModel(),
 ) {
+
+    var isSearchActive by remember { mutableStateOf(false) }
+
+
+
+
     val filteredTrips = viewModel.filteredTrips
     val isCreateTripMode = remember { mutableStateOf(false) }
     val newTripPoints = remember {
@@ -205,17 +211,40 @@ fun StiturMapScreen(
 
                 val searchedText = textState.value.text.lowercase()
 
-                if (searchedText.isNotBlank()) {
+                if (searchedText.isNotBlank() && isSearchActive) {
 
                     viewModel.getCreatedTrip(searchedText)
-                    LazyColumn(modifier = Modifier.padding(10.dp)) {
+                    LazyColumn(modifier = Modifier
+                        .padding(10.dp)
+                        .background(color = Color.White)) {
                         items(items = filteredTrips, key = { it.uid }) { item ->
                             ColumnItem(item = item.routeName, onItemClick = {
                                 selectedTripState.value = item
+                                textState.value = TextFieldValue("")
+                                isSearchActive = false
+
                             })
                         }
                     }
                 }
+
+                if (isSearchActive) {
+                    Box(modifier = Modifier
+                        .fillMaxSize()
+                        .clickable {
+                            isSearchActive = false
+                        }, contentAlignment = Alignment.TopCenter) {
+                    }
+                }
+
+                LaunchedEffect(textState.value) {
+                    isSearchActive = textState.value.text.isNotBlank()
+
+                }
+
+
+
+
                 var showInstruction by remember { mutableStateOf(false) }
 
 
