@@ -65,6 +65,9 @@ import no.hiof.mariusca.stitur.model.GeoTreasure
 import no.hiof.mariusca.stitur.model.Trip
 import no.hiof.mariusca.stitur.model.TripHistory
 import no.hiof.mariusca.stitur.ui.screen.GeoTreasureViewModel
+import no.hiof.mariusca.stitur.ui.screen.map.dialogs.SaveGeoTreasureDialog
+import no.hiof.mariusca.stitur.ui.screen.map.dialogs.SaveTripDialog
+import no.hiof.mariusca.stitur.ui.screen.map.dialogs.ShowGeoTreasureDialog
 import java.util.concurrent.TimeUnit
 
 @Composable
@@ -382,6 +385,15 @@ fun StiturMap(
                     treasureViewModel,
                     latestCoordinate,
                     locationRequest
+                )
+            }
+        }
+
+        when {
+            selectedTreasureState.value != null -> {
+                ShowGeoTreasureDialog(
+                    selectedTreasureState,
+                    treasureViewModel,
                 )
             }
         }

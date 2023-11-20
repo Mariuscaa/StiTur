@@ -1,4 +1,4 @@
-package no.hiof.mariusca.stitur.ui.screen.map
+package no.hiof.mariusca.stitur.ui.screen.map.dialogs
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.google.android.gms.maps.model.LatLng
 import no.hiof.mariusca.stitur.model.Trip
+import no.hiof.mariusca.stitur.ui.screen.map.StiturMapViewModel
 
 @Composable
 fun SaveTripDialog(
