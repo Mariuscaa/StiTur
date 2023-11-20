@@ -19,11 +19,15 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.maps.model.LatLng
 import no.hiof.mariusca.stitur.model.GeoLocation
 import no.hiof.mariusca.stitur.model.GeoTreasure
+import no.hiof.mariusca.stitur.model.MinimalProfile
+import no.hiof.mariusca.stitur.signup.SignUpViewModel
 import no.hiof.mariusca.stitur.ui.screen.GeoTreasureViewModel
+import no.hiof.mariusca.stitur.ui.screen.ProfileViewModel
 
 @Composable
 fun SaveGeoTreasureDialog(
@@ -31,14 +35,20 @@ fun SaveGeoTreasureDialog(
     newGeoTreasure: MutableState<GeoTreasure?>,
     geoTreasureViewModel: GeoTreasureViewModel,
     currentLocation: MutableState<LatLng?>,
-    locationRequest: MutableState<LocationRequest?>
+    locationRequest: MutableState<LocationRequest?>,
+    profileViewModel: ProfileViewModel = hiltViewModel(),
+    signUpViewModel: SignUpViewModel = hiltViewModel()
 ) {
+    profileViewModel.getUserInfo(signUpViewModel.currentLoggedInUserId)
+    val loggedInProfile = profileViewModel.filteredUser
+
     val geoLocation = GeoLocation(
         latitude = currentLocation.value?.latitude.toString(),
         longitude = currentLocation.value?.longitude.toString()
     )
-
-    newGeoTreasure.value = newGeoTreasure.value?.copy(geoLocation = geoLocation)
+    val miniProfile = MinimalProfile(loggedInProfile.value.userID, loggedInProfile.value.username)
+    newGeoTreasure.value =
+        newGeoTreasure.value?.copy(geoLocation = geoLocation, madeBy = miniProfile)
 
     Dialog(
         onDismissRequest = {
@@ -49,8 +59,7 @@ fun SaveGeoTreasureDialog(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(600.dp)
-                .padding(),
+                .height(600.dp),
             shape = RoundedCornerShape(16.dp),
         ) {
             Column {
@@ -87,8 +96,6 @@ fun SaveGeoTreasureDialog(
                         isError = geoTreasure.textContent.isEmpty()
                     )
                 }
-
-
                 Row(
                     modifier = Modifier
                         .padding(10.dp)

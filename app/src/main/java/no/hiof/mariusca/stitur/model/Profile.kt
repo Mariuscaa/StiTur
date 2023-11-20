@@ -15,5 +15,10 @@ data class Profile(
     val receivedInvites: List<Friendship> = emptyList(),
     var tripHistory: List<TripHistory> = emptyList(),
     val favorites: List<Trip> = emptyList(),
-    val geoTreasures: List<GeoTreasure> = emptyList()
+    var geoTreasures: List<GeoTreasure> = emptyList()
+)
+
+data class MinimalProfile(
+    val userID: String = "",
+    val userName: String = ""
 )

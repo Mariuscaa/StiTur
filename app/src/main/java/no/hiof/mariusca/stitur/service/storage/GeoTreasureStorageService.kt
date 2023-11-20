@@ -10,7 +10,7 @@ interface GeoTreasureStorageService {
     suspend fun getGeoTreasure(geoTreasureID: String): GeoTreasure?
     suspend fun save(treasure: GeoTreasure): String
     suspend fun update(treasure: GeoTreasure)
-    suspend fun delete(geoTreasureID: String)
+    suspend fun delete(treasure: GeoTreasure)
 
 }
 

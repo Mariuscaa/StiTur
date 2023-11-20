@@ -413,7 +413,7 @@ fun StiturMap(
                     newGeoTreasure,
                     treasureViewModel,
                     latestCoordinate,
-                    locationRequest
+                    locationRequest,
                 )
             }
         }
