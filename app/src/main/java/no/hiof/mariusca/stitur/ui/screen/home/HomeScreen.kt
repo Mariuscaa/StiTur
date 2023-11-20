@@ -1,8 +1,8 @@
 package no.hiof.mariusca.stitur.ui.screen.home
 
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -27,7 +27,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import no.hiof.mariusca.stitur.R
-import no.hiof.mariusca.stitur.model.Profile
 import no.hiof.mariusca.stitur.signup.SignUpViewModel
 import no.hiof.mariusca.stitur.ui.screen.GeoTreasureScreen
 import no.hiof.mariusca.stitur.ui.screen.ProfileScreen
@@ -41,20 +40,43 @@ import no.hiof.mariusca.stitur.ui.screen.map.StiturMapScreen
 
 @Composable
 fun HomeScreen(viewModel: SignUpViewModel = hiltViewModel()) {
-    val isAnonymous by viewModel.isAnonymous.collectAsState(initial = true)
+    //val isAnonymous by viewModel.isAnonymous.collectAsState(initial = true)
+
+    val currentUser by viewModel.currentLoggedInUser.collectAsState(initial = null)
+    Log.v("currentUser", currentUser.toString());
+
     // You can add logic here based on `isAnonymous`
-    if (isAnonymous) {
-        // Handle anonymous user
+    //if (isAnonymous) {
+    if (currentUser?.userID.isNullOrEmpty()) {
+        NonLoggedInNavApp()
     } else {
-        val user by viewModel.currentLoggedInUser.collectAsState(initial = Profile())
+
+        NavigationApp()
+        //val user by viewModel.currentLoggedInUser.collectAsState(initial = Profile())
         // Handle authenticated user
     }
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        NavigationApp()
 
-    }
 }
 
+@Composable
+fun NonLoggedInNavApp() {
+    val navController = rememberNavController()
+
+    NavHost(
+        navController = navController,
+        startDestination = Screen.SignIn.route
+    ) {
+        composable(Screen.SignUp.route) {
+            SignUpScreen(navController = navController)
+        }
+
+        composable(Screen.SignIn.route) {
+            SignInScreen(navController = navController)
+        }
+
+    }
+
+}
 //Alle sidene i prosjektet
 sealed class Screen(val route: String, @StringRes val title: Int, val icon: Int) {
     object Leaderboard : Screen("Leaderboard", R.string.leaderboard, R.drawable.vector)
@@ -83,6 +105,7 @@ fun NavigationApp() {
 
     )
 
+
     Scaffold(bottomBar = { BottomNavBar(navController, bottomNavigationScreen) }) { innerPadding ->
         Box(
             modifier = Modifier
@@ -96,7 +119,9 @@ fun NavigationApp() {
                 navController = navController,
                 //startDestination = Screen.SignUp.route
                 //startDestination = Screen.GeoTreasure.route
-                startDestination = Screen.SignIn.route
+
+                startDestination = Screen.StiturMap.route
+
 
 
             ) {
@@ -115,6 +140,8 @@ fun NavigationApp() {
                 composable(Screen.Profile.route) {
                     ProfileScreen(navController = navController)
                 }
+
+
                 composable(Screen.SignUp.route) {
                     SignUpScreen(navController = navController)
                 }
@@ -122,6 +149,10 @@ fun NavigationApp() {
                 composable(Screen.SignIn.route) {
                     SignInScreen(navController = navController)
                 }
+
+
+
+
 
 
                 composable(Screen.Weather.route) {
@@ -137,6 +168,9 @@ fun NavigationApp() {
         }
     }
 }
+
+
+
 
 @Composable
 fun BottomNavBar(navController: NavController, bottomNavigationScreen: List<Screen>) {

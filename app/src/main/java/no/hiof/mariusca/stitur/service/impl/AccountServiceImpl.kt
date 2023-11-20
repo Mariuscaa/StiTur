@@ -44,7 +44,5 @@ class AccountServiceImpl @Inject constructor(private val auth: FirebaseAuth) : A
 
     override suspend fun signOut() {
         auth.signOut()
-
-        auth.signInAnonymously()
     }
 }

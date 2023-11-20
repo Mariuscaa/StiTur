@@ -49,13 +49,14 @@ fun MapButtons(
                 .align(Alignment.BottomStart)
                 .padding(start = 10.dp, bottom = 16.dp)
         ) {
+            //Disse 3 iconbuttons, endres.
             if (ongoingTripState.value != null) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     IconButton(
                         onClick = { selectedTripState.value = ongoingTripState.value },
                     ) {
                         Image(
-                            painter = painterResource(id = R.drawable.start),
+                            painter = painterResource(id = R.drawable.active_trips),
                             contentDescription = "Active trip",
                             modifier = Modifier.size(48.dp)
                         )
@@ -67,7 +68,7 @@ fun MapButtons(
                             modifier = Modifier.padding(end = 10.dp)
                         ) {
                             Image(
-                                painter = painterResource(id = R.drawable.eye),
+                                painter = painterResource(id = R.drawable.gps_tracking_off),
                                 contentDescription = "Unlock Camera",
                                 modifier = Modifier.size(48.dp)
                             )
@@ -78,7 +79,7 @@ fun MapButtons(
                             modifier = Modifier.padding(end = 10.dp)
                         ) {
                             Image(
-                                painter = painterResource(id = R.drawable.closedeye),
+                                painter = painterResource(id = R.drawable.gps_tracking),
                                 contentDescription = "Lock Camera",
                                 modifier = Modifier.size(48.dp)
                             )
