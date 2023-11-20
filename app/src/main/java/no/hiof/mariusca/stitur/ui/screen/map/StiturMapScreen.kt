@@ -122,6 +122,7 @@ fun StiturMapScreen(
 ) {
 
     var isSearchActive by remember { mutableStateOf(false) }
+    var isTripSelected by remember { mutableStateOf(false) }
 
 
 
@@ -217,12 +218,13 @@ fun StiturMapScreen(
                             ColumnItem(item = item.routeName, onItemClick = {
                                 selectedTripState.value = item
                                 isSearchActive = false
+                                isTripSelected = true
                             })
                         }
                     }
                 }
 
-                if (isSearchActive) {
+                if (isSearchActive && !isTripSelected) {
                     Box(modifier = Modifier
                         .fillMaxSize()
                         .clickable {
@@ -246,7 +248,7 @@ fun StiturMapScreen(
                 }
 
                 LaunchedEffect(textState.value) {
-                    isSearchActive = textState.value.text.isNotBlank()
+                    isSearchActive = textState.value.text.isNotBlank() && !isTripSelected
                 }
 
                 AnimatedVisibility(
