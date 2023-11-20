@@ -15,11 +15,12 @@ class GeoTreasureViewModel @Inject constructor (private val geoTreasureStorageSe
     fun createTreasure(treasure: GeoTreasure) {
         viewModelScope.launch {
             geoTreasureStorageService.save(treasure)
+
         }
     }
     fun deleteTreasure(treasure: GeoTreasure) {
         viewModelScope.launch {
-            geoTreasureStorageService.delete(treasure.uid)
+            geoTreasureStorageService.delete(treasure)
         }
     }
 }

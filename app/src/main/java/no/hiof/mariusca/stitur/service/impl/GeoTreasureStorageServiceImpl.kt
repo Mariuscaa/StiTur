@@ -6,6 +6,7 @@ import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 import no.hiof.mariusca.stitur.model.GeoTreasure
+import no.hiof.mariusca.stitur.model.Profile
 import no.hiof.mariusca.stitur.service.storage.GeoTreasureStorageService
 import javax.inject.Inject
 
@@ -16,15 +17,49 @@ constructor(private val firestore: FirebaseFirestore) : GeoTreasureStorageServic
 
     override val treasures: Flow<List<GeoTreasure>>
         get() = firestore.collection(TREASURE_INFO_COLLECTION).dataObjects()
-    override suspend fun delete(geoTreasureID: String) {
-        firestore.collection(TREASURE_INFO_COLLECTION).document(geoTreasureID).delete().await()
+
+    override suspend fun delete(treasure: GeoTreasure) {
+        val profile = firestore.collection("UserInfo")
+            .document(treasure.madeBy.userID).get().await().toObject<Profile>()
+        val temp = profile?.geoTreasures?.toMutableList()
+        temp?.removeIf { it.title == treasure.title }
+
+        if (profile != null) {
+            if (temp != null) {
+                profile.geoTreasures = temp.toList()
+            }
+        }
+        if (profile != null) {
+            firestore.collection("UserInfo").document(treasure.madeBy.userID).set(profile)
+                .await()
+        }
+
+        firestore.collection(TREASURE_INFO_COLLECTION).document(treasure.uid).delete().await()
+    }
+
+    override suspend fun save(treasure: GeoTreasure): String {
+        val profile = firestore.collection("UserInfo")
+            .document(treasure.madeBy.userID).get().await().toObject<Profile>()
+        val temp = profile?.geoTreasures?.toMutableList()
+        temp?.add(treasure)
+
+        if (profile != null) {
+            if (temp != null) {
+                profile.geoTreasures = temp.toList()
+            }
+        }
+        if (profile != null) {
+            firestore.collection("UserInfo").document(treasure.madeBy.userID).set(profile)
+                .await()
+        }
+        return firestore.collection(TREASURE_INFO_COLLECTION).add(treasure).await().id
+
     }
 
 
-    override suspend fun save(treasure: GeoTreasure): String =
-        firestore.collection(TREASURE_INFO_COLLECTION).add(treasure).await().id
     override suspend fun getGeoTreasure(geoTreasureID: String): GeoTreasure? =
-        firestore.collection(TREASURE_INFO_COLLECTION).document(geoTreasureID).get().await().toObject()
+        firestore.collection(TREASURE_INFO_COLLECTION).document(geoTreasureID).get().await()
+            .toObject()
 
 
     override suspend fun update(treasure: GeoTreasure) {

@@ -7,10 +7,11 @@ data class GeoTreasure(
     val title: String = "",
     val textContent: String = "",
     val pictureUrl: String = "",
-    val geoLocation: GeoLocation = GeoLocation()
+    val geoLocation: GeoLocation = GeoLocation(),
+    val madeBy: MinimalProfile = MinimalProfile()
 )
 
-data class GeoLocation (
+data class GeoLocation(
     val longitude: String = "",
     val latitude: String = ""
 )
