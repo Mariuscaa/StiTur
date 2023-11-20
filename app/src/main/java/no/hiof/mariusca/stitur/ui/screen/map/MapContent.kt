@@ -60,7 +60,6 @@ fun MapContent(
 
         LoadGeoTreasures(
             geoTreasures = treasure,
-            cameraPosition = cameraPosition,
             selectedGeoTreasureState = selectedTreasureState,
             context = context
         )
@@ -203,7 +202,6 @@ private fun CreateAllTrips(
 @Composable
 private fun LoadGeoTreasures(
     geoTreasures: List<GeoTreasure>,
-    cameraPosition: CameraPositionState,
     selectedGeoTreasureState: MutableState<GeoTreasure?>,
     context: Context
 ) {
@@ -215,8 +213,7 @@ private fun LoadGeoTreasures(
         val markerPosition = LatLng(
             geoLocation.latitude.toDouble(),
             geoLocation.longitude.toDouble(),
-
-            )
+        )
 
         Marker(
             state = MarkerState(position = markerPosition),

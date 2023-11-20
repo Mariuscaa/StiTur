@@ -1,4 +1,4 @@
-package no.hiof.mariusca.stitur.ui.screen.map
+package no.hiof.mariusca.stitur.ui.screen.map.dialogs
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
