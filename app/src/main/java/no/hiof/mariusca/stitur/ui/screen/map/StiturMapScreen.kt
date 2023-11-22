@@ -151,9 +151,7 @@ fun StiturMapScreen(
 
     // Does not work well. Just white for the most part when loading. Not sure why.
     val isLoading = remember { mutableStateOf(true) }
-    if (isLoading.value) {
-        Text(text = "Loading..", fontSize = 22.sp)
-    }
+
     PermissionBox(
         permissions = permissions,
         requiredPermissions = listOf(permissions.first()),
