@@ -64,7 +64,7 @@ dependencies {
 
     implementation("com.google.android.gms:play-services-location:21.0.1")
 
-
+    //implementation("com.google.accompanist:accompanist-flowlayout:<version>")
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
     implementation("com.google.firebase:firebase-analytics-ktx")

@@ -2,13 +2,17 @@ package no.hiof.mariusca.stitur.ui.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -18,6 +22,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -32,6 +38,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -39,6 +46,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import no.hiof.mariusca.stitur.R
+import no.hiof.mariusca.stitur.model.GeoTreasure
 import no.hiof.mariusca.stitur.model.Profile
 import no.hiof.mariusca.stitur.model.TripHistory
 import no.hiof.mariusca.stitur.signup.SignUpViewModel
@@ -53,6 +61,7 @@ fun ProfileScreen(
 
     val isEditMode = remember { mutableStateOf(false) }
     val showTripHistoryScreen = remember { mutableStateOf(false) }
+    val showGeoTreasureScreen = remember { mutableStateOf(false) }
     val newUsername = remember { mutableStateOf("") }
 
     profViewModel.getUserInfo(viewModel.currentLoggedInUserId)
@@ -110,7 +119,16 @@ fun ProfileScreen(
 
                 )
 
+                ProfileItem(drawableId = R.drawable._icon__camera_slr_, text = "My GeoTreasures",
+                    onClick = {
+                        showGeoTreasureScreen.value = !showGeoTreasureScreen.value
 
+                    })
+                if (showGeoTreasureScreen.value) {
+                    GeoTreasureScreen(filteredUser.value
+                    )
+
+                }
 
 
                 ProfileItem(drawableId = R.drawable._icon__history_, text = "Trip History",
@@ -123,7 +141,6 @@ fun ProfileScreen(
                     )
 
                 }
-                ProfileItem(drawableId = R.drawable._icon__camera_slr_, text = "My GeoTreasures")
                 LogoutButton(viewModel, navController)
             }
         }
@@ -255,6 +272,65 @@ fun TripHistoryCard(tripHistory: TripHistory) {
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun GeoTreasureCard(geoTreasureObj: GeoTreasure) {
+    Card(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()
+            .heightIn(max = 150.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.game_icons_locked_chest),
+                contentDescription = "Treasure",
+                modifier = Modifier.size(60.dp)
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Column {
+                Text(
+                    text = geoTreasureObj.title,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    IconTextCombo(icon = Icons.Default.Face, text = geoTreasureObj.madeBy.userName)
+                    IconTextCombo(icon = Icons.Default.Email, text = "Melding: ${geoTreasureObj.textContent}")
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun IconTextCombo(icon: ImageVector, text: String) {
+    Row(verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start,
+        modifier = Modifier
+            .height(IntrinsicSize.Min)
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.size(20.dp)
+                .align(Alignment.CenterVertically)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(text = text,
+            modifier = Modifier
+                .align(Alignment.CenterVertically))
+    }
+}
+
+
+
+
 @Composable
 fun TripHistoryScreen(loggedInProfile: Profile) {
     Column {
@@ -278,8 +354,22 @@ fun TripHistoryScreen(loggedInProfile: Profile) {
 
 
 @Composable
-fun GeoTreasureScreen(){
-
+fun GeoTreasureScreen(loggedInProfile: Profile){
+    Column {
+        if (loggedInProfile.geoTreasures.isEmpty()){
+            Text(
+                text = "You have no GeoTreasures to show",
+                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 24.sp),
+            )
+        }
+        else{
+            LazyColumn {
+                items(loggedInProfile.geoTreasures) { geoTreasureObj ->
+                    GeoTreasureCard(geoTreasureObj = geoTreasureObj)
+                }
+            }
+        }
+    }
 }
 
 
