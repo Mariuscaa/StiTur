@@ -7,8 +7,9 @@ import kotlinx.coroutines.launch
 import no.hiof.mariusca.stitur.service.module.AccountService
 import javax.inject.Inject
 
+// Not in use.
 @HiltViewModel
-class AViewModel @Inject constructor(private val accountService: AccountService)
+class AnonymousViewModel @Inject constructor(private val accountService: AccountService)
     : ViewModel() {
 
     init {
