@@ -14,15 +14,12 @@ class ProfileViewModel @Inject constructor(private val profileStorageService: Pr
     ViewModel() {
     var filteredUser = mutableStateOf(Profile())
 
-
     fun getUserInfo(user: String) {
         viewModelScope.launch {
             val temp = profileStorageService.getProfile(user)
-
             if (temp != null) {
                 filteredUser.value = temp
             }
-
         }
     }
 

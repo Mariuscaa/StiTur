@@ -1,7 +1,6 @@
 package no.hiof.mariusca.stitur.ui.screen.home
 
 import android.util.Log
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -39,22 +38,14 @@ import no.hiof.mariusca.stitur.ui.screen.map.StiturMapScreen
 
 @Composable
 fun HomeScreen(viewModel: SignUpViewModel = hiltViewModel()) {
-    //val isAnonymous by viewModel.isAnonymous.collectAsState(initial = true)
-
     val currentUser by viewModel.currentLoggedInUser.collectAsState(initial = null)
-    Log.v("currentUser", currentUser.toString());
+    Log.v("currentUser", currentUser.toString())
 
-    // You can add logic here based on `isAnonymous`
-    //if (isAnonymous) {
     if (currentUser?.userID.isNullOrEmpty()) {
         NonLoggedInNavApp()
     } else {
-
         NavigationApp()
-        //val user by viewModel.currentLoggedInUser.collectAsState(initial = Profile())
-        // Handle authenticated user
     }
-
 }
 
 @Composable
@@ -68,25 +59,22 @@ fun NonLoggedInNavApp() {
         composable(Screen.SignUp.route) {
             SignUpScreen(navController = navController)
         }
-
         composable(Screen.SignIn.route) {
             SignInScreen(navController = navController)
         }
-
     }
-
 }
-//Alle sidene i prosjektet
-sealed class Screen(val route: String, @StringRes val title: Int, val icon: Int) {
-    object Leaderboard : Screen("Leaderboard", R.string.leaderboard, R.drawable.vector)
-    object StiturMap : Screen("Maps", R.string.stiturMap, R.drawable.maps)
-    object Profile : Screen("Profile", R.string.profile, R.drawable._icon__person_)
-    object Weather : Screen("weather", R.string.profile, R.drawable.ic_weathericon)
 
-    object SignUp : Screen("SignUp", R.string.SignUp, R.drawable.powerbutton)
+sealed class Screen(val route: String, val icon: Int) {
+    object Leaderboard : Screen("Leaderboard", R.drawable.vector)
+    object StiturMap : Screen("Maps", R.drawable.maps)
+    object Profile : Screen("Profile", R.drawable._icon__person_)
+    object Weather : Screen("weather", R.drawable.ic_weathericon)
 
-    object SignIn : Screen("SignIn", R.string.SignUp, R.drawable.powerbutton)
-    object GeoTreasure : Screen("GeoTreasure", R.string.SignUp, R.drawable.maps)
+    object SignUp : Screen("SignUp", R.drawable.powerbutton)
+
+    object SignIn : Screen("SignIn", R.drawable.powerbutton)
+    object GeoTreasure : Screen("GeoTreasure", R.drawable.maps)
 }
 
 
@@ -101,9 +89,7 @@ fun NavigationApp() {
         Screen.Leaderboard,
         Screen.StiturMap,
         Screen.Profile
-
     )
-
 
     Scaffold(bottomBar = { BottomNavBar(navController, bottomNavigationScreen) }) { innerPadding ->
         Box(
@@ -111,21 +97,13 @@ fun NavigationApp() {
                 .padding(innerPadding)
                 .fillMaxSize(),
 
-            //.background(customBackgroundColor),
             contentAlignment = Alignment.BottomCenter
         ) {
             NavHost(
                 navController = navController,
-                //startDestination = Screen.SignUp.route
-                //startDestination = Screen.GeoTreasure.route
-
                 startDestination = Screen.StiturMap.route
-
-
-
             ) {
                 composable(Screen.Leaderboard.route) {
-
                     val leaderboardsViewModel: StiturLeaderboardsViewModel = hiltViewModel()
                     LeaderboardScreen(viewModel = leaderboardsViewModel)
                 }
@@ -158,8 +136,6 @@ fun NavigationApp() {
 }
 
 
-
-
 @Composable
 fun BottomNavBar(navController: NavController, bottomNavigationScreen: List<Screen>) {
     val navBakStackEntry by navController.currentBackStackEntryAsState()
@@ -175,11 +151,6 @@ fun BottomNavBar(navController: NavController, bottomNavigationScreen: List<Scre
                             saveState = true
                         }
                         launchSingleTop = true
-
-
-                        //restoreState = true
-
-
                     }
                 },
                 icon = {
@@ -189,7 +160,6 @@ fun BottomNavBar(navController: NavController, bottomNavigationScreen: List<Scre
                             .size(20.dp),
                     )
                 },
-
                 label = {
                     Text(title)
                 }

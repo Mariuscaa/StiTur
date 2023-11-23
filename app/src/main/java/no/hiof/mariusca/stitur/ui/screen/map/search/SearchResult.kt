@@ -14,7 +14,7 @@ import no.hiof.mariusca.stitur.model.Trip
 import no.hiof.mariusca.stitur.ui.screen.map.TripViewModel
 
 @Composable
-fun SearchResult(
+fun searchResult(
     textState: MutableState<TextFieldValue>,
     isSearchActive: Boolean,
     viewModel: TripViewModel,
@@ -26,7 +26,7 @@ fun SearchResult(
 
     if (searchedText.isNotBlank() && isSearchActive1) {
 
-        viewModel.getCreatedTrip(searchedText)
+        viewModel.getFilteredTrips(searchedText)
         LazyColumn(
             modifier = Modifier
                 .padding(10.dp)
