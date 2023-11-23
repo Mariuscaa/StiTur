@@ -37,8 +37,8 @@ import kotlinx.coroutines.delay
 import no.hiof.mariusca.stitur.R
 import no.hiof.mariusca.stitur.model.GeoTreasure
 import no.hiof.mariusca.stitur.model.Trip
-import no.hiof.mariusca.stitur.ui.screen.map.search.SearchResult
 import no.hiof.mariusca.stitur.ui.screen.map.search.TripsSearchBar
+import no.hiof.mariusca.stitur.ui.screen.map.search.searchResult
 import no.hiof.mariusca.stitur.ui.screen.map.utils.PermissionBox
 
 @Composable
@@ -140,7 +140,7 @@ fun StiturMapScreen(
             )
 
             isSearchActive =
-                SearchResult(textState, isSearchActive, viewModel, filteredTrips, selectedTripState)
+                searchResult(textState, isSearchActive, viewModel, filteredTrips, selectedTripState)
 
 
             LaunchedEffect(textState.value) {
