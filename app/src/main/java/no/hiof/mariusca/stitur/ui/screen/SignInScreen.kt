@@ -19,7 +19,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,7 +39,6 @@ import no.hiof.mariusca.stitur.signup.SignUpViewModel
 import no.hiof.mariusca.stitur.ui.screen.home.Screen
 
 
-
 @Composable
 fun SignInScreen(
     modifier: Modifier = Modifier,
@@ -48,12 +46,11 @@ fun SignInScreen(
     navController: NavController
 ) {
     val uiState by signInViewModel.uiState
-    val isAnonymous by signInViewModel.isAnonymous.collectAsState(initial = true)
     val fieldModifier = Modifier
         .fillMaxWidth()
         .padding(16.dp, 4.dp)
 
-    if (isAnonymous) {
+    if (signInViewModel.currentLoggedInUserId.isEmpty()) {
         Column(
             modifier = modifier
                 .fillMaxWidth()
@@ -63,8 +60,10 @@ fun SignInScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (uiState.errorMessage != 0)
-                Text(text = stringResource(id = uiState.errorMessage),
-                    Modifier.padding(vertical = 8.dp))
+                Text(
+                    text = stringResource(id = uiState.errorMessage),
+                    Modifier.padding(vertical = 8.dp)
+                )
 
             EmailField(uiState.email, signInViewModel::onEmailChange, fieldModifier)
             PasswordFieldSignIn(uiState.password, signInViewModel::onPasswordChange, fieldModifier)
@@ -89,8 +88,6 @@ fun SignInScreen(
             }
 
         }
-    } else {
-        navController.navigate(route = Screen.StiturMap.route)
     }
 }
 

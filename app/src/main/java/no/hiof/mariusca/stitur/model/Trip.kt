@@ -25,6 +25,7 @@ data class Coordinate(
     val long: String = ""
 )
 
+// Math code was made with help from ChatGPT.
 fun calculateDistanceMeters(coordinates: List<Coordinate>): Double {
     var distance = 0.0
 
@@ -44,7 +45,7 @@ fun calculateDistanceMeters(coordinates: List<Coordinate>): Double {
         val c = 2 * atan2(sqrt(a), sqrt(1 - a))
 
         val radius = 6371 // Earth radius in kilometers
-        distance += radius * c * 1000 // Convert to meters
+        distance += radius * c * 1000
     }
 
     return distance

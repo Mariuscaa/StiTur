@@ -6,15 +6,14 @@ data class Profile(
     @DocumentId val userID: String = "",
     val isAnonymous: Boolean = true,
     val username: String = "",
-    val nickname: String = "",
-    val profileImageUrl: String = "",
+    val profileImageUrl: String = "", // Not in use.
 
     // Connected properties
-    val friends: List<String> = emptyList(),
-    val sentInvites: List<Friendship> = emptyList(),
-    val receivedInvites: List<Friendship> = emptyList(),
+    val friends: List<String> = emptyList(), // Not in use
+    val sentInvites: List<Friendship> = emptyList(), // Not in use
+    val receivedInvites: List<Friendship> = emptyList(), // Not in use
     var tripHistory: List<TripHistory> = emptyList(),
-    val favorites: List<Trip> = emptyList(),
+    val favorites: List<Trip> = emptyList(), // Not in use
     var geoTreasures: List<GeoTreasure> = emptyList()
 )
 

@@ -1,5 +1,6 @@
 package no.hiof.mariusca.stitur.model
 
+// Not in use.
 data class Review (
     val reviewID: String = "",
     val userID: String = "",

@@ -13,12 +13,11 @@ import javax.inject.Inject
 class GeoTreasureStorageServiceImpl
 @Inject
 constructor(private val firestore: FirebaseFirestore) : GeoTreasureStorageService {
-
-
     override val treasures: Flow<List<GeoTreasure>>
         get() = firestore.collection(TREASURE_INFO_COLLECTION).dataObjects()
 
     override suspend fun delete(treasure: GeoTreasure) {
+        // Connected with profiles so it also deleted from profile.
         val profile = firestore.collection("UserInfo")
             .document(treasure.madeBy.userID).get().await().toObject<Profile>()
         val temp = profile?.geoTreasures?.toMutableList()
@@ -38,6 +37,7 @@ constructor(private val firestore: FirebaseFirestore) : GeoTreasureStorageServic
     }
 
     override suspend fun save(treasure: GeoTreasure): String {
+        // Connected with profiles so it also saves to profile.
         val profile = firestore.collection("UserInfo")
             .document(treasure.madeBy.userID).get().await().toObject<Profile>()
         val temp = profile?.geoTreasures?.toMutableList()
@@ -56,19 +56,15 @@ constructor(private val firestore: FirebaseFirestore) : GeoTreasureStorageServic
 
     }
 
-
     override suspend fun getGeoTreasure(geoTreasureID: String): GeoTreasure? =
         firestore.collection(TREASURE_INFO_COLLECTION).document(geoTreasureID).get().await()
             .toObject()
-
 
     override suspend fun update(treasure: GeoTreasure) {
         firestore.collection(TREASURE_INFO_COLLECTION).document(treasure.uid).set(treasure).await()
     }
 
-
     companion object {
         private const val TREASURE_INFO_COLLECTION = "GeoTreasure"
     }
-
 }

@@ -22,7 +22,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,14 +52,13 @@ fun SignUpScreen(
 
 ) {
     val uiState by signViewModel.uiState
-    val isAnonymous by signViewModel.isAnonymous.collectAsState(initial = true)
     val fieldModifier = Modifier
         .fillMaxWidth()
         .padding(16.dp, 4.dp)
 
 
 
-    if (isAnonymous) {
+    if (signViewModel.currentLoggedInUserId.isEmpty()) {
         Column(
             modifier = modifier
                 .fillMaxWidth()
@@ -70,18 +68,24 @@ fun SignUpScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (uiState.errorMessage != 0)
-                Text(text = stringResource(id = uiState.errorMessage),
-                    Modifier.padding(vertical = 8.dp))
+                Text(
+                    text = stringResource(id = uiState.errorMessage),
+                    Modifier.padding(vertical = 8.dp)
+                )
 
             EmailField(uiState.email, signViewModel::onEmailChange, fieldModifier)
-            UserNameField(uiState.userName, signViewModel::onUserNameChange, fieldModifier )
+            UserNameField(uiState.userName, signViewModel::onUserNameChange, fieldModifier)
             PasswordField(uiState.password, signViewModel::onPasswordChange, fieldModifier)
 
-            RepeatPasswordField(uiState.repeatPassword, signViewModel::onRepeatPasswordChange, fieldModifier)
+            RepeatPasswordField(
+                uiState.repeatPassword,
+                signViewModel::onRepeatPasswordChange,
+                fieldModifier
+            )
 
             Row {
                 Button(
-                    onClick = { navController.navigate(Screen.SignIn.route)},
+                    onClick = { navController.navigate(Screen.SignIn.route) },
                     modifier = Modifier
                         .padding(16.dp, 8.dp),
                 ) {
@@ -91,7 +95,11 @@ fun SignUpScreen(
                     onClick = {
                         signViewModel.onSignUpClick { userId ->
                             if (userId != null) {
-                                val newProfile = Profile(userID = userId, false,signViewModel.uiState.value.userName)
+                                val newProfile = Profile(
+                                    userID = userId,
+                                    false,
+                                    signViewModel.uiState.value.userName
+                                )
                                 profViewModel.createUser(newProfile)
                             }
                         }
@@ -104,15 +112,10 @@ fun SignUpScreen(
             }
         }
     }
-    else {
-
-        navController.navigate(route = Screen.StiturMap.route)
-
-    }
 }
 
 @Composable
-fun UserNameField(value: String, onNewValue: (String) -> Unit, modifier: Modifier = Modifier){
+fun UserNameField(value: String, onNewValue: (String) -> Unit, modifier: Modifier = Modifier) {
     OutlinedTextField(
         singleLine = true,
         modifier = modifier,
@@ -122,7 +125,6 @@ fun UserNameField(value: String, onNewValue: (String) -> Unit, modifier: Modifie
         leadingIcon = { Icon(imageVector = Icons.Default.Face, contentDescription = "Email") }
     )
 }
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -179,7 +181,11 @@ private fun PasswordField(
         leadingIcon = { Icon(imageVector = Icons.Default.Lock, contentDescription = "Lock") },
         trailingIcon = {
             IconButton(onClick = { isVisible = !isVisible }) {
-                Icon(painter = icon, contentDescription = "Visibility", modifier = Modifier.size(size))
+                Icon(
+                    painter = icon,
+                    contentDescription = "Visibility",
+                    modifier = Modifier.size(size)
+                )
             }
         },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),

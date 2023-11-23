@@ -4,7 +4,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import no.hiof.mariusca.stitur.R
 import no.hiof.mariusca.stitur.common.ext.isValidEmail
@@ -26,12 +25,11 @@ class SignUpViewModel @Inject constructor(private val accountService: AccountSer
     private val userName
         get() = uiState.value.userName
 
-    val isAnonymous = accountService.currentUser.map { it.isAnonymous }
-
     val currentLoggedInUser = accountService.currentUser
 
     val currentLoggedInUserId = accountService.currentUserId
 
+    // Anonymous log in is not in use.
     fun createAnonymousAccount() {
         viewModelScope.launch {
             if (!accountService.hasUser)
