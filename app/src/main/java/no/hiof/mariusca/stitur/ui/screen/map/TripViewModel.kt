@@ -13,7 +13,7 @@ class TripViewModel @Inject constructor(private val tripStorageService: TripStor
     ViewModel() {
     val trips = tripStorageService.trips
     val filteredTrips = mutableListOf<Trip>()
-    val allTrips = mutableListOf<Trip>()
+    private val allTrips = mutableListOf<Trip>()
 
     init {
         viewModelScope.launch {
@@ -27,30 +27,14 @@ class TripViewModel @Inject constructor(private val tripStorageService: TripStor
         }
     }
 
-    // henter ut absolutt alle trips, fiks så den henter kun den søkt på turen.
-    // annen måte slik at du kun henter ut den du ønsker.
-    fun getCreatedTrip(tripName: String) {
+    fun getFilteredTrips(tripName: String) {
         viewModelScope.launch {
-            //ChatGbt eksempel under.
-
             filteredTrips.clear()
 
             allTrips.forEach { trip ->
                 if (trip.routeName.lowercase().contains(tripName))
                     filteredTrips.add(trip)
             }
-
-
-            /*filteredTrips.clear()
-
-            trips.collect() {
-                    tripList -> tripList.forEach {
-                        trip ->
-                        if (trip.routeName.contains(tripName))
-                            filteredTrips.add(trip)
-                     }
-            }*/
-            //tripStorageService.getName(tripName)
         }
     }
 

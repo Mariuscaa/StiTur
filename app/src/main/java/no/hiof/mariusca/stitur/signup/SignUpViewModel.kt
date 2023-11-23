@@ -12,7 +12,8 @@ import no.hiof.mariusca.stitur.service.module.AccountService
 import javax.inject.Inject
 
 @HiltViewModel
-class SignUpViewModel @Inject constructor(private val accountService: AccountService) : ViewModel() {
+class SignUpViewModel @Inject constructor(private val accountService: AccountService) :
+    ViewModel() {
 
     var uiState = mutableStateOf(SignUpUiState())
         private set
@@ -22,25 +23,20 @@ class SignUpViewModel @Inject constructor(private val accountService: AccountSer
     private val password
         get() = uiState.value.password
 
-    private val userName
-        get() = uiState.value.userName
-
     val currentLoggedInUser = accountService.currentUser
 
     val currentLoggedInUserId = accountService.currentUserId
 
-    // Anonymous log in is not in use.
+    // Anonymous login is not in use.
     fun createAnonymousAccount() {
         viewModelScope.launch {
-            if (!accountService.hasUser)
-                accountService.createAnonymousAccount()
+            if (!accountService.hasUser) accountService.createAnonymousAccount()
         }
     }
 
     fun onEmailChange(newValue: String) {
         uiState.value = uiState.value.copy(email = newValue)
     }
-
 
     fun onPasswordChange(newValue: String) {
         uiState.value = uiState.value.copy(password = newValue)
@@ -58,56 +54,43 @@ class SignUpViewModel @Inject constructor(private val accountService: AccountSer
         if (!email.isValidEmail()) {
             uiState.value = uiState.value.copy(errorMessage = R.string.email_error)
             return
-        }
-
-        else if (!password.isValidPassword()) {
+        } else if (!password.isValidPassword()) {
             uiState.value = uiState.value.copy(errorMessage = R.string.password_error)
             return
         }
-
-
-                viewModelScope.launch {
-                    try {
-                        accountService.authenticate(email, password) { error ->
-                            if (error == null)
-                                return@authenticate
-                        }
-                    }
-                    catch(e: Exception) {
-                        uiState.value = uiState.value.copy(errorMessage = R.string.could_not_log_in)
-                    }
+        viewModelScope.launch {
+            try {
+                accountService.authenticate(email, password) { error ->
+                    if (error == null) return@authenticate
                 }
-
+            } catch (e: Exception) {
+                uiState.value = uiState.value.copy(errorMessage = R.string.could_not_log_in)
+            }
+        }
     }
 
     fun onSignUpClick(completion: (String?) -> Unit) {
         if (!email.isValidEmail()) {
             uiState.value = uiState.value.copy(errorMessage = R.string.email_error)
             return
-        }
-
-        else if (!password.isValidPassword()) {
+        } else if (!password.isValidPassword()) {
             uiState.value = uiState.value.copy(errorMessage = R.string.password_error)
             return
-        }
-
-        else if ((password != uiState.value.repeatPassword)) {
+        } else if ((password != uiState.value.repeatPassword)) {
             uiState.value = uiState.value.copy(errorMessage = R.string.password_match_error)
             return
         }
-                viewModelScope.launch {
-                    try {
-                        accountService.linkAccount(email, password) { error ->
-                            if (error == null)
-                                completion(accountService.currentUserId)
+        viewModelScope.launch {
+            try {
+                accountService.linkAccount(email, password) { error ->
+                    if (error == null) completion(accountService.currentUserId)
 
-                                //return@linkAccount
-                        }
-                    }
-                    catch(e: Exception) {
-                        uiState.value = uiState.value.copy(errorMessage = R.string.could_not_create_account)
-                    }
+                    //return@linkAccount
                 }
+            } catch (e: Exception) {
+                uiState.value = uiState.value.copy(errorMessage = R.string.could_not_create_account)
+            }
+        }
     }
 
     fun onSignOutClick() {
