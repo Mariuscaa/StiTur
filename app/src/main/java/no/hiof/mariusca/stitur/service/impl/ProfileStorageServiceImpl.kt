@@ -7,16 +7,17 @@ import no.hiof.mariusca.stitur.model.LeaderboardEntry
 import no.hiof.mariusca.stitur.model.PersonalRanking
 import no.hiof.mariusca.stitur.model.Profile
 import no.hiof.mariusca.stitur.model.Tiers
-import no.hiof.mariusca.stitur.service.storage.UserInfoStorageService
+import no.hiof.mariusca.stitur.service.storage.ProfileStorageService
 import javax.inject.Inject
 
-class UserInfoStorageServiceImpl
+class ProfileStorageServiceImpl
 @Inject
-constructor(private val firestore: FirebaseFirestore) : UserInfoStorageService {
+constructor(private val firestore: FirebaseFirestore) : ProfileStorageService {
 
     override suspend fun getProfile(profileID: String): Profile? =
         firestore.collection(USER_INFO_COLLECTION).document(profileID).get().await().toObject()
 
+    // Saves profile and leaderboard entry at the same time.
     override suspend fun save(profile: Profile) {
         firestore.collection(USER_INFO_COLLECTION).document(profile.userID).set(profile).await()
         val leaderboardEntry = LeaderboardEntry(
@@ -39,7 +40,7 @@ constructor(private val firestore: FirebaseFirestore) : UserInfoStorageService {
     }
 
     companion object {
-        private const val USER_INFO_COLLECTION = "UserInfo"
+        private const val USER_INFO_COLLECTION = "Profile"
     }
 
 }

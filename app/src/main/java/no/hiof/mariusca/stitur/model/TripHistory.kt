@@ -19,6 +19,7 @@ data class TripHistory(
     var pointsEarned: Int = 0
 )
 
+// Math code was made with help from ChatGPT.
 fun calculateDistanceKM(coordinates: List<Coordinate>): Double {
     var distance = 0.0
 

@@ -1,5 +1,8 @@
 package no.hiof.mariusca.stitur.model
 
+// This was used when trying to implement data from Turrutebasen.
+// This converted from Geojson to our own custom Trip.
+
 data class GeoJsonFeatureCollection(
     val type: String,
     val features: List<GeoJsonFeature>
