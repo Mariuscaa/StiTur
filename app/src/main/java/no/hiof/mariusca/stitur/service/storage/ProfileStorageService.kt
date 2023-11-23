@@ -2,7 +2,7 @@ package no.hiof.mariusca.stitur.service.storage
 
 import no.hiof.mariusca.stitur.model.Profile
 
-interface UserInfoStorageService {
+interface ProfileStorageService {
 
     suspend fun getProfile(profileID: String): Profile?
     suspend fun save(profile: Profile): Unit
