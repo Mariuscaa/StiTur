@@ -1,4 +1,4 @@
-package no.hiof.mariusca.stitur.ui.screen
+package no.hiof.mariusca.stitur.ui.screen.authentication
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
