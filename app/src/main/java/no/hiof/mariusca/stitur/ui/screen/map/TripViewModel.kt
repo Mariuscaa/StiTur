@@ -9,7 +9,7 @@ import no.hiof.mariusca.stitur.service.storage.TripStorageService
 import javax.inject.Inject
 
 @HiltViewModel
-class StiturMapViewModel @Inject constructor(private val tripStorageService: TripStorageService) :
+class TripViewModel @Inject constructor(private val tripStorageService: TripStorageService) :
     ViewModel() {
     val trips = tripStorageService.trips
     val filteredTrips = mutableListOf<Trip>()

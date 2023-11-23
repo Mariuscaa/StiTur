@@ -1,4 +1,4 @@
-package no.hiof.mariusca.stitur.ui.screen
+package no.hiof.mariusca.stitur.ui.screen.authentication
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
@@ -41,6 +41,7 @@ import no.hiof.mariusca.stitur.R
 import no.hiof.mariusca.stitur.model.Profile
 import no.hiof.mariusca.stitur.signup.SignUpViewModel
 import no.hiof.mariusca.stitur.ui.screen.home.Screen
+import no.hiof.mariusca.stitur.ui.screen.profile.ProfileViewModel
 
 
 @Composable

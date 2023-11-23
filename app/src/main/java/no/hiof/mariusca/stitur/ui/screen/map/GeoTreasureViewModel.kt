@@ -1,4 +1,4 @@
-package no.hiof.mariusca.stitur.ui.screen
+package no.hiof.mariusca.stitur.ui.screen.map
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

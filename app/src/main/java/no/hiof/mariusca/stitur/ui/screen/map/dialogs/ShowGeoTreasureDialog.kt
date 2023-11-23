@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import no.hiof.mariusca.stitur.model.GeoTreasure
-import no.hiof.mariusca.stitur.ui.screen.GeoTreasureViewModel
+import no.hiof.mariusca.stitur.ui.screen.map.GeoTreasureViewModel
 
 @Composable
 fun ShowGeoTreasureDialog(

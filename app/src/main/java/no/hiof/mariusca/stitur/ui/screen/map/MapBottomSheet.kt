@@ -25,11 +25,10 @@ import no.hiof.mariusca.stitur.model.Trip
 import no.hiof.mariusca.stitur.model.TripHistory
 import no.hiof.mariusca.stitur.model.calculateDistanceKM
 import no.hiof.mariusca.stitur.signup.SignUpViewModel
-import no.hiof.mariusca.stitur.ui.screen.ProfileViewModel
+import no.hiof.mariusca.stitur.ui.screen.profile.ProfileViewModel
 import no.hiof.mariusca.stitur.ui.screen.leaderboard.StiturLeaderboardsViewModel
 import java.time.Duration
 import java.time.Instant
-import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,7 +43,7 @@ fun MapBottomSheet(
     toggleBottomSheet: (Boolean) -> Unit,
     scope: CoroutineScope,
     ongoingTripState: MutableState<Trip?>,
-    viewModel: StiturMapViewModel,
+    viewModel: TripViewModel,
     newTripHistoryState: MutableState<TripHistory?>,
     gpsTripState: MutableState<Trip?>,
     locationRequest: MutableState<LocationRequest?>,

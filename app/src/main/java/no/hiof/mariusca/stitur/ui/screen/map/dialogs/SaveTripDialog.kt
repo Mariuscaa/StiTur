@@ -23,13 +23,13 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.google.android.gms.maps.model.LatLng
 import no.hiof.mariusca.stitur.model.Trip
-import no.hiof.mariusca.stitur.ui.screen.map.StiturMapViewModel
+import no.hiof.mariusca.stitur.ui.screen.map.TripViewModel
 
 @Composable
 fun SaveTripDialog(
     openDialog: MutableState<Boolean>,
     newTrip: MutableState<Trip?>,
-    stiturMapViewModel: StiturMapViewModel,
+    tripViewModel: TripViewModel,
     newTripPoints: MutableList<LatLng>,
     isCreateTripMode: MutableState<Boolean>,
 ) {
@@ -111,7 +111,7 @@ fun SaveTripDialog(
                         Text(text = "Cancel")
                     }
                     Button(onClick = {
-                        newTrip.value?.let { stiturMapViewModel.createTrip(it) }
+                        newTrip.value?.let { tripViewModel.createTrip(it) }
                         newTripPoints.clear()
                         openDialog.value = false
                         isCreateTripMode.value = !isCreateTripMode.value

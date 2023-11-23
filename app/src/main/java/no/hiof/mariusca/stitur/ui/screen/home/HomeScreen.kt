@@ -28,11 +28,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import no.hiof.mariusca.stitur.R
 import no.hiof.mariusca.stitur.signup.SignUpViewModel
-import no.hiof.mariusca.stitur.ui.screen.GeoTreasureScreen
-import no.hiof.mariusca.stitur.ui.screen.ProfileScreen
-import no.hiof.mariusca.stitur.ui.screen.SignInScreen
-import no.hiof.mariusca.stitur.ui.screen.SignUpScreen
-import no.hiof.mariusca.stitur.ui.screen.WeatherScreen
+import no.hiof.mariusca.stitur.ui.screen.profile.ProfileScreen
+import no.hiof.mariusca.stitur.ui.screen.authentication.SignInScreen
+import no.hiof.mariusca.stitur.ui.screen.authentication.SignUpScreen
+import no.hiof.mariusca.stitur.ui.screen.map.WeatherScreen
 import no.hiof.mariusca.stitur.ui.screen.leaderboard.LeaderboardScreen
 import no.hiof.mariusca.stitur.ui.screen.leaderboard.StiturLeaderboardsViewModel
 import no.hiof.mariusca.stitur.ui.screen.map.StiturMapScreen
@@ -141,7 +140,6 @@ fun NavigationApp() {
                     ProfileScreen(navController = navController)
                 }
 
-
                 composable(Screen.SignUp.route) {
                     SignUpScreen(navController = navController)
                 }
@@ -150,18 +148,8 @@ fun NavigationApp() {
                     SignInScreen(navController = navController)
                 }
 
-
-
-
-
-
                 composable(Screen.Weather.route) {
                     WeatherScreen()
-                }
-
-
-                composable(Screen.GeoTreasure.route) {
-                    GeoTreasureScreen()
                 }
 
             }

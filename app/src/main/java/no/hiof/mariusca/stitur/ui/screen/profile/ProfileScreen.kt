@@ -1,4 +1,4 @@
-package no.hiof.mariusca.stitur.ui.screen
+package no.hiof.mariusca.stitur.ui.screen.profile
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
