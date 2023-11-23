@@ -17,6 +17,7 @@ constructor(private val firestore: FirebaseFirestore) : UserInfoStorageService {
     override suspend fun getProfile(profileID: String): Profile? =
         firestore.collection(USER_INFO_COLLECTION).document(profileID).get().await().toObject()
 
+    // Saves profile and leaderboard entry at the same time.
     override suspend fun save(profile: Profile) {
         firestore.collection(USER_INFO_COLLECTION).document(profile.userID).set(profile).await()
         val leaderboardEntry = LeaderboardEntry(
