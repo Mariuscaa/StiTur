@@ -51,125 +51,165 @@ fun MapButtons(
                 .align(Alignment.BottomStart)
                 .padding(start = 10.dp, bottom = 16.dp)
         ) {
-            //Disse 3 iconbuttons, endres.
             if (ongoingTripState.value != null) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    IconButton(
-                        onClick = { selectedTripState.value = ongoingTripState.value },
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.active_trips),
-                            contentDescription = "Active trip",
-                            modifier = Modifier.size(48.dp)
+                    ActiveTripButton(selectedTripState, ongoingTripState)
+
+                    GpsCameraLockButtons(cameraFollowingGps)
+                }
+            }
+
+            NewGeoTreasureButton(openNewGeoTreasureDialog, newGeoTreasure)
+            CreateNewTripButtons(isCreateTripMode, newTripPoints, newTrip, openNewTripDialog)
+        }
+    }
+}
+
+@Composable
+private fun CreateNewTripButtons(
+    isCreateTripMode: MutableState<Boolean>,
+    newTripPoints: MutableList<LatLng>,
+    newTrip: MutableState<Trip?>,
+    openNewTripDialog: MutableState<Boolean>
+) {
+    if (!isCreateTripMode.value) {
+        IconButton(
+            onClick = {
+                isCreateTripMode.value = !isCreateTripMode.value
+            }
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.create_new_trip),
+                contentDescription = "Hiking icon",
+                modifier = Modifier.size(48.dp)
+            )
+        }
+    } else {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Button(
+                modifier = Modifier
+                    .alpha(if (isCreateTripMode.value) 1f else 0f)
+                    .padding(end = 2.dp),
+                onClick = {
+                    isCreateTripMode.value = !isCreateTripMode.value
+                    if (!isCreateTripMode.value) {
+                        newTripPoints.clear()
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+            ) {
+                Text("Cancel")
+            }
+
+            SaveTripButton(isCreateTripMode, newTripPoints, newTrip, openNewTripDialog)
+        }
+    }
+}
+
+@Composable
+private fun SaveTripButton(
+    isCreateTripMode: MutableState<Boolean>,
+    newTripPoints: MutableList<LatLng>,
+    newTrip: MutableState<Trip?>,
+    openNewTripDialog: MutableState<Boolean>
+) {
+    Button(onClick = {
+        if (isCreateTripMode.value) {
+            val coordinates = mutableListOf<Coordinate>()
+            for (point in newTripPoints) {
+                val coordinate = Coordinate(
+                    point.latitude.toString(),
+                    point.longitude.toString()
+                )
+                coordinates.add(coordinate)
+            }
+            val distance = calculateDistanceMeters(coordinates)
+            if (newTrip.value == null) {
+                newTrip.value = Trip(
+                    lengthInMeters = distance.toLong(),
+                    coordinates = newTripPoints.map {
+                        Coordinate(
+                            it.latitude.toString(), it.longitude.toString()
                         )
                     }
-
-                    if (cameraFollowingGps.value) {
-                        IconButton(
-                            onClick = { cameraFollowingGps.value = false },
-                            modifier = Modifier.padding(end = 10.dp)
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.gps_tracking_off),
-                                contentDescription = "Unlock Camera",
-                                modifier = Modifier.size(48.dp)
-                            )
-                        }
-                    } else {
-                        IconButton(
-                            onClick = { cameraFollowingGps.value = true },
-                            modifier = Modifier.padding(end = 10.dp)
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.gps_tracking),
-                                contentDescription = "Lock Camera",
-                                modifier = Modifier.size(48.dp)
-                            )
-                        }
-                    }
-                }
-            }
-
-            IconButton(
-                onClick = {
-                    openNewGeoTreasureDialog.value = true
-                    newGeoTreasure.value = GeoTreasure()
-                },
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.new_geotreasure2),
-                    contentDescription = "GeoTreasure icon",
-                    modifier = Modifier.size(48.dp)
                 )
-            }
-            if (!isCreateTripMode.value) {
-                IconButton(
-                    onClick = {
-                        isCreateTripMode.value = !isCreateTripMode.value
-                    }
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.create_new_trip),
-                        contentDescription = "Hiking icon",
-                        modifier = Modifier.size(48.dp)
-                    )
-                }
             } else {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    Button(
-                        modifier = Modifier
-                            .alpha(if (isCreateTripMode.value) 1f else 0f)
-                            .padding(end = 2.dp),
-                        onClick = {
-                            isCreateTripMode.value = !isCreateTripMode.value
-                            if (!isCreateTripMode.value) {
-                                newTripPoints.clear()
-                            }
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
-                    ) {
-                        Text("Cancel")
-                    }
-
-                    Button(onClick = {
-                        if (isCreateTripMode.value) {
-                            val coordinates = mutableListOf<Coordinate>()
-                            for (point in newTripPoints) {
-                                val coordinate = Coordinate(
-                                    point.latitude.toString(),
-                                    point.longitude.toString()
-                                )
-                                coordinates.add(coordinate)
-                            }
-                            val distance = calculateDistanceMeters(coordinates)
-                            if (newTrip.value == null) {
-                                newTrip.value = Trip(
-                                    lengthInMeters = distance.toLong(),
-                                    coordinates = newTripPoints.map {
-                                        Coordinate(
-                                            it.latitude.toString(), it.longitude.toString()
-                                        )
-                                    }
-                                )
-                            } else {
-                                newTrip.value!!.lengthInMeters = distance.toLong()
-                                newTrip.value!!.coordinates = newTripPoints.map {
-                                    Coordinate(
-                                        it.latitude.toString(), it.longitude.toString()
-                                    )
-                                }
-                            }
-                        }
-                        openNewTripDialog.value = true
-                    }) {
-                        Text("Save trip")
-                    }
+                newTrip.value!!.lengthInMeters = distance.toLong()
+                newTrip.value!!.coordinates = newTripPoints.map {
+                    Coordinate(
+                        it.latitude.toString(), it.longitude.toString()
+                    )
                 }
             }
         }
+        openNewTripDialog.value = true
+    }) {
+        Text("Save trip")
+    }
+}
+
+@Composable
+private fun NewGeoTreasureButton(
+    openNewGeoTreasureDialog: MutableState<Boolean>,
+    newGeoTreasure: MutableState<GeoTreasure?>
+) {
+    IconButton(
+        onClick = {
+            openNewGeoTreasureDialog.value = true
+            newGeoTreasure.value = GeoTreasure()
+        },
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.new_geotreasure2),
+            contentDescription = "GeoTreasure icon",
+            modifier = Modifier.size(48.dp)
+        )
+    }
+}
+
+@Composable
+private fun GpsCameraLockButtons(cameraFollowingGps: MutableState<Boolean>) {
+    if (cameraFollowingGps.value) {
+        IconButton(
+            onClick = { cameraFollowingGps.value = false },
+            modifier = Modifier.padding(end = 10.dp)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.gps_tracking_off),
+                contentDescription = "Unlock Camera",
+                modifier = Modifier.size(48.dp)
+            )
+        }
+    } else {
+        IconButton(
+            onClick = { cameraFollowingGps.value = true },
+            modifier = Modifier.padding(end = 10.dp)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.gps_tracking),
+                contentDescription = "Lock Camera",
+                modifier = Modifier.size(48.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun ActiveTripButton(
+    selectedTripState: MutableState<Trip?>,
+    ongoingTripState: MutableState<Trip?>
+) {
+    IconButton(
+        onClick = { selectedTripState.value = ongoingTripState.value },
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.active_trips),
+            contentDescription = "Active trip",
+            modifier = Modifier.size(48.dp)
+        )
     }
 }
 

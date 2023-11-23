@@ -88,7 +88,7 @@ private fun GpsLine(gpsTripState: MutableState<Trip?>) {
                 color = Color.Cyan,
                 width = 20f,
                 onClick = {
-                    //selectedTripState.value = trip
+                    // Nothing for now.
                 })
 
         }
@@ -107,14 +107,13 @@ private fun CreateNewTrip(
             visible = true,
             width = 20.0f,
             onClick = {
-
                 Toast.makeText(context, "This trip is not saved yet.", Toast.LENGTH_LONG)
                     .show()
             })
     }
 }
 
-// From https://www.boltuix.com/2022/11/add-custom-marker-to-google-maps-in.html
+// Inspired by https://www.boltuix.com/2022/11/add-custom-marker-to-google-maps-in.html
 fun bitmapDescriptorFromVector(
     context: Context,
     vectorResId: Int
