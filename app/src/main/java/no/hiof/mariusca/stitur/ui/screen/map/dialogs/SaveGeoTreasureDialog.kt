@@ -27,7 +27,7 @@ import no.hiof.mariusca.stitur.model.GeoLocation
 import no.hiof.mariusca.stitur.model.GeoTreasure
 import no.hiof.mariusca.stitur.model.MinimalProfile
 import no.hiof.mariusca.stitur.signup.SignUpViewModel
-import no.hiof.mariusca.stitur.ui.screen.GeoTreasureViewModel
+import no.hiof.mariusca.stitur.ui.screen.map.GeoTreasureViewModel
 import no.hiof.mariusca.stitur.ui.screen.ProfileViewModel
 
 @Composable
