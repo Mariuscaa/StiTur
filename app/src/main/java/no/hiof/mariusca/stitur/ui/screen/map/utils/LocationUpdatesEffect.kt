@@ -1,4 +1,4 @@
-package no.hiof.mariusca.stitur.ui.screen.map
+package no.hiof.mariusca.stitur.ui.screen.map.utils
 
 import android.Manifest
 import android.os.Looper

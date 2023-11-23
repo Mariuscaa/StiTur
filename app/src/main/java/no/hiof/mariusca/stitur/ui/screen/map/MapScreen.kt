@@ -39,6 +39,7 @@ import no.hiof.mariusca.stitur.model.GeoTreasure
 import no.hiof.mariusca.stitur.model.Trip
 import no.hiof.mariusca.stitur.ui.screen.map.search.SearchResult
 import no.hiof.mariusca.stitur.ui.screen.map.search.TripsSearchBar
+import no.hiof.mariusca.stitur.ui.screen.map.utils.PermissionBox
 
 @Composable
 fun StiturMapScreen(

@@ -28,6 +28,7 @@ import no.hiof.mariusca.stitur.model.TripHistory
 import no.hiof.mariusca.stitur.ui.screen.map.dialogs.SaveGeoTreasureDialog
 import no.hiof.mariusca.stitur.ui.screen.map.dialogs.SaveTripDialog
 import no.hiof.mariusca.stitur.ui.screen.map.dialogs.ShowGeoTreasureDialog
+import no.hiof.mariusca.stitur.ui.screen.map.utils.LocationUpdatesEffect
 import java.util.concurrent.TimeUnit
 
 @SuppressLint("MissingPermission")
