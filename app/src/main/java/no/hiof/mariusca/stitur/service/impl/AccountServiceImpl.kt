@@ -22,14 +22,20 @@ class AccountServiceImpl @Inject constructor(private val auth: FirebaseAuth) : A
         get() = callbackFlow {
             val listener =
                 FirebaseAuth.AuthStateListener { auth ->
-                    this.trySend(auth.currentUser?.let { Profile(it.uid, it.isAnonymous) } ?: Profile())
+                    this.trySend(auth.currentUser?.let { Profile(it.uid, it.isAnonymous) }
+                        ?: Profile())
                 }
             auth.addAuthStateListener(listener)
             awaitClose { auth.removeAuthStateListener(listener) }
         }
 
-    override suspend fun authenticate(email: String, password: String, onResult: (Throwable?) -> Unit) {
-        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { onResult(it.exception) }.await()
+    override suspend fun authenticate(
+        email: String,
+        password: String,
+        onResult: (Throwable?) -> Unit
+    ) {
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener { onResult(it.exception) }.await()
     }
 
     // Not in use.
@@ -38,9 +44,14 @@ class AccountServiceImpl @Inject constructor(private val auth: FirebaseAuth) : A
     }
 
     // For linking anonymous accounts with newly registered account. Not in use.
-    override suspend fun linkAccount(email: String, password: String, onResult: (Throwable?) -> Unit) {
+    override suspend fun linkAccount(
+        email: String,
+        password: String,
+        onResult: (Throwable?) -> Unit
+    ) {
         val credential = EmailAuthProvider.getCredential(email, password)
-        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { onResult(it.exception) }.await()
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener { onResult(it.exception) }.await()
     }
 
     override suspend fun signOut() {

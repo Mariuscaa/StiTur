@@ -7,12 +7,10 @@ import dagger.hilt.components.SingletonComponent
 import no.hiof.mariusca.stitur.service.impl.AccountServiceImpl
 import no.hiof.mariusca.stitur.service.impl.GeoTreasureStorageServiceImpl
 import no.hiof.mariusca.stitur.service.impl.LeaderboardsServiceImpl
-import no.hiof.mariusca.stitur.service.impl.TripHistoryStorageServiceImpl
 import no.hiof.mariusca.stitur.service.impl.TripStorageServiceImpl
 import no.hiof.mariusca.stitur.service.impl.UserInfoStorageServiceImpl
 import no.hiof.mariusca.stitur.service.storage.GeoTreasureStorageService
 import no.hiof.mariusca.stitur.service.storage.LeaderboardsService
-import no.hiof.mariusca.stitur.service.storage.TripHistoryStorageService
 import no.hiof.mariusca.stitur.service.storage.TripStorageService
 import no.hiof.mariusca.stitur.service.storage.UserInfoStorageService
 
@@ -30,9 +28,6 @@ abstract class ServiceModule {
 
     @Binds
     abstract fun provideUserStorageService(impl: UserInfoStorageServiceImpl): UserInfoStorageService
-
-    @Binds
-    abstract fun provideTripHistoryStorageService(impl: TripHistoryStorageServiceImpl): TripHistoryStorageService
 
     @Binds
     abstract fun provideLeaderboardsService(impl: LeaderboardsServiceImpl): LeaderboardsService
