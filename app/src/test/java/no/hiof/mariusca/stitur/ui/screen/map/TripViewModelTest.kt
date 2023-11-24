@@ -78,7 +78,7 @@ class TripViewModelTest {
 
 
     @Test
-    fun `deleteTrip_CallsDeleteOnTripStorageService`() = runTest {
+    fun deleteTrip_CallsDeleteOnTripStorageService() = runTest {
         val mockTrip = Trip(uid = "uniqueId", routeName = "Test Route")
 
         viewModel.deleteTrip(mockTrip)
