@@ -182,7 +182,8 @@ private fun LocationRequestHandler(
                     long = currentLocation.longitude.toString()
                 )
 
-                // Checks if the new coordinate is not already in the list
+                // Checks if the new coordinate is not already in the list. Avoids unnecessary
+                // saving of duplicate coordinates.
                 if (!gpsTripState.value?.coordinates.orEmpty().contains(newCoordinate)) {
                     val updatedCoordinates =
                         (gpsTripState.value?.coordinates ?: emptyList()) + newCoordinate
