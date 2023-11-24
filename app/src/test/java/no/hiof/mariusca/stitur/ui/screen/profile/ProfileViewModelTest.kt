@@ -59,7 +59,7 @@ class ProfileViewModelTest {
 
         viewModel.getUserInfo(testUser)
 
-        assert(viewModel.filteredUser.value == Profile()) // Default profile
+        assert(viewModel.filteredUser.value == Profile())
     }
 
     @Test

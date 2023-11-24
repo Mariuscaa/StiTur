@@ -57,18 +57,12 @@ class TripViewModelTest {
             Trip(routeName = "otherTripName", uid = "2")
         )
 
-
         coEvery { tripStorageService.getName("") } returns mockTripList
 
-
         viewModel = TripViewModel(tripStorageService)
-
-
         viewModel.getFilteredTrips(tripName)
 
-
         advanceUntilIdle()
-
 
         assert(viewModel.filteredTrips.size == 1)
         assert(viewModel.filteredTrips.first().routeName == tripName)
