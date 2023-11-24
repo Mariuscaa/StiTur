@@ -51,10 +51,10 @@ class TripViewModelTest {
 
     @Test
     fun getFilteredTrips_WithSpecificName_FiltersTripsCorrectly() = runTest {
-        val tripName = "specificName"
+        val tripName = "tripName"
         val mockTripList = listOf(
             Trip(routeName = tripName, uid = "1"),
-            Trip(routeName = "otherName", uid = "2")
+            Trip(routeName = "otherTripName", uid = "2")
         )
 
 
