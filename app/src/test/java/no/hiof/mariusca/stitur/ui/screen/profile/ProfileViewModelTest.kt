@@ -42,7 +42,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun getUserInfoWhenProfileExists_updatesFilteredUser() = runTest {
+    fun getUserInfo_WithExistingProfile_UpdatesFilteredUser() = runTest {
         val testUser = "testUser"
         val testProfile = Profile(userID = testUser, )
         coEvery { profileInfoStorageService.getProfile(testUser) } returns testProfile
@@ -53,7 +53,7 @@ class ProfileViewModelTest {
         assert(viewModel.filteredUser.value == testProfile)
     }
     @Test
-    fun getUserInfoWhenProfileIsNull_doesNotUpdateFilteredUser() = runTest {
+    fun getUserInfo_WithNullProfile_DoesNotUpdateFilteredUser() = runTest {
         val testUser = "testUser"
         coEvery { profileInfoStorageService.getProfile(testUser) } returns null
 
@@ -63,7 +63,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun createUserInvokesSaveOnStorageService() = runTest {
+    fun createUser_CallsSaveOnProfileStorageService() = runTest {
         val testProfile = Profile(userID = "newUser")
 
         viewModel.createUser(testProfile)
@@ -72,7 +72,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun updateUserInvokesUpdateOnStorageService() = runTest {
+    fun updateUser_CallsUpdateOnProfileStorageService() = runTest {
         val testProfile = Profile(userID = "existingUser")
 
         viewModel.updateUser(testProfile)
@@ -81,7 +81,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun updateUsernameUpdatesUsernameAndRefreshesUserInfo() = runTest {
+    fun updateUsername_ChangesUsernameAndRefreshesUserInfo() = runTest {
         val userId = "user123"
         val newUsername = "newUsername"
         val initialProfile = Profile(userID = userId, username = "oldUsername")
