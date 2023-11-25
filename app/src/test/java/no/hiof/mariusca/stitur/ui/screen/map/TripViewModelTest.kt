@@ -54,11 +54,10 @@ class TripViewModelTest {
         val tripName = "tripName"
         val mockTripList = listOf(
             Trip(routeName = tripName, uid = "1"),
-            Trip(routeName = "otherTripName", uid = "2")
+            Trip(routeName = "other journey", uid = "2")
         )
 
         coEvery { tripStorageService.getName("") } returns mockTripList
-
         viewModel = TripViewModel(tripStorageService)
         viewModel.getFilteredTrips(tripName)
 
