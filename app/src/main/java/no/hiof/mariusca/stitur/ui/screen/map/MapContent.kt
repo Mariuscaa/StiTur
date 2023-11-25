@@ -42,6 +42,7 @@ fun MapContent(
 
     val halden = LatLng(59.1330, 11.3875)
 
+    // Inspired by examples from https://github.com/SimformSolutionsPvtLtd/SSComposeCookBook/tree/main/app/src/main/java/com/jetpack/compose/learning/maps
     GoogleMap(modifier = Modifier.fillMaxSize(),
         properties = MapProperties(isMyLocationEnabled = true),
         cameraPositionState = cameraPosition,

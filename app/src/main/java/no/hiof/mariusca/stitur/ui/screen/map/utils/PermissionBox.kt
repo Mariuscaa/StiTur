@@ -51,9 +51,8 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 
 /**
-Greatly inspired by https://github.com/android/platform-samples/blob/main/samples/base/src/main/java/com/example/platform/base/PermissionBox.kt
+Greatly inspired by offical android source: https://github.com/android/platform-samples/blob/main/samples/base/src/main/java/com/example/platform/base/PermissionBox.kt
  */
-
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun PermissionBox(

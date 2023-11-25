@@ -176,6 +176,7 @@ private fun finishTrip(
 ) {
     locationRequest.value = null
 
+    // Sets properties needed for saving trip history addition.
     val tripStartDate = newTripHistoryState.value?.date?.toInstant()
     if (tripStartDate != null) {
         val currentInstant = Instant.now()
@@ -208,11 +209,13 @@ private fun finishTrip(
         newTripHistoryState.value!!.trackedTrip.routeDescription =
             selectedTripState.value?.routeDescription.toString()
 
+        // Connects trip history with current logge in profile.
         val temp: MutableList<TripHistory> = loggedInProfile.value.tripHistory.toMutableList()
         temp.add(newTripHistoryState.value!!)
         loggedInProfile.value.tripHistory = temp.toList()
         profileViewModel.updateUser(loggedInProfile.value)
     }
+    // Resets
     newTripHistoryState.value = null
     ongoingTripState.value = null
     gpsTripState.value = null
