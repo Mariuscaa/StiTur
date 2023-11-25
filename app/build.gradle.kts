@@ -60,6 +60,8 @@ android {
 dependencies {
     implementation("com.google.dagger:hilt-android:2.47")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+    testImplementation("org.testng:testng:6.9.6")
+    testImplementation("org.testng:testng:6.9.6")
     ksp("com.google.dagger:hilt-compiler:2.47")
 
     implementation("com.google.android.gms:play-services-location:21.0.1")
