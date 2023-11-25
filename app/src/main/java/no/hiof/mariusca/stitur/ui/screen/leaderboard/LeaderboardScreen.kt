@@ -42,33 +42,25 @@ import no.hiof.mariusca.stitur.model.Tiers
 
 @Composable
 fun LeaderboardScreen(viewModel: StiturLeaderboardsViewModel) {
-
-    // State - Search bar:
-    var searchQuery by remember{
+    var searchQuery by remember {
         mutableStateOf("")
     }
 
-    var tierState by remember{
+    // Not properly in use yet. Can look at LeaderboardsTierScreen for an idea of what is planned.
+    var tierState by remember {
         mutableStateOf(Tiers.ALL)
     }
 
-    LaunchedEffect(searchQuery, tierState){
+    LaunchedEffect(searchQuery, tierState) {
         viewModel.getLeaderboardEntry(searchQuery.lowercase(), tierState)
     }
 
     val filteredEntries = viewModel.filteredLeaderboards
-
-    // Collect flow of leaderboard entries and determine which list to display based on if query has content
     val leaderboardEntries by viewModel.leaderboardEntries.collectAsState(initial = listOf())
-
-    // Display leaderboard entries sorted by total points in descending order:
-    val displayEntries = if(searchQuery.isBlank()) leaderboardEntries.sortedByDescending { it.personalRanking.totalPoints }
-    else filteredEntries
-
-
+    val displayEntries =
+        if (searchQuery.isBlank()) leaderboardEntries.sortedByDescending { it.personalRanking.totalPoints }
+        else filteredEntries
     val customBackgroundColor = Color(0xFF133c07)
-
-
 
     Column(
         modifier = Modifier
@@ -79,20 +71,16 @@ fun LeaderboardScreen(viewModel: StiturLeaderboardsViewModel) {
     ) {
         TitleHeader()
         Spacer(modifier = Modifier.height(40.dp))
-        SearchBar(searchQuery){
-                newQuery -> searchQuery = newQuery }
+        SearchBar(searchQuery) { newQuery -> searchQuery = newQuery }
         Spacer(modifier = Modifier.height(40.dp))
-
         LeaderboardEntryDataList(leaderboardEntries = displayEntries)
     }
 }
 
 @Composable
-fun LeaderboardEntryDataList(leaderboardEntries: List<LeaderboardEntry>){
-
-    LazyColumn(modifier = Modifier
-        .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
+fun LeaderboardEntryDataList(leaderboardEntries: List<LeaderboardEntry>) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
         items(leaderboardEntries) { leaderboardEntry ->
@@ -102,12 +90,11 @@ fun LeaderboardEntryDataList(leaderboardEntries: List<LeaderboardEntry>){
 }
 
 @Composable
-fun TitleHeader(){
-
+fun TitleHeader() {
     Spacer(modifier = Modifier.height(70.dp))
     Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally) {
+        verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally
+    ) {
 
         Icon(
             Icons.Filled.List,
@@ -118,60 +105,58 @@ fun TitleHeader(){
                 .height(35.dp)
         )
 
-        Text(text = "Leaderboard",
-            style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold,
-                color = Color.White
+        Text(
+            text = "Leaderboard", style = MaterialTheme.typography.headlineSmall.copy(
+                fontWeight = FontWeight.Bold, color = Color.White
             )
         )
     }
 }
 
 @Composable
-fun SearchBar(query: String, onQueryChanged: (String) -> Unit){
+fun SearchBar(query: String, onQueryChanged: (String) -> Unit) {
     var text by remember {
         mutableStateOf(query)
     }
-
     TextField(
         value = text,
         onValueChange = {
             text = it
             onQueryChanged(it)
         },
-        label = {Text("Search for profiles!")},
-        leadingIcon = {Icon(Icons.Filled.Search, contentDescription = null)},
+        label = { Text("Search for profiles!") },
+        leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
         modifier = Modifier.width(250.dp)
     )
 }
 
 
 @Composable
-fun LeaderboardUserCard(leaderboardEntry: LeaderboardEntry){
-
+fun LeaderboardUserCard(leaderboardEntry: LeaderboardEntry) {
     val userName = leaderboardEntry.username
     val userTotalPoints = leaderboardEntry.personalRanking.totalPoints
-
-    Row(verticalAlignment = Alignment.CenterVertically,
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .padding(all = 6.dp)
             .clip(RoundedCornerShape(4.dp))
             .background(MaterialTheme.colorScheme.surface)
             .padding(16.dp)
             .width(250.dp)
-    )
-    {
+    ) {
         Image(
             painter = painterResource(id = R.drawable.user_icon_woman),
             contentDescription = null,
             modifier = Modifier.padding(end = 10.dp)
         )
 
-        Text(text = userName,
+        Text(
+            text = userName,
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
             modifier = Modifier.padding(end = 10.dp)
         )
 
-        Image( // Fix this: Icon placement in relation to input name. Swap with tier icon?
+        Image(
             painter = painterResource(id = R.drawable.group_icon_score),
             contentDescription = null,
             modifier = Modifier.padding(end = 10.dp)
@@ -179,12 +164,15 @@ fun LeaderboardUserCard(leaderboardEntry: LeaderboardEntry){
 
         Column(
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally){
-            Text(text = "Total points:",
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Total points:",
                 style = MaterialTheme.typography.bodySmall.copy(fontSize = 7.sp)
             )
 
-            Text(text = "$userTotalPoints",
+            Text(
+                text = "$userTotalPoints",
                 style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold)
             )
         }
