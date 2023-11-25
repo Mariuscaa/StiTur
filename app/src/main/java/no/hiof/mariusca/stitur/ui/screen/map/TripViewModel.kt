@@ -26,17 +26,17 @@ class TripViewModel @Inject constructor(private val tripStorageService: TripStor
             tripStorageService.save(trip)
         }
     }
-
     fun getFilteredTrips(tripName: String) {
         viewModelScope.launch {
             filteredTrips.clear()
 
             allTrips.forEach { trip ->
-                if (trip.routeName.lowercase().contains(tripName))
+                if (trip.routeName.lowercase().contains(tripName.lowercase()))
                     filteredTrips.add(trip)
             }
         }
     }
+
 
     fun deleteTrip(trip: Trip) {
         viewModelScope.launch {
