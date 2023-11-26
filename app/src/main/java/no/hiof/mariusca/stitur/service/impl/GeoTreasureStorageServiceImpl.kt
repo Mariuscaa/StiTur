@@ -1,5 +1,6 @@
 package no.hiof.mariusca.stitur.service.impl
 
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.dataObjects
 import com.google.firebase.firestore.ktx.toObject
@@ -18,7 +19,7 @@ constructor(private val firestore: FirebaseFirestore) : GeoTreasureStorageServic
 
     override suspend fun delete(treasure: GeoTreasure) {
         // Connected with profiles so it also deleted from profile.
-        val profile = firestore.collection("UserInfo")
+        val profile = firestore.collection("Profile")
             .document(treasure.madeBy.userID).get().await().toObject<Profile>()
         val temp = profile?.geoTreasures?.toMutableList()
         temp?.removeIf { it.title == treasure.title }
@@ -29,7 +30,7 @@ constructor(private val firestore: FirebaseFirestore) : GeoTreasureStorageServic
             }
         }
         if (profile != null) {
-            firestore.collection("UserInfo").document(treasure.madeBy.userID).set(profile)
+            firestore.collection("Profile").document(treasure.madeBy.userID).set(profile)
                 .await()
         }
 
@@ -38,10 +39,14 @@ constructor(private val firestore: FirebaseFirestore) : GeoTreasureStorageServic
 
     override suspend fun save(treasure: GeoTreasure): String {
         // Connected with profiles so it also saves to profile.
-        val profile = firestore.collection("UserInfo")
+        val profile = firestore.collection("Profile")
             .document(treasure.madeBy.userID).get().await().toObject<Profile>()
+
+        Log.v("ProfileStatus", "Made by ${treasure.madeBy.userID} Resulted in: ${profile.toString()}")
+
         val temp = profile?.geoTreasures?.toMutableList()
         temp?.add(treasure)
+
 
         if (profile != null) {
             if (temp != null) {
@@ -49,7 +54,8 @@ constructor(private val firestore: FirebaseFirestore) : GeoTreasureStorageServic
             }
         }
         if (profile != null) {
-            firestore.collection("UserInfo").document(treasure.madeBy.userID).set(profile)
+            Log.v("UpdateProfile", "Saving updated profile.")
+            firestore.collection("Profile").document(treasure.madeBy.userID).set(profile)
                 .await()
         }
         return firestore.collection(TREASURE_INFO_COLLECTION).add(treasure).await().id
