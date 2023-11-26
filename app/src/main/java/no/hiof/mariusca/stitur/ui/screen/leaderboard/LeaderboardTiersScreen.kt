@@ -36,20 +36,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import no.hiof.mariusca.stitur.R
 
+// Sadly did not get enough time to implement this properly. Can be viewed in design preview, but
+// not in app.
 @Composable
-fun LeaderboardTierScreen(){
-
+fun LeaderboardTierScreen() {
     val customBackgroundColor = Color(0xFF133c07)
-
-    // Main column containing all composables
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(customBackgroundColor),
         verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally){
-
-        //Inserting composables
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         LeaderboardTiersTitleHeader()
         Spacer(modifier = Modifier.height(40.dp))
         LeaderboardTierIcons()
@@ -58,14 +56,12 @@ fun LeaderboardTierScreen(){
 }
 
 @Composable
-fun LeaderboardTierLists(){
+fun LeaderboardTierLists() {
     Spacer(modifier = Modifier.height(20.dp))
 }
 
 @Composable
-fun LeaderboardTiersTitleHeader(){
-
-    // Title Header containing icon and the page title
+fun LeaderboardTiersTitleHeader() {
     Icon(
         Icons.Filled.List,
         contentDescription = null,
@@ -75,27 +71,29 @@ fun LeaderboardTiersTitleHeader(){
             .height(35.dp)
     )
 
-    Text(text="Leaderboard Tiers ",
-        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold,
-            color = Color.White
+    Text(
+        text = "Leaderboard Tiers ", style = MaterialTheme.typography.headlineSmall.copy(
+            fontWeight = FontWeight.Bold, color = Color.White
         )
     )
 
-    Text(text="Weekly",
-        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold, color = Color.White)
+    Text(
+        text = "Weekly", style = MaterialTheme.typography.bodyMedium.copy(
+            fontWeight = FontWeight.Bold, color = Color.White
+        )
     )
 }
 
 @Composable
-fun TestUserList(){
-    LazyColumn{
-        item{
+fun TestUserList() {
+    LazyColumn {
+        item {
             LeaderboardTierUserCard()
         }
-        item{
+        item {
             DummyUserCard()
         }
-        item{
+        item {
             AnotherDummyUserCard()
         }
     }
@@ -103,75 +101,83 @@ fun TestUserList(){
 
 @Composable
 fun LeaderboardTierIcons() {
-
-    // State of selected icons and onClick function
     var selectedIcon by remember { mutableStateOf<String?>(null) }
     val onIconClick = { iconTitle: String ->
         selectedIcon = if (selectedIcon == iconTitle) null else iconTitle
     }
 
     Spacer(modifier = Modifier.height(25.dp))
-
-    // Row of clickable tier level icons
     Row(
         horizontalArrangement = Arrangement.spacedBy(20.dp),
         modifier = Modifier.padding(horizontal = 20.dp)
     ) {
-        LeaderboardTierIcon(imageResId = R.drawable.leaderboard_tier_silver, title = "Silver", isSelected = selectedIcon == "Silver", onClick = onIconClick)
-        LeaderboardTierIcon(imageResId = R.drawable.leaderboard_tier_gold, title = "Gold", isSelected = selectedIcon == "Gold", onClick = onIconClick)
-        LeaderboardTierIcon(imageResId = R.drawable.leaderboard_tier_diamond, title = "Diamond", isSelected = selectedIcon == "Diamond", onClick = onIconClick)
-        LeaderboardTierIcon(imageResId = R.drawable.leaderboard_tier_platinum, title = "Platinum", isSelected = selectedIcon == "Platinum", onClick = onIconClick)
+        LeaderboardTierIcon(
+            imageResId = R.drawable.leaderboard_tier_silver,
+            title = "Silver",
+            isSelected = selectedIcon == "Silver",
+            onClick = onIconClick
+        )
+        LeaderboardTierIcon(
+            imageResId = R.drawable.leaderboard_tier_gold,
+            title = "Gold",
+            isSelected = selectedIcon == "Gold",
+            onClick = onIconClick
+        )
+        LeaderboardTierIcon(
+            imageResId = R.drawable.leaderboard_tier_diamond,
+            title = "Diamond",
+            isSelected = selectedIcon == "Diamond",
+            onClick = onIconClick
+        )
+        LeaderboardTierIcon(
+            imageResId = R.drawable.leaderboard_tier_platinum,
+            title = "Platinum",
+            isSelected = selectedIcon == "Platinum",
+            onClick = onIconClick
+        )
     }
 }
+
 @Composable
-fun LeaderboardTierIcon(@DrawableRes imageResId: Int, title: String, isSelected: Boolean, onClick: (String) -> Unit)
-{
-    // Value: Icon size for selected and unselected icons
+fun LeaderboardTierIcon(
+    @DrawableRes imageResId: Int, title: String, isSelected: Boolean, onClick: (String) -> Unit
+) {
     val iconSize = if (isSelected) 60.dp else 45.dp
-
-    // The column for icon ond icon title
     Column(horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .clickable{onClick(title)}
-    ) {
-
+        modifier = Modifier.clickable { onClick(title) }) {
         Image(
             painter = painterResource(id = imageResId),
             contentDescription = title,
-            modifier = Modifier
-                .size(iconSize)
+            modifier = Modifier.size(iconSize)
         )
         Text(
             text = title,
             color = Color.White,
-            style = MaterialTheme.typography
-                .bodySmall
-                .copy(fontWeight = FontWeight.Bold)
+            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold)
         )
     }
 }
 
 @Composable
-fun LeaderboardTierUserCard(){
-
+fun LeaderboardTierUserCard() {
     Spacer(modifier = Modifier.height(20.dp))
-
-    Row(verticalAlignment = Alignment.CenterVertically,
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .padding(all = 6.dp)
             .clip(RoundedCornerShape(4.dp))
             .background(MaterialTheme.colorScheme.surface)
             .padding(16.dp)
             .width(250.dp)
-    )
-    {
+    ) {
         Image(
             painter = painterResource(id = R.drawable.user_icon_woman),
             contentDescription = null,
             modifier = Modifier.padding(end = 10.dp)
         )
 
-        Text(text = "Test User", //Insert user name here
+        Text(
+            text = "Test User", //Insert user name here
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
             modifier = Modifier.padding(end = 10.dp)
         )
@@ -183,44 +189,45 @@ fun LeaderboardTierUserCard(){
                 .padding(end = 10.dp)
                 .size(25.dp, 25.dp)
         )
-
         Column(
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally){
-            Text(text = "Weekly score:",
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Weekly score:",
                 style = MaterialTheme.typography.bodySmall.copy(fontSize = 7.sp)
             )
 
-            val dummyValue: Int = 2560
-            Text(text = "$dummyValue Points", //Insert personalRanking.weeklyPoints here
+            val dummyValue = 2560
+            Text(
+                text = "$dummyValue Points", //Insert personalRanking.weeklyPoints here
                 style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold)
             )
         }
     }
 }
 
-//Dummy user cards
 @Composable
-fun DummyUserCard(){
-
+fun DummyUserCard() {
     Spacer(modifier = Modifier.height(20.dp))
 
-    Row(verticalAlignment = Alignment.CenterVertically,
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .padding(all = 6.dp)
             .clip(RoundedCornerShape(4.dp))
             .background(MaterialTheme.colorScheme.surface)
             .padding(16.dp)
             .width(250.dp)
-    )
-    {
+    ) {
         Image(
             painter = painterResource(id = R.drawable.user_icon_woman),
             contentDescription = null,
             modifier = Modifier.padding(end = 10.dp)
         )
 
-        Text(text = "Test User 2", //Insert user name here
+        Text(
+            text = "Test User 2", //Insert user name here
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
             modifier = Modifier.padding(end = 10.dp)
         )
@@ -235,39 +242,42 @@ fun DummyUserCard(){
 
         Column(
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally){
-            Text(text = "Weekly score:",
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Weekly score:",
                 style = MaterialTheme.typography.bodySmall.copy(fontSize = 7.sp)
             )
 
-            val dummyValue: Int = 2900
-            Text(text = "$dummyValue Points", //Insert personalRanking.weeklyPoints here
+            val dummyValue = 2900
+            Text(
+                text = "$dummyValue Points", //Insert personalRanking.weeklyPoints here
                 style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold)
             )
         }
     }
 }
+
 @Composable
-fun AnotherDummyUserCard(){
-
+fun AnotherDummyUserCard() {
     Spacer(modifier = Modifier.height(20.dp))
-
-    Row(verticalAlignment = Alignment.CenterVertically,
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .padding(all = 6.dp)
             .clip(RoundedCornerShape(4.dp))
             .background(MaterialTheme.colorScheme.surface)
             .padding(16.dp)
             .width(250.dp)
-    )
-    {
+    ) {
         Image(
             painter = painterResource(id = R.drawable.user_icon_woman),
             contentDescription = null,
             modifier = Modifier.padding(end = 10.dp)
         )
 
-        Text(text = "Test User 3", //Insert user name here
+        Text(
+            text = "Test User 3", //Insert user name here
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
             modifier = Modifier.padding(end = 10.dp)
         )
@@ -282,13 +292,16 @@ fun AnotherDummyUserCard(){
 
         Column(
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally){
-            Text(text = "Weekly score:",
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Weekly score:",
                 style = MaterialTheme.typography.bodySmall.copy(fontSize = 7.sp)
             )
 
-            val dummyValue: Int = 2950
-            Text(text = "$dummyValue Points", //Insert personalRanking.weeklyPoints here
+            val dummyValue = 2950
+            Text(
+                text = "$dummyValue Points", //Insert personalRanking.weeklyPoints here
                 style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold)
             )
         }

@@ -38,11 +38,7 @@ class StiturLeaderboardsViewModel @Inject constructor(private val leaderboardsSe
         }
     }
 
-    // Flow of leaderboard entries to be observed by UI
     val leaderboardEntries: Flow<List<LeaderboardEntry>> = leaderboardsService.leaderboardEntries
-
-    // SEARCH BAR FUNCTIONALITY
-    val leaderboards = leaderboardsService.leaderboardEntries
     val filteredLeaderboards = mutableListOf<LeaderboardEntry>()
     val allLeaderboards = mutableListOf<LeaderboardEntry>()
 
@@ -52,31 +48,32 @@ class StiturLeaderboardsViewModel @Inject constructor(private val leaderboardsSe
         }
     }
 
+    // Prepared to add Tiers functionality here, but did not get that far in frontend.
     fun getLeaderboardEntry(leaderboardEntryUser: String?, tier: Tiers?) {
         viewModelScope.launch {
             filteredLeaderboards.clear()
 
             if (tier != null && tier != Tiers.ALL) {
                 allLeaderboards.forEach { leaderboardEntry ->
-                    if (leaderboardEntry.personalRanking.tier == tier)
-                        filteredLeaderboards.add(leaderboardEntry)
+                    if (leaderboardEntry.personalRanking.tier == tier) filteredLeaderboards.add(
+                        leaderboardEntry
+                    )
                 }
-
                 if (!leaderboardEntryUser.isNullOrEmpty()) {
                     filteredLeaderboards.forEach { leaderboardEntry ->
-                        if (!leaderboardEntry.username.lowercase().contains(leaderboardEntryUser))
-                            filteredLeaderboards.remove(leaderboardEntry)
+                        if (!leaderboardEntry.username.lowercase()
+                                .contains(leaderboardEntryUser)
+                        ) filteredLeaderboards.remove(leaderboardEntry)
                     }
                 }
             } else if (!leaderboardEntryUser.isNullOrEmpty()) {
                 allLeaderboards.forEach { leaderboardEntry ->
-                    if (leaderboardEntry.username.lowercase().contains(leaderboardEntryUser))
-                        filteredLeaderboards.add(leaderboardEntry)
+                    if (leaderboardEntry.username.lowercase()
+                            .contains(leaderboardEntryUser)
+                    ) filteredLeaderboards.add(leaderboardEntry)
                 }
             }
-
         }
-
         filteredLeaderboards.sortByDescending { it.personalRanking.totalPoints }
     }
 
@@ -85,6 +82,4 @@ class StiturLeaderboardsViewModel @Inject constructor(private val leaderboardsSe
             leaderboardsService.update(leaderboardEntry)
         }
     }
-
-
 }
